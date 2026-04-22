@@ -120,7 +120,7 @@ const AppContent = () => {
             Your Vercel deployment is missing the **Supabase URL** and **Anon Key**.
           </p>
           <div className="bg-white/5 p-4 rounded-xl text-left text-[10px] font-mono space-y-2 mb-6">
-            <p>1. Go to Vercel -> Settings -> Env Variables</p>
+            <p>1. Go to Vercel → Settings → Env Variables</p>
             <p>2. Add **VITE_SUPABASE_URL**</p>
             <p>3. Add **VITE_SUPABASE_ANON_KEY**</p>
             <p>4. Redeploy your app</p>
