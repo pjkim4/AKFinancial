@@ -120,16 +120,21 @@ const AppContent = () => {
             Your Vercel deployment is missing the **Supabase URL** and **Anon Key**.
           </p>
           <div className="bg-white/5 p-4 rounded-xl text-left text-[10px] font-mono space-y-2 mb-6">
-            <p>1. Go to Vercel Settings then Environment Variables</p>
-            <p>2. Add VITE_SUPABASE_URL</p>
-            <p>3. Add VITE_SUPABASE_ANON_KEY</p>
-            <p>4. Redeploy your app</p>
+            <p className={import.meta.env.VITE_SUPABASE_URL ? "text-success" : "text-danger"}>
+              {import.meta.env.VITE_SUPABASE_URL ? "✓ URL Found" : "✗ VITE_SUPABASE_URL Missing"}
+            </p>
+            <p className={import.meta.env.VITE_SUPABASE_ANON_KEY ? "text-success" : "text-danger"}>
+              {import.meta.env.VITE_SUPABASE_ANON_KEY ? "✓ Key Found" : "✗ VITE_SUPABASE_ANON_KEY Missing"}
+            </p>
           </div>
+          <p className="text-[10px] text-text-muted mb-6">
+            Make sure to <b>Redeploy</b> in Vercel after adding these!
+          </p>
           <button 
             onClick={() => window.location.reload()}
             className="w-full py-4 bg-primary text-background font-black rounded-2xl hover:scale-[1.02] transition-all"
           >
-            I have Added Them, Reload
+            Check Again
           </button>
         </div>
       </div>
