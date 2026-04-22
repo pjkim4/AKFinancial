@@ -123,16 +123,23 @@ export const FinanceProvider = ({ children }) => {
 
   const fetchPendingInvitations = async () => {
     try {
-      const userEmail = user.email.toLowerCase();
-      console.log('Fetching invites for:', userEmail);
+      const userEmail = user.email.toLowerCase().trim();
+      console.log('DEBUG: Searching for invites for:', userEmail);
+      
       const { data, error } = await supabase
         .from('household_invitations')
-        .select('*, profiles!household_id(username)')
+        .select('*')
         .eq('invitee_email', userEmail)
         .eq('status', 'pending');
       
-      console.log('Found invites:', data?.length || 0);
       if (error) {
+        console.error('DATABASE ERROR:', error.code, error.message);
+        return;
+      }
+      
+      console.log('DEBUG: Raw invites found:', data);
+      setPendingInvitations(data || []);
+    } catch (err) {
         if (error.code === '42P01') return;
         throw error;
       }
