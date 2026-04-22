@@ -128,6 +128,28 @@ const AdminSettings = () => {
           </div>
         )}
 
+        {/* JOINED HOUSEHOLDS / SWITCHER */}
+        <div className="mt-6 pt-4 border-t border-white/20">
+          <p className="text-[10px] text-white font-black uppercase mb-3 text-center">
+            Your Accounts (Switch Below):
+          </p>
+          <div className="space-y-2">
+            {availableHouseholds.map(hh => (
+              <button 
+                key={hh.id}
+                onClick={() => {
+                  setCurrentHouseholdId(hh.id);
+                  window.scrollTo(0,0);
+                }}
+                className={`w-full p-4 rounded-xl text-xs font-bold flex justify-between items-center transition-all ${currentHouseholdId === hh.id ? 'bg-success text-black border-2 border-white' : 'bg-white/10 text-white hover:bg-white/20'}`}
+              >
+                <span>{hh.name}</span>
+                {currentHouseholdId === hh.id ? <Check size={16} /> : <Zap size={16} className="opacity-30" />}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <button 
           onClick={() => window.location.reload()}
           className="w-full mt-6 py-5 bg-white text-black font-black rounded-2xl text-[10px] uppercase tracking-[0.2em] shadow-xl active:scale-95 transition-all"

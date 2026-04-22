@@ -398,7 +398,7 @@ const AppContent = () => {
                     <select 
                       value={currentHouseholdId}
                       onChange={(e) => setCurrentHouseholdId(e.target.value)}
-                      className="bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full border-none focus:ring-0 appearance-none cursor-pointer"
+                      className="bg-primary text-black text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl border-2 border-white shadow-lg focus:ring-0 appearance-none cursor-pointer"
                     >
                       {availableHouseholds.map(hh => (
                         <option key={hh.id} value={hh.id} className="bg-card text-text">
