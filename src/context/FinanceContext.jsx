@@ -111,7 +111,7 @@ export const FinanceProvider = ({ children }) => {
         myHousehold,
         ...(data?.map(h => ({
           id: h.household_id,
-          name: h.profiles?.username ? `${h.profiles.username}'s Household` : `Household #${h.household_id.slice(0, 4)}`,
+          name: h.profiles?.username ? `${h.profiles.username}'s Household` : `Household #${h.household_id?.slice(0, 4) || '??'}`,
           role: 'Member'
         })) || [])
       ];

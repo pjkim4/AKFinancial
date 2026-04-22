@@ -116,7 +116,7 @@ const AdminSettings = () => {
                 onClick={() => respondToInvitation(inv.id, 'accepted')}
                 className="w-full p-3 bg-success text-black font-black rounded-xl text-xs flex justify-between items-center hover:scale-[1.02] transition-all"
               >
-                <span>Join Household #{inv.household_id?.slice(0, 5)}...</span>
+                <span>Join Household #{inv.household_id?.slice(0, 5) || '??'}...</span>
                 <Check size={16} />
               </button>
             ))}
