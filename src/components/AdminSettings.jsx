@@ -6,7 +6,7 @@ const AdminSettings = () => {
   const { 
     user, profile, updateProfile, updatePassword, 
     householdMembers, addHouseholdMember, deleteHouseholdMember,
-    inviteMember, currentHouseholdId, pendingInvitations, respondToInvitation
+    inviteMember, currentHouseholdId, pendingInvitations, respondToInvitation, availableHouseholds
   } = useFinance();
   
   const [isAddingMember, setIsAddingMember] = useState(false);
