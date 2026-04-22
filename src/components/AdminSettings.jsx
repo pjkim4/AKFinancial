@@ -101,9 +101,27 @@ const AdminSettings = () => {
             <p className="text-lg font-black font-mono text-danger">{pendingInvitations.length}</p>
           </div>
         </div>
+
+        {/* INSTANT ACCEPT BUTTONS */}
+        {pendingInvitations.length > 0 && (
+          <div className="mt-4 space-y-2">
+            <p className="text-[10px] text-white font-bold uppercase mb-2">Pending Invites - Click to Join:</p>
+            {pendingInvitations.map(inv => (
+              <button 
+                key={inv.id}
+                onClick={() => respondToInvitation(inv.id, 'accepted')}
+                className="w-full p-3 bg-success text-black font-black rounded-xl text-xs flex justify-between items-center hover:scale-[1.02] transition-all"
+              >
+                <span>Join Household #{inv.household_id?.slice(0, 5)}...</span>
+                <Check size={16} />
+              </button>
+            ))}
+          </div>
+        )}
+
         <button 
           onClick={() => window.location.reload()}
-          className="w-full mt-4 py-3 bg-danger text-white font-bold rounded-xl text-xs"
+          className="w-full mt-4 py-3 bg-danger/20 text-white font-bold rounded-xl text-[10px] border border-danger/40"
         >
           FORCE DATA REFRESH
         </button>
