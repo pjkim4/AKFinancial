@@ -123,12 +123,15 @@ export const FinanceProvider = ({ children }) => {
 
   const fetchPendingInvitations = async () => {
     try {
+      const userEmail = user.email.toLowerCase();
+      console.log('Fetching invites for:', userEmail);
       const { data, error } = await supabase
         .from('household_invitations')
         .select('*, profiles!household_id(username)')
-        .eq('invitee_email', user.email)
+        .eq('invitee_email', userEmail)
         .eq('status', 'pending');
       
+      console.log('Found invites:', data?.length || 0);
       if (error) {
         if (error.code === '42P01') return;
         throw error;
@@ -969,12 +972,14 @@ export const FinanceProvider = ({ children }) => {
 
   const inviteMember = async (email, householdId) => {
     try {
+      const trimmedEmail = email.trim().toLowerCase();
+      console.log('Inviting:', trimmedEmail, 'to household:', householdId);
       const { data, error } = await supabase
         .from('household_invitations')
         .insert([{ 
           household_id: householdId,
           inviter_id: user.id,
-          invitee_email: email,
+          invitee_email: trimmedEmail,
           status: 'pending'
         }])
         .select();
