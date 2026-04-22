@@ -337,6 +337,25 @@ const AdminSettings = () => {
             </div>
           )}
         </div>
+        <div className="mt-12 pt-8 border-t border-white/5 opacity-50">
+          <p className="text-[8px] text-text-muted uppercase tracking-[0.3em] mb-4 text-center">Troubleshooting Data</p>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-white/5 p-3 rounded-xl">
+              <p className="text-[8px] text-text-muted mb-1 uppercase">Logged In As</p>
+              <p className="text-[10px] font-mono truncate">{user?.email}</p>
+            </div>
+            <div className="bg-white/5 p-3 rounded-xl">
+              <p className="text-[8px] text-text-muted mb-1 uppercase">Invites Found</p>
+              <p className="text-[10px] font-mono">{pendingInvitations.length}</p>
+            </div>
+          </div>
+          <button 
+            onClick={() => window.location.reload()}
+            className="w-full mt-4 py-2 text-[10px] text-primary border border-primary/20 rounded-xl hover:bg-primary/5"
+          >
+            Force App Reload
+          </button>
+        </div>
       </div>
 
       <div className="card glass bg-white/5 border-white/10">
