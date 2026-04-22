@@ -140,11 +140,6 @@ export const FinanceProvider = ({ children }) => {
       console.log('DEBUG: Raw invites found:', data);
       setPendingInvitations(data || []);
     } catch (err) {
-        if (error.code === '42P01') return;
-        throw error;
-      }
-      setPendingInvitations(data || []);
-    } catch (err) {
       console.error('Error fetching pending invites:', err.message);
     }
   };
