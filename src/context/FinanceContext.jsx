@@ -111,7 +111,7 @@ export const FinanceProvider = ({ children }) => {
         myHousehold,
         ...(data?.map(h => ({
           id: h.household_id,
-          name: h.profiles?.username ? `${h.profiles.username}'s Household` : 'Shared Account',
+          name: h.profiles?.username ? `${h.profiles.username}'s Household` : `Household #${h.household_id.slice(0, 4)}`,
           role: 'Member'
         })) || [])
       ];
@@ -490,7 +490,7 @@ export const FinanceProvider = ({ children }) => {
         type: 'Income',
         description: `Transfer from ${fromAcc.name}`,
         account_id: toId,
-        category: 'Transfer',
+        category: 'Income',
         date: new Date().toISOString().split('T')[0]
       });
       if (result2.error) throw result2.error;

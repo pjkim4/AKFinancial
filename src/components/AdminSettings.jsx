@@ -91,14 +91,18 @@ const AdminSettings = () => {
       {/* EMERGENCY TROUBLESHOOTING BOX - MOVED TO TOP */}
       <div className="p-4 bg-danger/10 border-2 border-danger rounded-2xl animate-pulse-slow">
         <p className="text-[10px] text-danger font-black uppercase tracking-widest mb-3 text-center">Diagnostic Mode Active</p>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-black/20 p-3 rounded-xl border border-danger/20">
-            <p className="text-[8px] text-text-muted mb-1 uppercase">Logged In As</p>
-            <p className="text-[10px] font-mono truncate text-white">{user?.email}</p>
+        <div className="grid grid-cols-3 gap-2">
+          <div className="bg-black/20 p-2 rounded-xl border border-danger/20">
+            <p className="text-[7px] text-text-muted mb-1 uppercase">User</p>
+            <p className="text-[9px] font-mono truncate text-white">{user?.email?.split('@')[0]}</p>
           </div>
-          <div className="bg-black/20 p-3 rounded-xl border border-danger/20">
-            <p className="text-[8px] text-text-muted mb-1 uppercase">Invites Found</p>
-            <p className="text-lg font-black font-mono text-danger">{pendingInvitations.length}</p>
+          <div className="bg-black/20 p-2 rounded-xl border border-danger/20">
+            <p className="text-[7px] text-text-muted mb-1 uppercase">Pending</p>
+            <p className="text-md font-black font-mono text-danger">{pendingInvitations.length}</p>
+          </div>
+          <div className="bg-black/20 p-2 rounded-xl border border-danger/20">
+            <p className="text-[7px] text-text-muted mb-1 uppercase">Joined</p>
+            <p className="text-md font-black font-mono text-success">{availableHouseholds.length}</p>
           </div>
         </div>
 
