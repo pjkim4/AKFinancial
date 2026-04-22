@@ -288,7 +288,7 @@ const AdminSettings = () => {
             {pendingInvitations.map(inv => (
               <div key={inv.id} className="p-5 bg-primary/5 border border-primary/20 rounded-2xl flex items-center justify-between animate-pulse-slow">
                 <div>
-                  <p className="text-sm font-bold">Invite to: {inv.households?.name || 'Shared Account'}</p>
+                  <p className="text-sm font-bold">Invite from: {inv.profiles?.username || 'Shared Household'}</p>
                   <p className="text-[9px] text-text-muted uppercase tracking-tighter">Status: Waiting for you</p>
                 </div>
                 <div className="flex gap-2">

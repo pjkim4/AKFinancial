@@ -95,7 +95,7 @@ export const FinanceProvider = ({ children }) => {
       // 2. Fetch shared households (requires invitations table)
       const { data, error } = await supabase
         .from('household_invitations')
-        .select('household_id, households(name)')
+        .select('household_id, profiles!household_id(username)')
         .eq('invitee_email', user.email)
         .eq('status', 'accepted');
       
@@ -107,12 +107,15 @@ export const FinanceProvider = ({ children }) => {
         throw error;
       }
 
-      const shared = data.map(inv => ({ 
-        id: inv.household_id, 
-        name: inv.households?.name || 'Shared Account', 
-        role: 'Member' 
-      }));
-      setAvailableHouseholds([myHousehold, ...shared]);
+      const formattedHouseholds = [
+        myHousehold,
+        ...(data?.map(h => ({
+          id: h.household_id,
+          name: h.profiles?.username ? `${h.profiles.username}'s Household` : 'Shared Account',
+          role: 'Member'
+        })) || [])
+      ];
+      setAvailableHouseholds(formattedHouseholds);
     } catch (err) {
       console.error('Error fetching households:', err.message);
     }
@@ -122,7 +125,7 @@ export const FinanceProvider = ({ children }) => {
     try {
       const { data, error } = await supabase
         .from('household_invitations')
-        .select('*, households(name)')
+        .select('*, profiles!household_id(username)')
         .eq('invitee_email', user.email)
         .eq('status', 'pending');
       
