@@ -140,6 +140,7 @@ export const FinanceProvider = ({ children }) => {
       console.log('DEBUG: Raw invites found:', data);
       setPendingInvitations(data || []);
     } catch (err) {
+      if (err.code === '42P01') return;
       console.error('Error fetching pending invites:', err.message);
     }
   };
@@ -178,8 +179,8 @@ export const FinanceProvider = ({ children }) => {
         throw error;
       }
       setHouseholdMembers(data || []);
-    } catch (error) {
-      console.error('Error fetching members:', error.message);
+    } catch (err) {
+      console.error('Error fetching members:', err.message);
     }
   };
 

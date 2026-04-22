@@ -109,34 +109,30 @@ const AdminSettings = () => {
         {/* INSTANT ACCEPT BUTTONS */}
         {pendingInvitations.length > 0 && (
           <div className="mt-4 space-y-3">
-            <p className="text-[10px] text-white font-black uppercase mb-2 border-b border-white/20 pb-2">
-              Action Required: Join Households Below
+            <p className="text-[10px] text-white font-black uppercase mb-2 border-b border-white/20 pb-2 text-center">
+              Tap Green Button to Join:
             </p>
             {pendingInvitations.map(inv => (
               <button 
                 key={inv.id}
                 onClick={() => respondToInvitation(inv.id, 'accepted')}
-                className="w-full p-5 bg-[#007aff] text-white font-black rounded-2xl text-sm flex justify-between items-center shadow-2xl animate-bounce-subtle"
+                className="w-full p-6 bg-[#c1ff72] text-black font-black rounded-2xl text-sm flex justify-between items-center shadow-[0_0_20px_rgba(193,255,114,0.3)] active:scale-95 transition-all"
               >
                 <div className="text-left">
-                  <span className="block">JOIN SHARED HOUSEHOLD</span>
-                  <span className="text-[9px] opacity-70 font-mono">ID: {inv.household_id || 'Missing ID'}</span>
+                  <span className="block text-xs uppercase tracking-tighter">JOIN SHARED HOUSEHOLD</span>
+                  <span className="text-[8px] opacity-50 font-mono">ID: {inv.household_id?.slice(0, 8) || '??'}...</span>
                 </div>
-                <Check size={24} />
+                <Check size={24} strokeWidth={3} />
               </button>
             ))}
           </div>
         )}
 
-        <div className="mt-4 text-[7px] font-mono text-white/30 truncate">
-          RAW: {JSON.stringify(pendingInvitations).slice(0, 100)}
-        </div>
-
         <button 
           onClick={() => window.location.reload()}
-          className="w-full mt-4 py-3 bg-danger/20 text-white font-bold rounded-xl text-[10px] border border-danger/40"
+          className="w-full mt-6 py-5 bg-white text-black font-black rounded-2xl text-[10px] uppercase tracking-[0.2em] shadow-xl active:scale-95 transition-all"
         >
-          FORCE DATA REFRESH
+          Force App Refresh
         </button>
       </div>
 
