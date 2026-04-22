@@ -88,6 +88,27 @@ const AdminSettings = () => {
         <p className="text-text-muted">Managed via Supabase Cloud Auth.</p>
       </header>
 
+      {/* EMERGENCY TROUBLESHOOTING BOX - MOVED TO TOP */}
+      <div className="p-4 bg-danger/10 border-2 border-danger rounded-2xl animate-pulse-slow">
+        <p className="text-[10px] text-danger font-black uppercase tracking-widest mb-3 text-center">Diagnostic Mode Active</p>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="bg-black/20 p-3 rounded-xl border border-danger/20">
+            <p className="text-[8px] text-text-muted mb-1 uppercase">Logged In As</p>
+            <p className="text-[10px] font-mono truncate text-white">{user?.email}</p>
+          </div>
+          <div className="bg-black/20 p-3 rounded-xl border border-danger/20">
+            <p className="text-[8px] text-text-muted mb-1 uppercase">Invites Found</p>
+            <p className="text-lg font-black font-mono text-danger">{pendingInvitations.length}</p>
+          </div>
+        </div>
+        <button 
+          onClick={() => window.location.reload()}
+          className="w-full mt-4 py-3 bg-danger text-white font-bold rounded-xl text-xs"
+        >
+          FORCE DATA REFRESH
+        </button>
+      </div>
+
       <div className="card glass border-white/10">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-6">
@@ -336,25 +357,6 @@ const AdminSettings = () => {
               <p className="text-xs text-text-muted font-bold">No extra users added yet.</p>
             </div>
           )}
-        </div>
-        <div className="mt-12 pt-8 border-t border-white/5 opacity-50">
-          <p className="text-[8px] text-text-muted uppercase tracking-[0.3em] mb-4 text-center">Troubleshooting Data</p>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-white/5 p-3 rounded-xl">
-              <p className="text-[8px] text-text-muted mb-1 uppercase">Logged In As</p>
-              <p className="text-[10px] font-mono truncate">{user?.email}</p>
-            </div>
-            <div className="bg-white/5 p-3 rounded-xl">
-              <p className="text-[8px] text-text-muted mb-1 uppercase">Invites Found</p>
-              <p className="text-[10px] font-mono">{pendingInvitations.length}</p>
-            </div>
-          </div>
-          <button 
-            onClick={() => window.location.reload()}
-            className="w-full mt-4 py-2 text-[10px] text-primary border border-primary/20 rounded-xl hover:bg-primary/5"
-          >
-            Force App Reload
-          </button>
         </div>
       </div>
 
