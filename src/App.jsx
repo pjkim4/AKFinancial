@@ -108,6 +108,34 @@ const AppContent = () => {
     }
   };
 
+  if (!supabase) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 text-center">
+        <div className="glass p-8 rounded-3xl border border-danger/20 max-w-md">
+          <div className="w-16 h-16 bg-danger/10 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Settings className="text-danger" size={32} />
+          </div>
+          <h2 className="text-2xl font-black mb-2">Configuration Missing</h2>
+          <p className="text-text-muted text-sm mb-6 leading-relaxed">
+            Your Vercel deployment is missing the **Supabase URL** and **Anon Key**.
+          </p>
+          <div className="bg-white/5 p-4 rounded-xl text-left text-[10px] font-mono space-y-2 mb-6">
+            <p>1. Go to Vercel -> Settings -> Env Variables</p>
+            <p>2. Add **VITE_SUPABASE_URL**</p>
+            <p>3. Add **VITE_SUPABASE_ANON_KEY**</p>
+            <p>4. Redeploy your app</p>
+          </div>
+          <button 
+            onClick={() => window.location.reload()}
+            className="w-full py-4 bg-primary text-background font-black rounded-2xl hover:scale-[1.02] transition-all"
+          >
+            I've Added Them, Reload
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-bg">

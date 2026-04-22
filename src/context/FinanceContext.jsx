@@ -34,6 +34,12 @@ export const FinanceProvider = ({ children }) => {
   }, [preferences]);
 
   useEffect(() => {
+    if (!supabase) {
+      console.error('Supabase client not initialized');
+      setLoading(false);
+      return;
+    }
+
     // Check initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
