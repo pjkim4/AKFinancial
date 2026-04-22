@@ -108,20 +108,29 @@ const AdminSettings = () => {
 
         {/* INSTANT ACCEPT BUTTONS */}
         {pendingInvitations.length > 0 && (
-          <div className="mt-4 space-y-2">
-            <p className="text-[10px] text-white font-bold uppercase mb-2">Pending Invites - Click to Join:</p>
+          <div className="mt-4 space-y-3">
+            <p className="text-[10px] text-white font-black uppercase mb-2 border-b border-white/20 pb-2">
+              Action Required: Join Households Below
+            </p>
             {pendingInvitations.map(inv => (
               <button 
                 key={inv.id}
                 onClick={() => respondToInvitation(inv.id, 'accepted')}
-                className="w-full p-3 bg-success text-black font-black rounded-xl text-xs flex justify-between items-center hover:scale-[1.02] transition-all"
+                className="w-full p-5 bg-[#007aff] text-white font-black rounded-2xl text-sm flex justify-between items-center shadow-2xl animate-bounce-subtle"
               >
-                <span>Join Household #{inv.household_id?.slice(0, 5) || '??'}...</span>
-                <Check size={16} />
+                <div className="text-left">
+                  <span className="block">JOIN SHARED HOUSEHOLD</span>
+                  <span className="text-[9px] opacity-70 font-mono">ID: {inv.household_id || 'Missing ID'}</span>
+                </div>
+                <Check size={24} />
               </button>
             ))}
           </div>
         )}
+
+        <div className="mt-4 text-[7px] font-mono text-white/30 truncate">
+          RAW: {JSON.stringify(pendingInvitations).slice(0, 100)}
+        </div>
 
         <button 
           onClick={() => window.location.reload()}
