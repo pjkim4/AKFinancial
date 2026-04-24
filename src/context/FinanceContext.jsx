@@ -22,7 +22,9 @@ export const FinanceProvider = ({ children }) => {
     return saved || null;
   }); 
   const [loading, setLoading] = useState(true);
+  const [showLogModal, setShowLogModal] = useState(false);
   const [syncError, setSyncError] = useState(null);
+
   
   // Track the current sync request to prevent race conditions
   const syncVersionRef = React.useRef(0);
@@ -1195,8 +1197,11 @@ export const FinanceProvider = ({ children }) => {
       preferences,
       updatePreferences: (newPrefs) => setPreferences(prev => ({ ...prev, ...newPrefs })),
       toggleBalances: () => setPreferences(prev => ({ ...prev, hideBalances: !prev.hideBalances })),
-      syncError
+      syncError,
+      showLogModal,
+      setShowLogModal
     }}>
+
 
 
       {children}

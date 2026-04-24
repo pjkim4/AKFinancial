@@ -38,8 +38,9 @@ const Logo = ({ size = 24 }) => (
 const AppContent = () => {
   const { 
     user, profile, login, signup, logout, loading, sendPasswordResetEmail, updatePassword, 
-    availableHouseholds, currentHouseholdId, setCurrentHouseholdId 
+    showLogModal, setShowLogModal, availableHouseholds, currentHouseholdId, setCurrentHouseholdId 
   } = useFinance();
+
 
 
 
