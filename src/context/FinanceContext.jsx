@@ -17,7 +17,9 @@ export const FinanceProvider = ({ children }) => {
   const [availableHouseholds, setAvailableHouseholds] = useState([]); 
   const [pendingInvitations, setPendingInvitations] = useState([]);
   const [currentHouseholdId, setCurrentHouseholdId] = useState(() => {
-    return localStorage.getItem('finance_current_household_id') || null;
+    const saved = localStorage.getItem('finance_current_household_id');
+    console.log("[WORKSPACE] Initial ID from localStorage:", saved);
+    return saved || null;
   }); 
   const [loading, setLoading] = useState(true);
   const [showLogModal, setShowLogModal] = useState(false);
@@ -82,6 +84,7 @@ export const FinanceProvider = ({ children }) => {
     if (user) {
       // Default to my own account as the first household
       if (!currentHouseholdId) {
+        console.log("[WORKSPACE] No current ID, defaulting to user.id:", user.id);
         setCurrentHouseholdId(user.id);
       }
       fetchProfile();
@@ -301,7 +304,9 @@ export const FinanceProvider = ({ children }) => {
     // Increment version to ignore previous requests
     const currentVersion = ++syncVersionRef.current;
     
+    console.log(`[SYNC] [v${currentVersion}] fetchData(targetId: ${targetId}) - USER: ${user.id}`);
     setLoading(true);
+    console.log(`[SYNC] [v${currentVersion}] Clearing all data state...`);
     clearAllData();
 
     try {
@@ -332,7 +337,7 @@ export const FinanceProvider = ({ children }) => {
 
       setAccounts(accountsRes.data || []);
       setTransactions(transactionsRes.data || []);
-      console.log(`[SYNC] [v${currentVersion}] Data sync complete`);
+      console.log(`[SYNC] [v${currentVersion}] Data received. Accounts: ${accountsRes.data?.length || 0}, Transactions: ${transactionsRes.data?.length || 0}`);
 
     } catch (err) {
       if (currentVersion === syncVersionRef.current) {

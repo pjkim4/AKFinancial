@@ -40,6 +40,9 @@ const AppContent = () => {
     user, profile, login, signup, logout, loading, sendPasswordResetEmail, updatePassword, 
     showLogModal, setShowLogModal, availableHouseholds, currentHouseholdId, setCurrentHouseholdId 
   } = useFinance();
+
+  console.log("[DEBUG] AppContent render - currentHouseholdId:", currentHouseholdId);
+
   const [activeTab, setActiveTab] = useState('dashboard');
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');

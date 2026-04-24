@@ -202,7 +202,11 @@ const Dashboard = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 md:mb-12 gap-6">
         <div className="hidden md:block">
           <h2 className="text-2xl md:text-4xl font-black tracking-tighter">Financial Overview</h2>
+          <p className="text-[10px] text-primary uppercase font-black tracking-widest mt-1">
+            Active Workspace: {availableHouseholds.find(h => h.id === currentHouseholdId)?.name || 'Personal Account'}
+          </p>
         </div>
+
         
         <div className="flex flex-wrap items-center gap-3">
           <button 
