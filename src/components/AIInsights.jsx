@@ -89,20 +89,20 @@ const AIInsights = () => {
             <div className="p-3 bg-primary/20 rounded-xl">
               <Sparkles className="text-primary" />
             </div>
-            <h3 className="font-bold text-lg">Next Month Forecast</h3>
+            <h3 className="font-bold text-lg">Portfolio Summary</h3>
           </div>
           <div className="space-y-4">
             <div className="flex justify-between items-center bg-white/5 p-4 rounded-xl">
-              <span className="text-text-muted">Expected Income</span>
-              <span className="font-bold text-success">$3,000.00</span>
+              <span className="text-text-muted">Total Monthly Income</span>
+              <span className="font-bold text-success">${insights.totalIncome.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
             </div>
             <div className="flex justify-between items-center bg-white/5 p-4 rounded-xl">
-              <span className="text-text-muted">Estimated Expenses</span>
-              <span className="font-bold text-danger">$2,950.00</span>
+              <span className="text-text-muted">Total Monthly Expenses</span>
+              <span className="font-bold text-danger">${insights.totalExpense.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
             </div>
             <div className="border-t border-white/10 pt-4 flex justify-between items-center">
-              <span className="font-bold">Projected Surplus</span>
-              <span className="font-bold text-xl">$50.00</span>
+              <span className="font-bold">Net Savings</span>
+              <span className="font-bold text-xl">${insights.savings.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
             </div>
           </div>
         </div>
@@ -113,24 +113,31 @@ const AIInsights = () => {
             <svg className="w-full h-full transform -rotate-90">
               <circle cx="64" cy="64" r="58" stroke="rgba(255,255,255,0.05)" strokeWidth="8" fill="transparent" />
               <circle cx="64" cy="64" r="58" stroke="#3b82f6" strokeWidth="8" fill="transparent" 
-                strokeDasharray="364" strokeDashoffset={364 - (364 * (insights.savingsRate / 100))} />
+                strokeDasharray="364" strokeDashoffset={364 - (364 * (Math.min(100, Math.max(0, insights.savingsRate)) / 100))} />
             </svg>
-            <span className="absolute text-2xl font-black">{Math.round(insights.savingsRate)}%</span>
+            <span className="absolute text-2xl font-black">{isNaN(insights.savingsRate) ? 0 : Math.round(insights.savingsRate)}%</span>
           </div>
           <p className="text-xs text-text-muted mt-4">Safe zone is 20%+</p>
         </div>
 
         <div className="card glass flex flex-col justify-between">
-          <h4 className="text-sm font-bold text-text-muted uppercase tracking-widest">Top Category</h4>
+          <h4 className="text-sm font-bold text-text-muted uppercase tracking-widest">Top Expense</h4>
           <div className="mt-4">
-             <h3 className="text-2xl font-bold">Rent</h3>
-             <p className="text-danger font-bold text-lg">$1,800.00</p>
+             <h3 className="text-2xl font-bold truncate">
+               {Object.entries(insights.categories).sort((a,b) => b[1] - a[1])[0]?.[0] || 'N/A'}
+             </h3>
+             <p className="text-danger font-bold text-lg">
+               ${(Object.entries(insights.categories).sort((a,b) => b[1] - a[1])[0]?.[1] || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+             </p>
           </div>
           <div className="bg-danger/10 text-danger text-[10px] py-1 px-2 rounded-md font-bold mt-4 inline-block w-fit">
-            60% OF BUDGET
+            {insights.totalExpense > 0 
+              ? `${Math.round(((Object.entries(insights.categories).sort((a,b) => b[1] - a[1])[0]?.[1] || 0) / insights.totalExpense) * 100)}% OF BUDGET` 
+              : '0% OF BUDGET'}
           </div>
         </div>
       </div>
+
 
       {/* Strategies */}
       <div className="space-y-4">

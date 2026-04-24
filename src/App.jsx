@@ -316,6 +316,28 @@ const AppContent = () => {
           </div>
         </div>
 
+        {availableHouseholds.length > 1 && (
+          <div className="px-6 mb-4">
+            <div className="relative group">
+              <div className="absolute inset-0 bg-primary/5 rounded-xl blur-sm group-hover:bg-primary/10 transition-all"></div>
+              <select 
+                value={currentHouseholdId || ''}
+                onChange={(e) => setCurrentHouseholdId(e.target.value)}
+                className="relative w-full bg-white/5 text-white text-[10px] font-black uppercase tracking-widest px-4 py-3 rounded-xl border border-white/10 shadow-lg focus:ring-1 focus:ring-primary/50 appearance-none cursor-pointer hover:bg-white/10 transition-all"
+              >
+                {availableHouseholds.map(hh => (
+                  <option key={hh.id} value={hh.id} className="bg-card text-text">
+                    {hh.name}
+                  </option>
+                ))}
+              </select>
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-text-muted">
+                <ChevronDown size={14} />
+              </div>
+            </div>
+          </div>
+        )}
+
         <nav className="flex-1 px-4 space-y-2 py-4">
           <button 
             onClick={() => setActiveTab('dashboard')}

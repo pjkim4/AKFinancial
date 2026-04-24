@@ -16,7 +16,9 @@ export const FinanceProvider = ({ children }) => {
   const [householdMembers, setHouseholdMembers] = useState([]);
   const [availableHouseholds, setAvailableHouseholds] = useState([]); 
   const [pendingInvitations, setPendingInvitations] = useState([]);
-  const [currentHouseholdId, setCurrentHouseholdId] = useState(null); 
+  const [currentHouseholdId, setCurrentHouseholdId] = useState(() => {
+    return localStorage.getItem('finance_current_household_id') || null;
+  }); 
   const [loading, setLoading] = useState(true);
   const [showLogModal, setShowLogModal] = useState(false);
   const [syncError, setSyncError] = useState(null);
@@ -351,7 +353,15 @@ export const FinanceProvider = ({ children }) => {
       fetchRecurringSchedules(currentHouseholdId);
       fetchHouseholdMembers(currentHouseholdId);
     }
+  }, [currentHouseholdId, user]);
+
+  useEffect(() => {
+    if (currentHouseholdId) {
+      localStorage.setItem('finance_current_household_id', currentHouseholdId);
+    }
   }, [currentHouseholdId]);
+
+
 
 
   const addTransaction = async (transaction) => {
@@ -1067,6 +1077,7 @@ export const FinanceProvider = ({ children }) => {
       setTransactions([]);
       setAvailableHouseholds([]);
       setCurrentHouseholdId(null);
+      localStorage.removeItem('finance_current_household_id');
       
       // Force a clean reload to clear any remaining in-memory states
       window.location.href = '/';
