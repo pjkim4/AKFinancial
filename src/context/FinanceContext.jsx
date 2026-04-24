@@ -348,9 +348,10 @@ export const FinanceProvider = ({ children }) => {
 
     } catch (err) {
       if (currentVersion === syncVersionRef.current) {
-        console.error(`[SYNC] [v${currentVersion}] Fetch Error:`, err.message);
+        addLog(`[ERROR] [v${currentVersion}] Fetch Failed: ${err.message || JSON.stringify(err)}`);
         setSyncError(err.message);
       }
+
     } finally {
       if (currentVersion === syncVersionRef.current) {
         setLoading(false);
@@ -700,9 +701,10 @@ export const FinanceProvider = ({ children }) => {
       setAccounts(prev => [...prev, data[0]]);
       return { success: true };
     } catch (error) {
-      console.error('Error creating account:', error.message);
+      addLog(`[ERROR] Create Account Failed: ${error.message || JSON.stringify(error)}`);
       return { error };
     }
+
   };
 
   const updateAccount = async (accountId, updates) => {
