@@ -36,7 +36,9 @@ const Dashboard = () => {
     preferences,
     updatePreferences,
     toggleBalances,
-    setShowLogModal
+    setShowLogModal,
+    currentHouseholdId,
+    availableHouseholds
   } = useFinance();
 
   const { showInstantMove, showMonthlyTrend, showExpenseDistribution } = preferences;
