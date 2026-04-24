@@ -60,7 +60,12 @@ export const FinanceProvider = ({ children }) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
-      if (!session) setLoading(false);
+      if (!session) {
+        setLoading(false);
+      } else {
+        // If we have a session but it's been loading too long, force it off
+        setTimeout(() => setLoading(false), 3000);
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -88,15 +93,7 @@ export const FinanceProvider = ({ children }) => {
     }
   }, [user]);
 
-  // When household changes, re-fetch all data
-  useEffect(() => {
-    if (user && currentHouseholdId) {
-      fetchData();
-      fetchFrequentPayments();
-      fetchRecurringSchedules();
-      fetchHouseholdMembers();
-    }
-  }, [currentHouseholdId]);
+
 
   const fetchHouseholds = async () => {
     if (!user) return;
@@ -127,11 +124,11 @@ export const FinanceProvider = ({ children }) => {
 
       // 3. For each accepted invitation, fetch the household name (username of the owner)
       const sharedHouseholds = [];
-      const seenHouseholdIds = new Set();
+      const seenHouseholdIds = new Set([user.id]); // Initialize with user's own ID
       
       if (data && data.length > 0) {
         for (const inv of data) {
-          // Skip if we've already processed this household (prevents duplicates)
+          // Skip if we've already processed this household or if it's the personal account
           if (seenHouseholdIds.has(inv.household_id)) continue;
           seenHouseholdIds.add(inv.household_id);
 
@@ -208,23 +205,26 @@ export const FinanceProvider = ({ children }) => {
   };
 
   const fetchHouseholdMembers = async () => {
+    if (!user) return;
     try {
+      const targetId = currentHouseholdId || user.id;
+      console.log('[AUTH] Fetching members for household:', targetId);
       const { data, error } = await supabase
         .from('household_members')
         .select('*')
-        .order('name');
+        .eq('user_id', targetId);
       
       if (error) {
-        if (error.code === '42P01' || error.message?.includes('not find the table')) {
-           const local = localStorage.getItem('finance_household_members');
-           setHouseholdMembers(local ? JSON.parse(local) : []);
-           return;
+        if (error.code === '42P01') {
+          const local = localStorage.getItem('finance_household_members');
+          setHouseholdMembers(local ? JSON.parse(local) : []);
+          return;
         }
         throw error;
       }
       setHouseholdMembers(data || []);
     } catch (err) {
-      console.error('Error fetching members:', err.message);
+      console.error('[AUTH] Error fetching members:', err.message);
     }
   };
 
@@ -244,40 +244,54 @@ export const FinanceProvider = ({ children }) => {
   };
 
   const fetchFrequentPayments = async () => {
+    if (!user) return;
     try {
+      const targetId = currentHouseholdId || user.id;
       const { data, error } = await supabase
         .from('frequent_payments')
         .select('*')
-        .order('created_at');
+        .eq('user_id', targetId);
+      
       if (error) throw error;
       setFrequentPayments(data || []);
-    } catch (error) {
-      console.error('Error fetching shortcuts:', error.message);
+    } catch (err) {
+      console.error('[AUTH] Error fetching shortcuts:', err.message);
     }
   };
 
   const fetchRecurringSchedules = async () => {
+    if (!user) return;
     try {
+      const targetId = currentHouseholdId || user.id;
       const { data, error } = await supabase
         .from('recurring_transactions')
         .select('*')
+        .eq('user_id', targetId)
         .order('created_at');
+      
       if (error) throw error;
       setRecurringSchedules(data || []);
-      
-      // Critical: Process any due transactions after fetching
       if (data && data.length > 0) {
         processRecurringTransactions(data);
       }
-    } catch (error) {
-      console.error('Error fetching recurring schedules:', error.message);
+    } catch (err) {
+      console.error('[AUTH] Error fetching schedules:', err.message);
     }
   };
 
-  const fetchData = async () => {
+  const fetchData = async (overrideId = null) => {
+    if (!user) return;
+    
+    const targetId = overrideId || currentHouseholdId || user.id;
     setLoading(true);
+    
+    // Clear state before fetching new data to prevent mixed data
+    setAccounts([]);
+    setTransactions([]);
+
     try {
-      const targetId = currentHouseholdId || user.id;
+      console.log('[AUTH] Syncing data for Target ID:', targetId);
+
       const { data: accountsData, error: accountsError } = await supabase
         .from('accounts')
         .select('*')
@@ -285,23 +299,34 @@ export const FinanceProvider = ({ children }) => {
         .order('name');
       
       if (accountsError) throw accountsError;
+      setAccounts(accountsData || []);
 
       const { data: transactionsData, error: transactionsError } = await supabase
         .from('transactions')
         .select('*')
         .eq('user_id', targetId)
-        .order('date', { ascending: false });
-
+        .order('date', { ascending: false })
+        .limit(100);
+      
       if (transactionsError) throw transactionsError;
-
-      setAccounts(accountsData || []);
       setTransactions(transactionsData || []);
-    } catch (error) {
-      console.error('Error fetching data:', error.message);
+
+    } catch (err) {
+      console.error('[AUTH] Fetch Error:', err.message);
     } finally {
-      setLoading(false);
+      // Small delay to ensure state has propagated
+      setTimeout(() => setLoading(false), 50);
     }
   };
+
+  useEffect(() => {
+    if (user && currentHouseholdId) {
+      fetchData(currentHouseholdId);
+      fetchFrequentPayments();
+      fetchRecurringSchedules();
+      fetchHouseholdMembers();
+    }
+  }, [currentHouseholdId]);
 
   const addTransaction = async (transaction) => {
     try {
@@ -1000,7 +1025,27 @@ export const FinanceProvider = ({ children }) => {
     }
   };
 
-  const logout = () => supabase.auth.signOut();
+  const logout = async () => {
+    try {
+      setLoading(true);
+      await supabase.auth.signOut();
+      
+      // Clear all state
+      setUser(null);
+      setProfile(null);
+      setSession(null);
+      setAccounts([]);
+      setTransactions([]);
+      setAvailableHouseholds([]);
+      setCurrentHouseholdId(null);
+      
+      // Force a clean reload to clear any remaining in-memory states
+      window.location.href = '/';
+    } catch (err) {
+      console.error('Logout error:', err.message);
+      setLoading(false);
+    }
+  };
 
   const addHouseholdMember = async (member) => {
     try {
