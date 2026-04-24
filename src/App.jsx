@@ -38,8 +38,9 @@ const Logo = ({ size = 24 }) => (
 const AppContent = () => {
   const { 
     user, profile, login, signup, logout, loading, sendPasswordResetEmail, updatePassword, 
-    showLogModal, setShowLogModal, availableHouseholds, currentHouseholdId, setCurrentHouseholdId 
+    availableHouseholds, currentHouseholdId, setCurrentHouseholdId 
   } = useFinance();
+
 
 
   const [activeTab, setActiveTab] = useState('dashboard');

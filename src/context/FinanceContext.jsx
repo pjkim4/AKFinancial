@@ -1191,13 +1191,13 @@ export const FinanceProvider = ({ children }) => {
       calculateNextPaymentDate,
       login, signup, logout, fetchData, updateProfile, updatePassword, sendPasswordResetEmail,
       setAccounts,
-      showLogModal, setShowLogModal,
+
       preferences,
       updatePreferences: (newPrefs) => setPreferences(prev => ({ ...prev, ...newPrefs })),
       toggleBalances: () => setPreferences(prev => ({ ...prev, hideBalances: !prev.hideBalances })),
-      syncError,
-      setShowLogModal: (val) => {} // No-op placeholder if needed
+      syncError
     }}>
+
 
       {children}
     </FinanceContext.Provider>
