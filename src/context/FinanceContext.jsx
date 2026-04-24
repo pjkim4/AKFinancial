@@ -24,6 +24,13 @@ export const FinanceProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [showLogModal, setShowLogModal] = useState(false);
   const [syncError, setSyncError] = useState(null);
+  const [logs, setLogs] = useState([]);
+
+  const addLog = (msg) => {
+    const timestamp = new Date().toLocaleTimeString();
+    setLogs(prev => [`[${timestamp}] ${msg}`, ...prev].slice(0, 20));
+    console.log(msg);
+  };
   
   // Track the current sync request to prevent race conditions
   const syncVersionRef = React.useRef(0);
@@ -84,7 +91,7 @@ export const FinanceProvider = ({ children }) => {
     if (user) {
       // Default to my own account as the first household
       if (!currentHouseholdId) {
-        console.log("[WORKSPACE] No current ID, defaulting to user.id:", user.id);
+        addLog(`[WORKSPACE] No current ID, defaulting to user.id: ${user.id}`);
         setCurrentHouseholdId(user.id);
       }
       fetchProfile();
@@ -304,9 +311,9 @@ export const FinanceProvider = ({ children }) => {
     // Increment version to ignore previous requests
     const currentVersion = ++syncVersionRef.current;
     
-    console.log(`[SYNC] [v${currentVersion}] fetchData(targetId: ${targetId}) - USER: ${user.id}`);
+    addLog(`[SYNC] [v${currentVersion}] Fetching target: ${targetId.slice(0,8)}...`);
     setLoading(true);
-    console.log(`[SYNC] [v${currentVersion}] Clearing all data state...`);
+    addLog(`[SYNC] [v${currentVersion}] Clearing state...`);
     clearAllData();
 
     try {
@@ -337,7 +344,7 @@ export const FinanceProvider = ({ children }) => {
 
       setAccounts(accountsRes.data || []);
       setTransactions(transactionsRes.data || []);
-      console.log(`[SYNC] [v${currentVersion}] Data received. Accounts: ${accountsRes.data?.length || 0}, Transactions: ${transactionsRes.data?.length || 0}`);
+      addLog(`[SYNC] [v${currentVersion}] Success. Accounts: ${accountsRes.data?.length || 0}, Transactions: ${transactionsRes.data?.length || 0}`);
 
     } catch (err) {
       if (currentVersion === syncVersionRef.current) {
@@ -1199,9 +1206,13 @@ export const FinanceProvider = ({ children }) => {
       showLogModal, setShowLogModal,
       preferences,
       updatePreferences: (newPrefs) => setPreferences(prev => ({ ...prev, ...newPrefs })),
-      toggleBalances: () => setPreferences(prev => ({ ...prev, hideBalances: !prev.hideBalances }))
+      toggleBalances: () => setPreferences(prev => ({ ...prev, hideBalances: !prev.hideBalances })),
+      syncError,
+      logs
     }}>
+
       {children}
     </FinanceContext.Provider>
   );
 };
+
