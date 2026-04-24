@@ -385,7 +385,15 @@ const AppContent = () => {
             <BrainCircuit size={20} />
             AI Planning
           </button>
+          <button 
+            onClick={() => setActiveTab('reports')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${activeTab === 'reports' ? 'bg-primary text-black shadow-lg shadow-primary/20' : 'hover:bg-white/5 text-text-muted hover:text-white'}`}
+          >
+            <FileText size={20} />
+            Financial Intel
+          </button>
         </nav>
+
 
         <div className="p-4 border-t border-white/5">
           <button 
