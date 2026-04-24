@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useFinance } from '../context/FinanceContext';
-import { Shield, User, Key, Save, AlertCircle, Mail, Zap, Users, Trash2, Plus, X, Check } from 'lucide-react';
+import { Shield, User, Key, Save, AlertCircle, Mail, Zap, Users, Trash2, Plus, X, Check, Edit2 } from 'lucide-react';
+
 
 const AdminSettings = () => {
   const { 
     user, profile, updateProfile, updatePassword, 
     householdMembers, addHouseholdMember, updateHouseholdMember, deleteHouseholdMember,
-    inviteMember, currentHouseholdId, pendingInvitations, respondToInvitation, availableHouseholds,
+    inviteMember, currentHouseholdId, pendingInvitations, sentInvitations, revokeInvitation, respondToInvitation, availableHouseholds,
     setCurrentHouseholdId
   } = useFinance();
   
@@ -479,6 +480,50 @@ const AdminSettings = () => {
             <div className="text-center py-12 border-2 border-dashed border-white/5 rounded-2xl">
               <Users size={32} className="mx-auto text-text-muted mb-4 opacity-20" />
               <p className="text-xs text-text-muted font-bold">No extra users added yet.</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Sent Invitations / Revoke Access */}
+      <div className="card glass border-white/10 p-8">
+        <div className="flex items-center gap-3 mb-6">
+          <Key className="text-warning" size={24} />
+          <h3 className="text-xl font-bold">Cloud Access Management</h3>
+        </div>
+        <p className="text-[10px] text-text-muted uppercase tracking-widest mb-6 leading-relaxed">
+          Authorized users who have access to your shared wallets. Revoke access here to remove their permission.
+        </p>
+
+        <div className="space-y-3">
+          {sentInvitations.map(inv => (
+            <div key={inv.id} className="flex items-center justify-between p-5 bg-white/5 border border-white/10 rounded-2xl group hover:border-warning/20 transition-all">
+              <div className="flex items-center gap-4">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-[10px] text-black ${inv.status === 'accepted' ? 'bg-success' : 'bg-warning animate-pulse'}`}>
+                  {inv.status === 'accepted' ? 'OK' : '??'}
+                </div>
+                <div>
+                  <p className="text-sm font-bold">{inv.invitee_email}</p>
+                  <p className="text-[9px] text-text-muted uppercase tracking-widest">
+                    Status: <span className={inv.status === 'accepted' ? 'text-success' : 'text-warning'}>{inv.status}</span>
+                  </p>
+                </div>
+              </div>
+              <button 
+                onClick={() => {
+                  if (window.confirm(`Revoke access for ${inv.invitee_email}?`)) {
+                    revokeInvitation(inv.id);
+                  }
+                }}
+                className="btn bg-white/5 border-white/10 text-[10px] font-black uppercase tracking-widest px-4 h-10 hover:bg-danger hover:text-white transition-all"
+              >
+                Revoke Access
+              </button>
+            </div>
+          ))}
+          {sentInvitations.length === 0 && (
+            <div className="text-center py-10 border-2 border-dashed border-white/5 rounded-2xl opacity-30">
+              <p className="text-[10px] font-black uppercase tracking-widest">No active cloud shares</p>
             </div>
           )}
         </div>

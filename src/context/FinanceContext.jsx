@@ -16,6 +16,7 @@ export const FinanceProvider = ({ children }) => {
   const [householdMembers, setHouseholdMembers] = useState([]);
   const [availableHouseholds, setAvailableHouseholds] = useState([]); 
   const [pendingInvitations, setPendingInvitations] = useState([]);
+  const [sentInvitations, setSentInvitations] = useState([]);
   const [currentHouseholdId, setCurrentHouseholdId] = useState(() => {
     const saved = localStorage.getItem('finance_current_household_id');
     console.log("[WORKSPACE] Initial ID from localStorage:", saved);
@@ -90,6 +91,7 @@ export const FinanceProvider = ({ children }) => {
       fetchProfile();
       fetchHouseholds();
       fetchPendingInvitations();
+      fetchSentInvitations();
     } else {
       setAccounts([]);
       setTransactions([]);
@@ -210,6 +212,39 @@ export const FinanceProvider = ({ children }) => {
       return { success: true };
     } catch (err) {
       console.error('[AUTH] Error responding to invitation:', err.message);
+      return { error: err };
+    }
+  };
+
+  const fetchSentInvitations = async () => {
+    if (!user) return;
+    try {
+      const { data, error } = await supabase
+        .from('household_invitations')
+        .select('*')
+        .eq('inviter_id', user.id);
+      
+      if (error) {
+        if (error.code === '42P01') return;
+        throw error;
+      }
+      setSentInvitations(data || []);
+    } catch (err) {
+      console.error('[AUTH] Error fetching sent invites:', err.message);
+    }
+  };
+
+  const revokeInvitation = async (id) => {
+    try {
+      const { error } = await supabase
+        .from('household_invitations')
+        .delete()
+        .eq('id', id);
+      
+      if (error) throw error;
+      setSentInvitations(prev => prev.filter(inv => inv.id !== id));
+      return { success: true };
+    } catch (err) {
       return { error: err };
     }
   };
@@ -1184,12 +1219,12 @@ export const FinanceProvider = ({ children }) => {
   return (
     <FinanceContext.Provider value={{
       user, profile, session, accounts, transactions, frequentPayments, recurringSchedules, householdMembers, 
-      availableHouseholds, pendingInvitations, currentHouseholdId, setCurrentHouseholdId, loading,
+      availableHouseholds, pendingInvitations, sentInvitations, currentHouseholdId, setCurrentHouseholdId, loading,
       addTransaction, updateTransaction, deleteTransaction, deleteTransactions,
       transferFunds, adjustBalance, createAccount, updateAccount, deleteAccount,
       addFrequentPayment, deleteFrequentPayment,
       addRecurringSchedule, updateRecurringSchedule, deleteRecurringSchedule, skipNextOccurrence,
-      addHouseholdMember, updateHouseholdMember, deleteHouseholdMember, inviteMember, respondToInvitation,
+      addHouseholdMember, updateHouseholdMember, deleteHouseholdMember, inviteMember, revokeInvitation, respondToInvitation,
       calculateNextPaymentDate,
       login, signup, logout, fetchData, updateProfile, updatePassword, sendPasswordResetEmail,
       setAccounts,

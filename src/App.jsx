@@ -15,8 +15,10 @@ import {
   CalendarClock,
   Eye,
   EyeOff,
-  ChevronDown
+  ChevronDown,
+  FileText
 } from 'lucide-react';
+
 
 
 import Dashboard from './components/Dashboard';
@@ -26,6 +28,7 @@ import AIInsights from './components/AIInsights';
 import AdminSettings from './components/AdminSettings';
 import RecurringManager from './components/RecurringManager';
 import ErrorBoundary from './components/ErrorBoundary';
+import Reports from './components/Reports';
 import LogEntryModal from './components/LogEntryModal';
 import { supabase } from './lib/supabase';
 
@@ -288,6 +291,7 @@ const AppContent = () => {
       case 'accounts': return <AccountManager />;
       case 'recurring': return <RecurringManager />;
       case 'ai': return <AIInsights />;
+      case 'reports': return <Reports />;
       case 'settings': return <AdminSettings />;
       default: return <Dashboard />;
     }
@@ -475,6 +479,14 @@ const AppContent = () => {
                 <BrainCircuit size={20} />
                 <span className="text-[8px] font-black uppercase tracking-tighter">Insights</span>
               </button>
+              <button 
+                onClick={() => setActiveTab('reports')}
+                className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'reports' ? 'text-primary scale-110' : 'text-text-muted hover:text-white'}`}
+              >
+                <FileText size={20} />
+                <span className="text-[8px] font-black uppercase tracking-tighter">Intel</span>
+              </button>
+
               <button 
                 onClick={() => setActiveTab('settings')}
                 className={`flex-1 flex flex-col items-center gap-0.5 py-2 transition-all ${activeTab === 'settings' ? 'text-primary' : 'text-text-muted hover:text-white'}`}
