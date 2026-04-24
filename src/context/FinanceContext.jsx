@@ -41,15 +41,26 @@ export const FinanceProvider = ({ children }) => {
     }
 
     // Check initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-    });
+    supabase.auth.getSession()
+      .then(({ data: { session }, error }) => {
+        if (error) console.error('Auth session retrieval error:', error.message);
+        setSession(session);
+        setUser(session?.user ?? null);
+        // If no user is found, explicitly set loading to false to show login screen
+        if (!session?.user) {
+          setLoading(false);
+        }
+      })
+      .catch(err => {
+        console.error('Unexpected auth initialization error:', err);
+        setLoading(false);
+      });
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
+      if (!session) setLoading(false);
     });
 
     return () => subscription.unsubscribe();
@@ -88,15 +99,22 @@ export const FinanceProvider = ({ children }) => {
   }, [currentHouseholdId]);
 
   const fetchHouseholds = async () => {
+    if (!user) return;
     try {
       // 1. My own household
       const myHousehold = { id: user.id, name: 'Personal Account', role: 'Admin' };
       
       // 2. Fetch shared households (requires invitations table)
+      const userEmail = user.email.toLowerCase().trim();
+      console.log('[AUTH] Fetching households for:', userEmail);
+
       const { data, error } = await supabase
         .from('household_invitations')
-        .select('household_id, profiles!household_id(username)')
-        .eq('invitee_email', user.email)
+        .select(`
+          household_id, 
+          status
+        `)
+        .eq('invitee_email', userEmail)
         .eq('status', 'accepted');
       
       if (error) {
@@ -107,24 +125,47 @@ export const FinanceProvider = ({ children }) => {
         throw error;
       }
 
-      const formattedHouseholds = [
-        myHousehold,
-        ...(data?.map(h => ({
-          id: h.household_id,
-          name: h.profiles?.username ? `${h.profiles.username}'s Household` : `Household #${h.household_id?.slice(0, 4) || '??'}`,
-          role: 'Member'
-        })) || [])
-      ];
+      // 3. For each accepted invitation, fetch the household name (username of the owner)
+      const sharedHouseholds = [];
+      const seenHouseholdIds = new Set();
+      
+      if (data && data.length > 0) {
+        for (const inv of data) {
+          // Skip if we've already processed this household (prevents duplicates)
+          if (seenHouseholdIds.has(inv.household_id)) continue;
+          seenHouseholdIds.add(inv.household_id);
+
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('username')
+            .eq('id', inv.household_id)
+            .single();
+          
+          sharedHouseholds.push({
+            id: inv.household_id,
+            name: profileData?.username ? `${profileData.username}'s Household` : `Household #${inv.household_id?.slice(0, 4)}`,
+            role: 'Member'
+          });
+        }
+      }
+
+      const formattedHouseholds = [myHousehold, ...sharedHouseholds];
+      console.log('[AUTH] Unique households found:', formattedHouseholds.length);
       setAvailableHouseholds(formattedHouseholds);
     } catch (err) {
-      console.error('Error fetching households:', err.message);
+      console.error('[AUTH] Error fetching households:', err.message);
+      // Fallback to just personal account
+      if (user) {
+        setAvailableHouseholds([{ id: user.id, name: 'Personal Account', role: 'Admin' }]);
+      }
     }
   };
 
   const fetchPendingInvitations = async () => {
+    if (!user) return;
     try {
       const userEmail = user.email.toLowerCase().trim();
-      console.log('DEBUG: Searching for invites for:', userEmail);
+      console.log('[AUTH] Searching for pending invites for:', userEmail);
       
       const { data, error } = await supabase
         .from('household_invitations')
@@ -133,20 +174,21 @@ export const FinanceProvider = ({ children }) => {
         .eq('status', 'pending');
       
       if (error) {
-        console.error('DATABASE ERROR:', error.code, error.message);
+        if (error.code === '42P01') return;
+        console.error('[AUTH] Database error fetching invites:', error.code, error.message);
         return;
       }
       
-      console.log('DEBUG: Raw invites found:', data);
+      console.log('[AUTH] Pending invites found:', data?.length || 0);
       setPendingInvitations(data || []);
     } catch (err) {
-      if (err.code === '42P01') return;
-      console.error('Error fetching pending invites:', err.message);
+      console.error('[AUTH] Unexpected error fetching pending invites:', err.message);
     }
   };
 
   const respondToInvitation = async (invitationId, status) => {
     try {
+      console.log(`[AUTH] Responding to invitation ${invitationId} with status: ${status}`);
       const { error } = await supabase
         .from('household_invitations')
         .update({ status })
@@ -155,10 +197,12 @@ export const FinanceProvider = ({ children }) => {
       if (error) throw error;
       
       // Refresh households and pending list
-      fetchHouseholds();
-      fetchPendingInvitations();
+      await fetchHouseholds();
+      await fetchPendingInvitations();
+      console.log('[AUTH] Household lists refreshed successfully');
       return { success: true };
     } catch (err) {
+      console.error('[AUTH] Error responding to invitation:', err.message);
       return { error: err };
     }
   };
@@ -261,107 +305,141 @@ export const FinanceProvider = ({ children }) => {
 
   const addTransaction = async (transaction) => {
     try {
+      const { member_id, ...txData } = transaction;
+      let finalTx = { ...txData, user_id: currentHouseholdId || user.id };
+      
+      // Try with member_id if provided
+      if (member_id) {
+        finalTx.member_id = member_id;
+      }
+
       const { data, error } = await supabase
         .from('transactions')
-        .insert([{
-          ...transaction,
-          user_id: currentHouseholdId || user.id
-        }])
+        .insert([finalTx])
         .select();
 
-      if (error) throw error;
+      if (error) {
+        // Fallback: If member_id column is missing in DB
+        if (member_id && (error.code === '42703' || error.message?.includes('column "member_id"'))) {
+          const member = householdMembers.find(m => m.id === member_id);
+          const memberPrefix = member ? `[${member.name}] ` : '';
+          const fallbackTx = { 
+            ...txData, 
+            description: memberPrefix + txData.description,
+            user_id: currentHouseholdId || user.id 
+          };
+          
+          const { data: retryData, error: retryError } = await supabase
+            .from('transactions')
+            .insert([fallbackTx])
+            .select();
+          
+          if (retryError) throw retryError;
+          if (!retryData || retryData.length === 0) throw new Error('Transaction created (fallback) but no data returned');
+          setTransactions(prev => [retryData[0], ...prev]);
+          // Balance update logic will use retryData[0]
+          return updateAccountBalancesAfterTx(retryData[0], 'add');
+        }
+        throw error;
+      }
+
       if (!data || data.length === 0) throw new Error('Transaction created but no data returned from database');
       setTransactions(prev => [data[0], ...prev]);
 
-      // Update account balance
-      const account = accounts.find(acc => acc.id === transaction.account_id);
-      if (account) {
-        const txAmount = Number(transaction.amount);
-        const amountChange = transaction.type === 'Income' ? txAmount : -txAmount;
-        
-        // Update balance logic
-        console.log(`[DEBUG] Account details: NAME=${account.name}, TYPE=${account.type}, PARENT=${account.parent_account_id}`);
-        if (account.type === 'Debit Card' && account.parent_account_id) {
-          console.log('[DEBUG] Debit Card Logic: Attempting to update parent...');
-          const parent = accounts.find(acc => acc.id === account.parent_account_id);
-          if (parent) {
-            const newParentBalance = Number((Number(parent.balance) + amountChange).toFixed(2));
-            console.log(`[DEBUG] Updating Parent '${parent.name}': ${parent.balance} -> ${newParentBalance}`);
-            await supabase.from('accounts').update({ balance: newParentBalance }).eq('id', parent.id);
-            setAccounts(prev => prev.map(acc => acc.id === parent.id ? { ...acc, balance: newParentBalance } : acc));
-          } else {
-            console.warn('[DEBUG] Parent account not found in state!');
-          }
-        } else {
-          console.log('[DEBUG] Standard Logic: Updating primary account...');
-          const newBalance = Number((Number(account.balance) + amountChange).toFixed(2));
-          console.log(`[DEBUG] Updating Balance: ${account.balance} -> ${newBalance}`);
-          await supabase.from('accounts').update({ balance: newBalance }).eq('id', account.id);
-          setAccounts(prev => prev.map(acc => acc.id === account.id ? { ...acc, balance: newBalance } : acc));
-        }
-      }
-      return { success: true };
+      return updateAccountBalancesAfterTx(data[0], 'add');
     } catch (error) {
       console.error('Error adding transaction:', error.message);
       return { error };
     }
   };
 
+  const updateAccountBalancesAfterTx = async (transaction, mode = 'add', oldTx = null) => {
+    try {
+      const account = accounts.find(acc => acc.id === transaction.account_id);
+      if (account) {
+        let amountChange = 0;
+        if (mode === 'add') {
+          const txAmount = Number(transaction.amount);
+          amountChange = transaction.type === 'Income' ? txAmount : -txAmount;
+        } else if (mode === 'update' && oldTx) {
+          // Reverse old amount
+          amountChange += oldTx.type === 'Income' ? -Number(oldTx.amount) : Number(oldTx.amount);
+          // Apply new amount
+          amountChange += transaction.type === 'Income' ? Number(transaction.amount) : -Number(transaction.amount);
+        } else if (mode === 'delete') {
+          const txAmount = Number(transaction.amount);
+          amountChange = transaction.type === 'Income' ? -txAmount : txAmount;
+        }
+
+        if (account.type === 'Debit Card' && account.parent_account_id) {
+          const parent = accounts.find(acc => acc.id === account.parent_account_id);
+          if (parent) {
+            const newParentBalance = Number((Number(parent.balance) + amountChange).toFixed(2));
+            await supabase.from('accounts').update({ balance: newParentBalance }).eq('id', parent.id);
+            setAccounts(prev => prev.map(acc => acc.id === parent.id ? { ...acc, balance: newParentBalance } : acc));
+          }
+        } else {
+          const newBalance = Number((Number(account.balance) + amountChange).toFixed(2));
+          await supabase.from('accounts').update({ balance: newBalance }).eq('id', account.id);
+          setAccounts(prev => prev.map(acc => acc.id === account.id ? { ...acc, balance: newBalance } : acc));
+        }
+      }
+      return { success: true };
+    } catch (err) {
+      console.error('Error updating balances:', err.message);
+      return { error: err };
+    }
+  };
+
   const updateTransaction = async (id, updates) => {
-    console.log('[DEBUG] Starting updateTransaction for ID:', id);
     try {
       const oldTx = transactions.find(t => t.id === id);
       if (!oldTx) throw new Error('Original transaction not found');
 
-      console.log('[DEBUG] Sending UPDATE to Supabase...');
+      const { member_id, ...updateData } = updates;
+      let finalUpdates = { ...updateData };
+      if (member_id) finalUpdates.member_id = member_id;
+
       const { data, error } = await supabase
         .from('transactions')
-        .update(updates)
+        .update(finalUpdates)
         .eq('id', id)
         .select();
 
       if (error) {
-        console.error('[DEBUG] Supabase UPDATE Error:', error);
+        // Fallback for member_id column
+        if (member_id && (error.code === '42703' || error.message?.includes('column "member_id"'))) {
+          const member = householdMembers.find(m => m.id === member_id);
+          const memberPrefix = member ? `[${member.name}] ` : '';
+          
+          // Clean old prefix if it exists to avoid duplication
+          let cleanDesc = updateData.description || oldTx.description;
+          cleanDesc = cleanDesc.replace(/^\[.*?\]\s*/, '');
+          
+          const fallbackUpdates = { 
+            ...updateData, 
+            description: memberPrefix + cleanDesc 
+          };
+          
+          const { data: retryData, error: retryError } = await supabase
+            .from('transactions')
+            .update(fallbackUpdates)
+            .eq('id', id)
+            .select();
+          
+          if (retryError) throw retryError;
+          if (!retryData || retryData.length === 0) throw new Error('Update failed');
+          setTransactions(prev => prev.map(t => t.id === id ? retryData[0] : t));
+          return updateAccountBalancesAfterTx(retryData[0], 'update', oldTx);
+        }
         throw error;
       }
+
       if (!data || data.length === 0) throw new Error('No data returned from update');
-      console.log('[DEBUG] Supabase UPDATE Success:', data[0]);
-
-      // Adjust account balance
-      const account = accounts.find(acc => acc.id === oldTx.account_id);
-      if (account) {
-        let amountChange = 0;
-        // Reverse old amount
-        amountChange += oldTx.type === 'Income' ? -Number(oldTx.amount) : Number(oldTx.amount);
-        // Apply new amount
-        amountChange += updates.type === 'Income' ? Number(updates.amount) : -Number(updates.amount);
-
-        // Sync balance logic
-        console.log(`[DEBUG] Update Logic: NAME=${account.name}, TYPE=${account.type}, PARENT=${account.parent_account_id}`);
-        if (account.type === 'Debit Card' && account.parent_account_id) {
-          const parent = accounts.find(acc => acc.id === account.parent_account_id);
-          if (parent) {
-             const newParentBalance = Number((Number(parent.balance) + amountChange).toFixed(2));
-             console.log(`[DEBUG] Syncing Parent: ${parent.balance} -> ${newParentBalance}`);
-             await supabase.from('accounts').update({ balance: newParentBalance }).eq('id', parent.id);
-             setAccounts(prev => prev.map(acc => acc.id === parent.id ? { ...acc, balance: newParentBalance } : acc));
-          } else {
-             console.warn('[DEBUG] Parent account not found for update sync');
-          }
-        } else {
-          const newBalance = Number((Number(account.balance) + amountChange).toFixed(2));
-          console.log(`[DEBUG] Updating Standard Balance: ${account.balance} -> ${newBalance}`);
-          const { error: accError } = await supabase.from('accounts').update({ balance: newBalance }).eq('id', account.id);
-          if (accError) throw accError;
-          setAccounts(prev => prev.map(acc => acc.id === account.id ? { ...acc, balance: newBalance } : acc));
-        }
-      }
-
       setTransactions(prev => prev.map(t => t.id === id ? data[0] : t));
-      console.log('[DEBUG] Transactions state updated locally. Update complete.');
-      return { success: true };
+      return updateAccountBalancesAfterTx(data[0], 'update', oldTx);
     } catch (error) {
-      console.error('[DEBUG] updateTransaction CATCH:', error);
+      console.error('Error updating transaction:', error.message);
       return { error };
     }
   };

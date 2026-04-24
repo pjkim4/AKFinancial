@@ -28,12 +28,8 @@ import LogEntryModal from './components/LogEntryModal';
 import { supabase } from './lib/supabase';
 
 const Logo = ({ size = 24 }) => (
-  <div className="relative flex items-center justify-center overflow-hidden rounded-xl" style={{ width: size * 1.5, height: size * 1.5 }}>
-    <img 
-      src="/src/assets/logo.png" 
-      alt="AK Finance Logo" 
-      className="w-full h-full object-contain"
-    />
+  <div className="flex items-center justify-center rounded-xl bg-primary text-black shadow-lg shadow-primary/20" style={{ width: size * 1.5, height: size * 1.5 }}>
+    <Wallet size={size} strokeWidth={3} />
   </div>
 );
 

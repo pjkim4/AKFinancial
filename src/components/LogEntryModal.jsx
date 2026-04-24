@@ -8,7 +8,8 @@ const LogEntryModal = ({ isOpen, onClose }) => {
   const { 
     accounts, 
     addTransaction, 
-    transferFunds 
+    transferFunds,
+    householdMembers
   } = useFinance();
 
   const [modalType, setModalType] = useState('expense'); 
@@ -30,7 +31,8 @@ const LogEntryModal = ({ isOpen, onClose }) => {
     to_account_id: accounts[1]?.id || '',
     category: '',
     customCategory: '',
-    date: getToday()
+    date: getToday(),
+    member_id: ''
   });
 
   useEffect(() => {
@@ -62,7 +64,8 @@ const LogEntryModal = ({ isOpen, onClose }) => {
         description: formData.description,
         account_id: formData.account_id,
         category: finalCategory,
-        date: formData.date
+        date: formData.date,
+        member_id: formData.member_id
       });
     }
 
@@ -83,7 +86,8 @@ const LogEntryModal = ({ isOpen, onClose }) => {
       to_account_id: accounts[1]?.id || '',
       category: '', 
       customCategory: '', 
-      date: getToday()
+      date: getToday(),
+      member_id: ''
     });
     setError('');
   };
@@ -158,6 +162,18 @@ const LogEntryModal = ({ isOpen, onClose }) => {
                   value={formData.to_account_id} 
                   onChange={(val) => setFormData({...formData, to_account_id: val})} 
                   placeholder="Search Target Wallet..." 
+                />
+              </div>
+            )}
+
+            {householdMembers.length > 0 && (
+              <div>
+                <label className="text-xs text-text-muted uppercase tracking-[0.2em] font-black block mb-2">Member Tag (Optional)</label>
+                <SearchableSelect 
+                  options={householdMembers.map(m => ({ id: m.id, name: m.name }))} 
+                  value={formData.member_id} 
+                  onChange={(val) => setFormData({...formData, member_id: val})} 
+                  placeholder="Tag family member..." 
                 />
               </div>
             )}

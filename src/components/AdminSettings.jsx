@@ -5,13 +5,16 @@ import { Shield, User, Key, Save, AlertCircle, Mail, Zap, Users, Trash2, Plus, X
 const AdminSettings = () => {
   const { 
     user, profile, updateProfile, updatePassword, 
-    householdMembers, addHouseholdMember, deleteHouseholdMember,
-    inviteMember, currentHouseholdId, pendingInvitations, respondToInvitation, availableHouseholds
+    householdMembers, addHouseholdMember, updateHouseholdMember, deleteHouseholdMember,
+    inviteMember, currentHouseholdId, pendingInvitations, respondToInvitation, availableHouseholds,
+    setCurrentHouseholdId
   } = useFinance();
   
   const [isAddingMember, setIsAddingMember] = useState(false);
+  const [editingMemberId, setEditingMemberId] = useState(null);
   const [memberType, setMemberType] = useState('virtual'); // 'virtual' or 'cloud'
   const [newMember, setNewMember] = useState({ name: '', role: 'Spouse', color: '#c1ff72' });
+  const [editMemberData, setEditMemberData] = useState({ name: '', role: 'Spouse', color: '#c1ff72' });
   const [inviteEmail, setInviteEmail] = useState('');
 
   const [formData, setFormData] = useState({
@@ -44,6 +47,17 @@ const AdminSettings = () => {
     } else {
       setNewMember({ name: '', role: 'Spouse', color: '#c1ff72' });
       setIsAddingMember(false);
+    }
+  };
+
+  const handleEditMember = async () => {
+    setLoading(true);
+    const { error } = await updateHouseholdMember(editingMemberId, editMemberData);
+    setLoading(false);
+    if (error) {
+      alert('Failed to update member: ' + error.message);
+    } else {
+      setEditingMemberId(null);
     }
   };
 
@@ -116,7 +130,7 @@ const AdminSettings = () => {
               <button 
                 key={inv.id}
                 onClick={() => respondToInvitation(inv.id, 'accepted')}
-                className="w-full p-6 bg-[#c1ff72] text-black font-black rounded-2xl text-sm flex justify-between items-center shadow-[0_0_20px_rgba(193,255,114,0.3)] active:scale-95 transition-all"
+                className="w-full p-6 bg-lime text-black font-black rounded-2xl text-sm flex justify-between items-center shadow-lime active-scale-95 transition-all"
               >
                 <div className="text-left">
                   <span className="block text-xs uppercase tracking-tighter">JOIN SHARED HOUSEHOLD</span>
@@ -351,6 +365,51 @@ const AdminSettings = () => {
           </div>
         )}
 
+        {editingMemberId && (
+          <div className="mb-8 p-6 bg-white/5 border border-primary/20 rounded-2xl animate-scale-in">
+            <div className="flex justify-between items-center mb-6">
+              <h4 className="text-xs font-black uppercase tracking-widest text-primary">Edit Member</h4>
+              <button onClick={() => setEditingMemberId(null)} className="text-text-muted hover:text-white">
+                <X size={18} />
+              </button>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="text-[10px] text-text-muted uppercase tracking-widest block mb-2 font-black">Full Name</label>
+                <input 
+                  autoFocus
+                  placeholder="e.g. John Doe"
+                  className="w-full bg-white/5 border-white/10"
+                  value={editMemberData.name}
+                  onChange={e => setEditMemberData({...editMemberData, name: e.target.value})}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-[10px] text-text-muted uppercase tracking-widest block mb-2 font-black">Role</label>
+                  <select className="w-full bg-white/5 border-white/10" value={editMemberData.role} onChange={e => setEditMemberData({...editMemberData, role: e.target.value})}>
+                    <option>Spouse</option>
+                    <option>Child</option>
+                    <option>Roommate</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-[10px] text-text-muted uppercase tracking-widest block mb-2 font-black">Color</label>
+                  <input type="color" className="h-12 w-full p-1 bg-white/5 border-white/10" value={editMemberData.color} onChange={e => setEditMemberData({...editMemberData, color: e.target.value})} />
+                </div>
+              </div>
+              <button 
+                onClick={handleEditMember}
+                disabled={!editMemberData.name || loading}
+                className="btn btn-primary w-full h-14 font-black uppercase text-black disabled:opacity-50"
+              >
+                {loading ? 'Saving...' : 'Update Member'}
+              </button>
+            </div>
+          </div>
+        )}
+
+
         {/* Pending Invitations */}
         {pendingInvitations.length > 0 && (
           <div className="mb-8 space-y-4">
@@ -392,12 +451,28 @@ const AdminSettings = () => {
                   <p className="text-[10px] text-text-muted uppercase tracking-widest">{member.role}</p>
                 </div>
               </div>
-              <button 
-                onClick={() => deleteHouseholdMember(member.id)}
-                className="p-2 text-text-muted hover:text-danger opacity-0 group-hover:opacity-100 transition-all"
-              >
-                <Trash2 size={16} />
-              </button>
+              <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                <button 
+                  onClick={() => {
+                    setEditingMemberId(member.id);
+                    setEditMemberData({ name: member.name, role: member.role, color: member.color });
+                    setIsAddingMember(false);
+                  }}
+                  className="p-2 text-text-muted hover:text-primary"
+                >
+                  <Edit2 size={16} />
+                </button>
+                <button 
+                  onClick={() => {
+                    if (window.confirm(`Delete ${member.name}?`)) {
+                      deleteHouseholdMember(member.id);
+                    }
+                  }}
+                  className="p-2 text-text-muted hover:text-danger"
+                >
+                  <Trash2 size={16} />
+                </button>
+              </div>
             </div>
           ))}
           {householdMembers.length === 0 && !isAddingMember && (

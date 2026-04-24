@@ -34,7 +34,8 @@ const TransactionList = () => {
     deleteTransactions, 
     transferFunds,
     preferences,
-    toggleBalances
+    toggleBalances,
+    householdMembers
   } = useFinance();
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -77,7 +78,8 @@ const TransactionList = () => {
     to_account_id: accounts[1]?.id || '',
     category: '',
     customCategory: '',
-    date: getToday()
+    date: getToday(),
+    member_id: ''
   });
 
   const categories = {
@@ -112,7 +114,8 @@ const TransactionList = () => {
       account_id: transaction.account_id,
       category: availableCategories.includes(transaction.category) ? transaction.category : 'Other',
       customCategory: availableCategories.includes(transaction.category) ? '' : transaction.category,
-      date: transaction.date
+      date: transaction.date,
+      member_id: transaction.member_id || ''
     });
     setIsModalOpen(true);
   };
@@ -188,7 +191,8 @@ const TransactionList = () => {
         description: formData.description,
         account_id: formData.account_id,
         category: finalCategory,
-        date: formData.date
+        date: formData.date,
+        member_id: formData.member_id
       });
     }
 
@@ -204,7 +208,7 @@ const TransactionList = () => {
   const resetForm = () => {
     setFormData({
       amount: '', description: '', account_id: accounts[0]?.id || '', to_account_id: accounts[1]?.id || '',
-      category: '', customCategory: '', date: getToday()
+      category: '', customCategory: '', date: getToday(), member_id: ''
     });
     setEditingId(null);
     setError('');
@@ -416,7 +420,18 @@ const TransactionList = () => {
                             {t.type === 'Income' ? <ArrowUpRight size={18} /> : <ArrowDownRight size={18} />}
                           </div>
                           <div>
-                            <p className="font-black text-[15px] tracking-tight text-white leading-none mb-1">{t.description}</p>
+                            <div className="flex items-center gap-2 mb-1">
+                              <p className="font-black text-[15px] tracking-tight text-white leading-none">{t.description}</p>
+                              {t.member_id && (
+                                <div 
+                                  className="w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-black text-black shrink-0"
+                                  style={{ backgroundColor: householdMembers.find(m => m.id === t.member_id)?.color || '#fff' }}
+                                  title={householdMembers.find(m => m.id === t.member_id)?.name}
+                                >
+                                  {householdMembers.find(m => m.id === t.member_id)?.name.charAt(0)}
+                                </div>
+                              )}
+                            </div>
                             <p className="text-[10px] text-primary uppercase font-black tracking-widest">{t.category}</p>
                           </div>
                         </div>
@@ -468,7 +483,17 @@ const TransactionList = () => {
                         {t.type === 'Income' ? <ArrowUpRight size={18} /> : <ArrowDownRight size={18} />}
                       </div>
                       <div>
-                        <p className="font-black text-sm text-white mb-1">{t.description}</p>
+                        <div className="flex items-center gap-2 mb-1">
+                          <p className="font-black text-sm text-white">{t.description}</p>
+                          {t.member_id && (
+                            <div 
+                              className="w-4 h-4 rounded-full flex items-center justify-center text-[7px] font-black text-black shrink-0"
+                              style={{ backgroundColor: householdMembers.find(m => m.id === t.member_id)?.color || '#fff' }}
+                            >
+                              {householdMembers.find(m => m.id === t.member_id)?.name.charAt(0)}
+                            </div>
+                          )}
+                        </div>
                         <p className="text-[10px] text-text-muted font-bold uppercase tracking-widest">{t.date}</p>
                       </div>
                     </div>
@@ -601,6 +626,17 @@ const TransactionList = () => {
                   <div>
                     <label className="text-[10px] text-text-muted uppercase tracking-[0.2em] font-black block mb-2">To Wallet</label>
                     <SearchableSelect options={accounts?.map(acc => ({ id: acc.id, name: acc.name }))} value={formData.to_account_id} onChange={(val) => setFormData({...formData, to_account_id: val})} placeholder="Search Target Wallet..." />
+                  </div>
+                )}
+                {householdMembers.length > 0 && (
+                  <div>
+                    <label className="text-[10px] text-text-muted uppercase tracking-[0.2em] font-black block mb-2">Member Tag (Optional)</label>
+                    <SearchableSelect 
+                      options={householdMembers.map(m => ({ id: m.id, name: m.name }))} 
+                      value={formData.member_id} 
+                      onChange={(val) => setFormData({...formData, member_id: val})} 
+                      placeholder="Tag family member..." 
+                    />
                   </div>
                 )}
               </div>

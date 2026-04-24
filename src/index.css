@@ -238,6 +238,20 @@ input:focus, select:focus {
 .border-b { border-bottom: 1px solid var(--border); }
 .border-t { border-top: 1px solid var(--border); }
 
+/* Additional Utilities for Premium Components */
+.bg-lime { background-color: #c1ff72; }
+.rounded-2xl { border-radius: 1.25rem; }
+.shadow-lime { box-shadow: 0 0 20px rgba(193, 255, 114, 0.3); }
+.active-scale-95:active { transform: scale(0.95); }
+.transition-all { transition: all 0.3s ease; }
+.bg-danger\/10 { background-color: rgba(239, 68, 68, 0.1); }
+.bg-black\/20 { background-color: rgba(0, 0, 0, 0.2); }
+.bg-white\/20 { background-color: rgba(255, 255, 255, 0.2); }
+.bg-white\/10 { background-color: rgba(255, 255, 255, 0.1); }
+.border-danger\/20 { border-color: rgba(239, 68, 68, 0.2); }
+.border-white\/20 { border-color: rgba(255, 255, 255, 0.2); }
+.text-md { font-size: 1rem; }
+
 /* Animations */
 @keyframes slideUp {
   from { transform: translateY(20px); opacity: 0; }
@@ -255,6 +269,12 @@ input:focus, select:focus {
 .animate-slide-up { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 .animate-scale-in { animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 .animate-fade-in { animation: fadeIn 0.2s ease-out forwards; }
+.animate-pulse-slow { animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
 
 .backdrop-blur-md { backdrop-filter: blur(8px); }
 .backdrop-blur-xl { backdrop-filter: blur(24px); }
