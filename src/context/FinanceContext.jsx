@@ -22,15 +22,7 @@ export const FinanceProvider = ({ children }) => {
     return saved || null;
   }); 
   const [loading, setLoading] = useState(true);
-  const [showLogModal, setShowLogModal] = useState(false);
   const [syncError, setSyncError] = useState(null);
-  const [logs, setLogs] = useState([]);
-
-  const addLog = (msg) => {
-    const timestamp = new Date().toLocaleTimeString();
-    setLogs(prev => [`[${timestamp}] ${msg}`, ...prev].slice(0, 20));
-    console.log(msg);
-  };
   
   // Track the current sync request to prevent race conditions
   const syncVersionRef = React.useRef(0);
@@ -91,7 +83,6 @@ export const FinanceProvider = ({ children }) => {
     if (user) {
       // Default to my own account as the first household
       if (!currentHouseholdId) {
-        addLog(`[WORKSPACE] No current ID, defaulting to user.id: ${user.id}`);
         setCurrentHouseholdId(user.id);
       }
       fetchProfile();
@@ -311,9 +302,7 @@ export const FinanceProvider = ({ children }) => {
     // Increment version to ignore previous requests
     const currentVersion = ++syncVersionRef.current;
     
-    addLog(`[SYNC] [v${currentVersion}] Fetching target: ${targetId.slice(0,8)}...`);
     setLoading(true);
-    addLog(`[SYNC] [v${currentVersion}] Clearing state...`);
     clearAllData();
 
     try {
@@ -344,11 +333,9 @@ export const FinanceProvider = ({ children }) => {
 
       setAccounts(accountsRes.data || []);
       setTransactions(transactionsRes.data || []);
-      addLog(`[SYNC] [v${currentVersion}] Success. Accounts: ${accountsRes.data?.length || 0}, Transactions: ${transactionsRes.data?.length || 0}`);
 
     } catch (err) {
       if (currentVersion === syncVersionRef.current) {
-        addLog(`[ERROR] [v${currentVersion}] Fetch Failed: ${err.message || JSON.stringify(err)}`);
         setSyncError(err.message);
       }
 
@@ -701,7 +688,6 @@ export const FinanceProvider = ({ children }) => {
       setAccounts(prev => [...prev, data[0]]);
       return { success: true };
     } catch (error) {
-      addLog(`[ERROR] Create Account Failed: ${error.message || JSON.stringify(error)}`);
       return { error };
     }
 
@@ -1210,7 +1196,7 @@ export const FinanceProvider = ({ children }) => {
       updatePreferences: (newPrefs) => setPreferences(prev => ({ ...prev, ...newPrefs })),
       toggleBalances: () => setPreferences(prev => ({ ...prev, hideBalances: !prev.hideBalances })),
       syncError,
-      logs
+      setShowLogModal: (val) => {} // No-op placeholder if needed
     }}>
 
       {children}

@@ -41,9 +41,9 @@ const AppContent = () => {
     showLogModal, setShowLogModal, availableHouseholds, currentHouseholdId, setCurrentHouseholdId 
   } = useFinance();
 
-  console.log("[DEBUG] AppContent render - currentHouseholdId:", currentHouseholdId);
 
   const [activeTab, setActiveTab] = useState('dashboard');
+
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');

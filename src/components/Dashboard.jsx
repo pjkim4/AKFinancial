@@ -40,8 +40,7 @@ const Dashboard = () => {
     toggleBalances,
     setShowLogModal,
     currentHouseholdId,
-    availableHouseholds,
-    logs
+    availableHouseholds
   } = useFinance();
 
   const { showInstantMove, showMonthlyTrend, showExpenseDistribution } = preferences;
@@ -545,37 +544,10 @@ const Dashboard = () => {
           )}
         </div>
       )}
-      {/* Diagnostic Logs Overlay */}
-      <div className="card bg-black/40 border-white/5 mt-10">
-        <div className="flex items-center gap-2 mb-4 px-1">
-          <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
-          <h4 className="text-[10px] font-black uppercase tracking-widest text-text-muted">System Synchronizer Logs</h4>
-          <button 
-            onClick={async () => {
-              const testAcc = { name: 'Test Sync Account', type: 'Checking', balance: 100, color: '#ff0000' };
-              const { error } = await createAccount(testAcc);
-              if (error) addLog(`[ERROR] Test Write Failed: ${error.message}`);
-              else addLog(`[SUCCESS] Test Write Worked!`);
-            }}
-            className="ml-auto text-[8px] bg-white/5 px-2 py-1 rounded hover:bg-white/10 text-text-muted"
-          >
-            Test DB Write
-          </button>
-        </div>
-
-        <div className="bg-black/60 rounded-xl p-4 font-mono text-[9px] h-40 overflow-y-auto space-y-1 border border-white/5">
-          {logs.length > 0 ? logs.map((log, i) => (
-            <div key={i} className={log.includes('Error') || log.includes('Denied') ? 'text-danger' : log.includes('Success') ? 'text-success' : 'text-text-muted'}>
-              {log}
-            </div>
-          )) : (
-            <div className="text-text-muted/30 italic">No logs generated yet...</div>
-          )}
-        </div>
-      </div>
     </div>
   );
 };
+
 
 
 export default Dashboard;
