@@ -19,6 +19,11 @@ export const FinanceProvider = ({ children }) => {
   const [currentHouseholdId, setCurrentHouseholdId] = useState(null); 
   const [loading, setLoading] = useState(true);
   const [showLogModal, setShowLogModal] = useState(false);
+  const [syncError, setSyncError] = useState(null);
+  
+  // Track the current sync request to prevent race conditions
+  const syncVersionRef = React.useRef(0);
+
   const [preferences, setPreferences] = useState(() => {
     const saved = localStorage.getItem('finance_preferences');
     return saved ? JSON.parse(saved) : { 
@@ -204,11 +209,10 @@ export const FinanceProvider = ({ children }) => {
     }
   };
 
-  const fetchHouseholdMembers = async () => {
-    if (!user) return;
+  const fetchHouseholdMembers = async (targetId) => {
+    if (!user || !targetId) return;
     try {
-      const targetId = currentHouseholdId || user.id;
-      console.log('[AUTH] Fetching members for household:', targetId);
+      console.log('[SYNC] Fetching members for household:', targetId);
       const { data, error } = await supabase
         .from('household_members')
         .select('*')
@@ -224,9 +228,10 @@ export const FinanceProvider = ({ children }) => {
       }
       setHouseholdMembers(data || []);
     } catch (err) {
-      console.error('[AUTH] Error fetching members:', err.message);
+      console.error('[SYNC] Error fetching members:', err.message);
     }
   };
+
 
   const fetchProfile = async () => {
     try {
@@ -243,10 +248,9 @@ export const FinanceProvider = ({ children }) => {
     }
   };
 
-  const fetchFrequentPayments = async () => {
-    if (!user) return;
+  const fetchFrequentPayments = async (targetId) => {
+    if (!user || !targetId) return;
     try {
-      const targetId = currentHouseholdId || user.id;
       const { data, error } = await supabase
         .from('frequent_payments')
         .select('*')
@@ -255,14 +259,14 @@ export const FinanceProvider = ({ children }) => {
       if (error) throw error;
       setFrequentPayments(data || []);
     } catch (err) {
-      console.error('[AUTH] Error fetching shortcuts:', err.message);
+      console.error('[SYNC] Error fetching shortcuts:', err.message);
     }
   };
 
-  const fetchRecurringSchedules = async () => {
-    if (!user) return;
+
+  const fetchRecurringSchedules = async (targetId) => {
+    if (!user || !targetId) return;
     try {
-      const targetId = currentHouseholdId || user.id;
       const { data, error } = await supabase
         .from('recurring_transactions')
         .select('*')
@@ -272,61 +276,83 @@ export const FinanceProvider = ({ children }) => {
       if (error) throw error;
       setRecurringSchedules(data || []);
       if (data && data.length > 0) {
-        processRecurringTransactions(data);
+        processRecurringTransactions(data, targetId);
       }
     } catch (err) {
-      console.error('[AUTH] Error fetching schedules:', err.message);
+      console.error('[SYNC] Error fetching schedules:', err.message);
     }
   };
 
-  const fetchData = async (overrideId = null) => {
-    if (!user) return;
-    
-    const targetId = overrideId || currentHouseholdId || user.id;
-    setLoading(true);
-    
-    // Clear state before fetching new data to prevent mixed data
+
+  const clearAllData = () => {
     setAccounts([]);
     setTransactions([]);
+    setFrequentPayments([]);
+    setRecurringSchedules([]);
+    setHouseholdMembers([]);
+    setSyncError(null);
+  };
+
+  const fetchData = async (targetId) => {
+    if (!user || !targetId) return;
+    
+    // Increment version to ignore previous requests
+    const currentVersion = ++syncVersionRef.current;
+    
+    setLoading(true);
+    clearAllData();
 
     try {
-      console.log('[AUTH] Syncing data for Target ID:', targetId);
+      console.log(`[SYNC] [v${currentVersion}] Starting data sync for ID:`, targetId);
 
-      const { data: accountsData, error: accountsError } = await supabase
-        .from('accounts')
-        .select('*')
-        .eq('user_id', targetId)
-        .order('name');
+      const [accountsRes, transactionsRes] = await Promise.all([
+        supabase
+          .from('accounts')
+          .select('*')
+          .eq('user_id', targetId)
+          .order('name'),
+        supabase
+          .from('transactions')
+          .select('*')
+          .eq('user_id', targetId)
+          .order('date', { ascending: false })
+          .limit(100)
+      ]);
       
-      if (accountsError) throw accountsError;
-      setAccounts(accountsData || []);
+      // If a newer request has started, ignore this one
+      if (currentVersion !== syncVersionRef.current) {
+        console.log(`[SYNC] [v${currentVersion}] Ignoring stale response`);
+        return;
+      }
 
-      const { data: transactionsData, error: transactionsError } = await supabase
-        .from('transactions')
-        .select('*')
-        .eq('user_id', targetId)
-        .order('date', { ascending: false })
-        .limit(100);
-      
-      if (transactionsError) throw transactionsError;
-      setTransactions(transactionsData || []);
+      if (accountsRes.error) throw accountsRes.error;
+      if (transactionsRes.error) throw transactionsRes.error;
+
+      setAccounts(accountsRes.data || []);
+      setTransactions(transactionsRes.data || []);
+      console.log(`[SYNC] [v${currentVersion}] Data sync complete`);
 
     } catch (err) {
-      console.error('[AUTH] Fetch Error:', err.message);
+      if (currentVersion === syncVersionRef.current) {
+        console.error(`[SYNC] [v${currentVersion}] Fetch Error:`, err.message);
+        setSyncError(err.message);
+      }
     } finally {
-      // Small delay to ensure state has propagated
-      setTimeout(() => setLoading(false), 50);
+      if (currentVersion === syncVersionRef.current) {
+        setLoading(false);
+      }
     }
   };
 
   useEffect(() => {
     if (user && currentHouseholdId) {
       fetchData(currentHouseholdId);
-      fetchFrequentPayments();
-      fetchRecurringSchedules();
-      fetchHouseholdMembers();
+      fetchFrequentPayments(currentHouseholdId);
+      fetchRecurringSchedules(currentHouseholdId);
+      fetchHouseholdMembers(currentHouseholdId);
     }
   }, [currentHouseholdId]);
+
 
   const addTransaction = async (transaction) => {
     try {
@@ -823,7 +849,7 @@ export const FinanceProvider = ({ children }) => {
     return `${year}-${month}-${day}`;
   };
 
-  const processRecurringTransactions = async (schedules) => {
+  const processRecurringTransactions = async (schedules, targetId) => {
     // Current date at local midnight
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -885,13 +911,14 @@ export const FinanceProvider = ({ children }) => {
       }
     }
 
-    if (updatedAny) {
+    if (updatedAny && targetId) {
       // Refresh schedules and transactions to reflect changes
-      fetchData(); // This gets updated transactions/accounts
-      const { data } = await supabase.from('recurring_transactions').select('*').order('created_at');
+      fetchData(targetId); // This gets updated transactions/accounts
+      const { data } = await supabase.from('recurring_transactions').select('*').eq('user_id', targetId).order('created_at');
       setRecurringSchedules(data || []);
     }
   };
+
 
   const getNextOccurrence = (date, frequency) => {
     const next = new Date(date);
@@ -966,8 +993,9 @@ export const FinanceProvider = ({ children }) => {
         .insert([{ ...schedule, user_id: currentHouseholdId || user.id }])
         .select();
       if (error) throw error;
+      const targetId = currentHouseholdId || user.id;
       setRecurringSchedules(prev => [...prev, data[0]]);
-      processRecurringTransactions([data[0]]); // Check immediately
+      processRecurringTransactions([data[0]], targetId); // Check immediately
       return { success: true };
     } catch (error) {
       return { error };
@@ -996,7 +1024,8 @@ export const FinanceProvider = ({ children }) => {
       setRecurringSchedules(prev => prev.map(s => s.id === id ? data[0] : s));
       // Re-process just in case dates shifted back
       if (updates.start_date || updates.frequency || updates.status === 'Active') {
-        processRecurringTransactions([data[0]]);
+        const targetId = currentHouseholdId || user.id;
+        processRecurringTransactions([data[0]], targetId);
       }
       return { success: true };
     } catch (error) {

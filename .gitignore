@@ -27,3 +27,4 @@ dist-ssr
 .env
 .gemini/
 scratch/
+.vite_cache/

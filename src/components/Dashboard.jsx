@@ -62,6 +62,24 @@ const Dashboard = () => {
   
   const [loading, setLoading] = useState(false);
 
+  // Sync local states when accounts change (e.g. on household switch)
+  React.useEffect(() => {
+    if (accounts.length > 0) {
+      // If current qtSource is no longer in accounts, reset it
+      if (!accounts.find(a => a.id === qtSource)) {
+        setQtSource(accounts[0].id);
+      }
+      // Same for newShortcut account preference
+      if (!accounts.find(a => a.id === newShortcut.account_id)) {
+        setNewShortcut(prev => ({ ...prev, account_id: accounts[0].id }));
+      }
+    } else {
+      setQtSource('');
+      setNewShortcut(prev => ({ ...prev, account_id: '' }));
+    }
+  }, [accounts]);
+
+
   const filteredTransactions = useMemo(() => {
     if (filterAccount === 'all') return transactions;
     return transactions.filter(t => t.account_id === filterAccount);
