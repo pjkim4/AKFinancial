@@ -489,11 +489,12 @@ const AppContent = () => {
               </button>
               <button 
                 onClick={() => setActiveTab('reports')}
-                className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'reports' ? 'text-primary scale-110' : 'text-text-muted hover:text-white'}`}
+                className={`flex-1 flex flex-col items-center gap-0.5 py-2 transition-all ${activeTab === 'reports' ? 'text-primary' : 'text-text-muted hover:text-white'}`}
               >
                 <FileText size={20} />
                 <span className="text-[8px] font-black uppercase tracking-tighter">Intel</span>
               </button>
+
 
               <button 
                 onClick={() => setActiveTab('settings')}
