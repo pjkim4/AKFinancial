@@ -209,7 +209,14 @@ const Dashboard = () => {
           <p className="text-[10px] text-primary uppercase font-black tracking-widest mt-1">
             Active Workspace: {availableHouseholds.find(h => h.id === currentHouseholdId)?.name || 'Personal Account'}
           </p>
+          <div className="flex items-center gap-2 mt-2">
+            <div className={`w-1.5 h-1.5 rounded-full ${accounts.length > 0 ? 'bg-success' : 'bg-warning animate-pulse'}`}></div>
+            <p className="text-[8px] text-text-muted uppercase font-black tracking-[0.2em]">
+              Cloud Sync: {accounts.length} Wallets Active
+            </p>
+          </div>
         </div>
+
 
         
         <div className="flex flex-wrap items-center gap-3">
