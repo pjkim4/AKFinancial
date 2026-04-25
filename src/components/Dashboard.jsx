@@ -189,11 +189,20 @@ const Dashboard = () => {
   const handleFrequentPayment = async (item) => {
     if (accounts.length === 0 || loading) return;
     
-    if (!window.confirm(`Log ${item.name} for $${item.amount}?`)) return;
+    let finalAmount = item.amount;
+    
+    // If no amount is set, or it's 0, ask for it
+    if (!finalAmount || Number(finalAmount) === 0) {
+      const promptedAmount = prompt(`Enter amount for ${item.name}:`);
+      if (promptedAmount === null || promptedAmount === '') return;
+      finalAmount = promptedAmount;
+    } else {
+      if (!window.confirm(`Log ${item.name} for $${item.amount}?`)) return;
+    }
 
     setLoading(true);
     await addTransaction({
-      amount: item.amount,
+      amount: finalAmount,
       type: 'Expense',
       description: `${item.name}`,
       account_id: item.account_id || accounts[0].id,
@@ -201,8 +210,9 @@ const Dashboard = () => {
       date: new Date().toISOString().split('T')[0]
     });
     setLoading(false);
-    alert(`Successfully logged ${item.name} ($${item.amount})`);
+    alert(`Successfully logged ${item.name} ($${finalAmount})`);
   };
+
 
   const handleQuickTransfer = async () => {
     if (!qtSource || !qtTarget || !qtAmount || loading) return;
@@ -488,8 +498,10 @@ const Dashboard = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="text-xs text-text-muted uppercase font-black tracking-widest mb-2 block">Default Amount</label>
-                    <input type="number" step="0.01" required value={newShortcut.amount} onChange={e => setNewShortcut({...newShortcut, amount: e.target.value})} />
+                    <input type="number" step="0.01" value={newShortcut.amount} onChange={e => setNewShortcut({...newShortcut, amount: e.target.value})} placeholder="0.00" />
+                    <p className="text-[8px] text-text-muted mt-1 uppercase italic">Leave empty to ask every time</p>
                   </div>
+
                   <div>
                     <label className="text-xs text-text-muted uppercase font-black tracking-widest mb-2 block">Category</label>
                     <SearchableSelect 
