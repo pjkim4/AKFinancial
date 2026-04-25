@@ -281,10 +281,13 @@ const TransactionList = () => {
         const dateDiff = new Date(b.date) - new Date(a.date);
         if (dateDiff !== 0) return dateDiff;
         
-        // Same-day priority: Income (0), Transfer (1), Expense (2)
+        // Priority for DESC processing (Process LATEST first)
+        // In UI (ASC), Income (0) is on top (FIRST).
+        // So in DESC, Income (0) must be at the bottom (LAST).
+        // Priority: Expense (2), Transfer (1), Income (0)
         const typeA = a.type === 'Income' ? 0 : (a.type === 'Transfer' ? 1 : 2);
         const typeB = b.type === 'Income' ? 0 : (b.type === 'Transfer' ? 1 : 2);
-        if (typeA !== typeB) return typeA - typeB;
+        if (typeA !== typeB) return typeB - typeA; // Process Expense (2) before Income (0)
 
         return new Date(b.created_at || 0) - new Date(a.created_at || 0);
       });
