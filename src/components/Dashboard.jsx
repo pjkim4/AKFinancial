@@ -224,6 +224,12 @@ const Dashboard = () => {
       if (!window.confirm(`Log ${item.name} for $${item.amount}\nFrom Wallet: [${account.name}]?`)) return;
     }
 
+    // Ask for Date
+    const today = new Date().toISOString().split('T')[0];
+    const finalDate = prompt(`Date for ${item.name}:`, today);
+    if (finalDate === null || finalDate === '') return;
+
+
 
     setLoading(true);
     await addTransaction({
@@ -232,8 +238,10 @@ const Dashboard = () => {
       description: `${item.name}`,
       account_id: item.account_id || accounts[0].id,
       category: item.category,
-      date: new Date().toISOString().split('T')[0]
+      date: finalDate,
+      member_id: user?.id
     });
+
 
     setLoading(false);
     alert(`Successfully logged ${item.name} ($${finalAmount}) to [${account.name}]`);

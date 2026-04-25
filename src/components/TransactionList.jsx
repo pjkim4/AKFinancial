@@ -237,8 +237,10 @@ const TransactionList = () => {
         description: formData.description,
         account_id: formData.account_id,
         category: finalCategory,
-        date: formData.date
+        date: formData.date,
+        member_id: formData.member_id
       });
+
     } else if (modalType === 'transfer') {
       result = await transferFunds(formData.account_id, formData.to_account_id, formData.amount);
     } else {
