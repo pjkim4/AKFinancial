@@ -62,6 +62,7 @@ const Dashboard = () => {
   
   const [filterAccount, setFilterAccount] = useState('all');
   const [chartPeriod, setChartPeriod] = useState('1M'); // 1M, 3M, 6M, YTD, All
+  const [statsPeriod, setStatsPeriod] = useState('1M'); // 1M, 3M, YTD, All
   const [pendingShortcut, setPendingShortcut] = useState(null);
   const [isAccountPickerOpen, setIsAccountPickerOpen] = useState(false);
   const [isLogConfirmationOpen, setIsLogConfirmationOpen] = useState(false);
@@ -152,12 +153,30 @@ const Dashboard = () => {
 
 
   const stats = useMemo(() => {
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
 
+    const periodTransactions = filteredTransactions.filter(t => {
+      const txDate = new Date(t.date);
+      if (statsPeriod === '1M') {
+        return txDate.getMonth() === currentMonth && txDate.getFullYear() === currentYear;
+      }
+      if (statsPeriod === '3M') {
+        const ninetyDaysAgo = new Date();
+        ninetyDaysAgo.setDate(now.getDate() - 90);
+        return txDate >= ninetyDaysAgo;
+      }
+      if (statsPeriod === 'YTD') {
+        return txDate.getFullYear() === currentYear;
+      }
+      return true; // 'All'
+    });
 
-    const income = filteredTransactions
+    const income = periodTransactions
       .filter(t => t.type === 'Income' && t.category !== 'Transfer')
       .reduce((sum, t) => sum + Number(t.amount), 0);
-    const expenses = filteredTransactions
+    const expenses = periodTransactions
       .filter(t => t.type === 'Expense' && t.category !== 'Transfer')
       .reduce((sum, t) => sum + Number(t.amount), 0);
     const balance = filterAccount === 'all' 
@@ -165,7 +184,7 @@ const Dashboard = () => {
       : accounts.find(a => a.id === filterAccount)?.balance || 0;
     
     return { income, expenses, balance };
-  }, [filteredTransactions, accounts, filterAccount]);
+  }, [filteredTransactions, accounts, filterAccount, statsPeriod]);
 
   const chartData = useMemo(() => {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -379,18 +398,32 @@ const Dashboard = () => {
             </button>
           </div>
 
-          <div className="flex items-center gap-2 ml-auto md:ml-0">
-            <Filter size={16} className="text-primary hidden sm:block" />
-            <select 
-              value={filterAccount} 
-              onChange={(e) => setFilterAccount(e.target.value)}
-              className="w-40 md:w-64 h-12 text-sm font-bold"
-            >
-              <option value="all">Total Portfolio</option>
-              {accounts.map(acc => (
-                <option key={acc.id} value={acc.id}>{acc.name}</option>
+          <div className="flex flex-wrap items-center gap-4 ml-auto">
+            <div className="flex bg-white/5 p-1 rounded-xl border border-white/10">
+              {['1M', '3M', 'YTD', 'All'].map(p => (
+                <button 
+                  key={p}
+                  onClick={() => setStatsPeriod(p)}
+                  className={`px-4 py-2 text-[10px] font-black uppercase rounded-lg transition-all ${statsPeriod === p ? 'bg-primary text-black' : 'text-text-muted hover:text-white'}`}
+                >
+                  {p}
+                </button>
               ))}
-            </select>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Filter size={16} className="text-primary hidden sm:block" />
+              <select 
+                value={filterAccount} 
+                onChange={(e) => setFilterAccount(e.target.value)}
+                className="w-40 md:w-64 h-12 text-sm font-bold"
+              >
+                <option value="all">Total Portfolio</option>
+                {accounts.map(acc => (
+                  <option key={acc.id} value={acc.id}>{acc.name}</option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
       </div>
@@ -442,11 +475,10 @@ const Dashboard = () => {
               <ArrowUpRight className="text-success" size={28} />
             </div>
             <div>
-              <p className="text-text-muted text-[10px] uppercase tracking-[0.2em] font-black mb-1">{t('dash_monthly_income')}</p>
+              <p className="text-text-muted text-[10px] uppercase tracking-[0.2em] font-black mb-1">{t('dash_monthly_income')} ({statsPeriod})</p>
               <h3 className="text-xl md:text-2xl font-black text-success">
                 {preferences.hideBalances ? '••••••' : `+$${Number(stats.income).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
               </h3>
-
             </div>
           </div>
         </div>
@@ -457,11 +489,10 @@ const Dashboard = () => {
               <ArrowDownRight className="text-danger" size={28} />
             </div>
             <div>
-              <p className="text-text-muted text-[10px] uppercase tracking-[0.2em] font-black mb-1">{t('dash_monthly_expense')}</p>
+              <p className="text-text-muted text-[10px] uppercase tracking-[0.2em] font-black mb-1">{t('dash_monthly_expense')} ({statsPeriod})</p>
               <h3 className="text-xl md:text-2xl font-black text-white">
                 {preferences.hideBalances ? '••••••' : `-$${Number(stats.expenses).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
               </h3>
-
             </div>
           </div>
         </div>
@@ -946,7 +977,10 @@ const Dashboard = () => {
                     >
                       {pieData.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
                     </Pie>
-                    <Tooltip contentStyle={{ background: '#181818', border: '1px solid #333' }} />
+                    <Tooltip 
+                      contentStyle={{ background: '#181818', border: '1px solid #333' }} 
+                      formatter={(value) => [`$${Number(value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 'Amount']}
+                    />
                     <Legend verticalAlign="bottom" align="center" iconType="circle" wrapperStyle={{ paddingTop: '20px' }} />
                   </PieChart>
                 </ResponsiveContainer>
