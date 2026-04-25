@@ -240,7 +240,7 @@ const TransactionList = () => {
     const matchesType = filterType === 'all' || t.type === filterType;
 
     // 6. Member Filter
-    const matchesMember = filterMember === 'all' || String(t.member_id) === String(filterMember);
+    const matchesMember = filterMember === 'all' || String(getMemberId(t)) === String(filterMember);
     
     return matchesSearch && matchesStartDate && matchesEndDate && matchesAccount && matchesCategory && matchesType && matchesMember;
   });
