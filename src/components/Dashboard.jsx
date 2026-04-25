@@ -77,6 +77,15 @@ const Dashboard = () => {
     ...(preferences.customCategories?.expense || []).map(c => ({ ...c, isCustom: true }))
   ];
 
+  const incomeCategories = [
+    { id: 'Salary', name: t('cat_salary') || 'Salary' },
+    { id: 'Investment', name: t('cat_investment') || 'Investment' },
+    { id: 'Gift', name: t('cat_gift') || 'Gift' },
+    { id: 'Other', name: t('cat_other') },
+    ...(preferences.customCategories?.income || []).map(c => ({ ...c, isCustom: true }))
+  ];
+
+
   
   // Shortcut Modal State
   const [isShortcutModalOpen, setIsShortcutModalOpen] = useState(false);
@@ -85,9 +94,11 @@ const Dashboard = () => {
     name: '', 
     amount: '', 
     category: 'Entertainment', 
+    type: 'Expense',
     color: '#10b981',
     account_id: accounts[0]?.id || ''
   });
+
   
   const [loading, setLoading] = useState(false);
 
@@ -204,12 +215,13 @@ const Dashboard = () => {
     setLoading(true);
     await addTransaction({
       amount: finalAmount,
-      type: 'Expense',
+      type: item.type || 'Expense',
       description: `${item.name}`,
       account_id: item.account_id || accounts[0].id,
       category: item.category,
       date: new Date().toISOString().split('T')[0]
     });
+
     setLoading(false);
     alert(`Successfully logged ${item.name} ($${finalAmount}) to [${account.name}]`);
   };
@@ -411,36 +423,84 @@ const Dashboard = () => {
                 </button>
              </div>
           </div>
-          <div className={`grid grid-cols-2 ${showInstantMove ? 'md:grid-cols-4' : 'md:grid-cols-6'} gap-4`}>
-            {frequentPayments.map((item) => (
-              <div 
-                key={item.id} 
-                className="relative group p-4 bg-white/5 rounded-2xl hover:bg-primary transition-all cursor-pointer border border-white/5 hover:border-transparent flex flex-col items-center text-center overflow-visible"
-              >
-                <div onClick={() => !isShortcutsEditMode && handleFrequentPayment(item)} className="w-full h-full flex flex-col items-center">
-                  <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-3 font-black text-2xl bg-white/10 group-hover:bg-black/20" style={{ color: item.color }}>
-                    {item.name.charAt(0)}
+          <div className="space-y-10">
+            {accounts.map((acc) => {
+              const shortcuts = frequentPayments.filter(p => p.account_id === acc.id);
+              if (shortcuts.length === 0) return null;
+              
+              return (
+                <div key={acc.id} className="space-y-4">
+                  <div className="flex items-center gap-3 px-2">
+                    <div className="w-1.5 h-4 bg-primary rounded-full"></div>
+                    <h5 className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted">{acc.name}</h5>
                   </div>
-                  <p className="text-sm font-black group-hover:text-black transition-colors line-clamp-1">{item.name}</p>
-                  <p className="text-[10px] font-bold text-text-muted group-hover:text-black/60 mt-1">${item.amount}</p>
-                  <p className="text-[8px] font-medium text-text-muted group-hover:text-black/50 mt-2 truncate w-full px-2 border-t border-white/5 group-hover:border-black/5 pt-1 leading-none">
-                    {accounts.find(a => a.id === item.account_id)?.name || (accounts.length > 0 ? accounts[0].name : 'N/A')}
-                  </p>
-
-
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {shortcuts.map((item) => (
+                      <div 
+                        key={item.id} 
+                        className="relative group p-4 bg-white/5 rounded-2xl hover:bg-primary transition-all cursor-pointer border border-white/5 hover:border-transparent flex flex-col items-center text-center overflow-visible"
+                      >
+                        <div onClick={() => !isShortcutsEditMode && handleFrequentPayment(item)} className="w-full h-full flex flex-col items-center">
+                          <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-3 font-black text-2xl bg-white/10 group-hover:bg-black/20" style={{ color: item.color }}>
+                            {item.type === 'Income' ? <ArrowUpRight size={24} /> : item.name.charAt(0)}
+                          </div>
+                          <p className="text-sm font-black group-hover:text-black transition-colors line-clamp-1">{item.name}</p>
+                          <p className="text-[10px] font-bold text-text-muted group-hover:text-black/60 mt-1">
+                            {item.type === 'Income' ? '+' : ''}${item.amount || '???'}
+                          </p>
+                        </div>
+                        
+                        {isShortcutsEditMode && (
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); deleteFrequentPayment(item.id); }}
+                            className="absolute -top-2 -right-2 w-7 h-7 bg-danger text-white rounded-full flex items-center justify-center shadow-xl z-30 border-2 border-card animate-scale-in"
+                          >
+                            <Trash2 size={12} />
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
+              );
+            })}
 
-                
-                {isShortcutsEditMode && (
-                  <button 
-                    onClick={(e) => { e.stopPropagation(); deleteFrequentPayment(item.id); }}
-                    className="absolute -top-2 -right-2 w-7 h-7 bg-danger text-white rounded-full flex items-center justify-center shadow-xl z-30 border-2 border-card animate-scale-in"
-                  >
-                    <Trash2 size={12} />
-                  </button>
-                )}
+            {/* Handle unassigned shortcuts or catch-all if no accounts matched */}
+            {frequentPayments.filter(p => !accounts.some(acc => acc.id === p.account_id)).length > 0 && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-3 px-2">
+                  <div className="w-1.5 h-4 bg-gray-500 rounded-full"></div>
+                  <h5 className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted">Other / Unassigned</h5>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {frequentPayments.filter(p => !accounts.some(acc => acc.id === p.account_id)).map((item) => (
+                     <div 
+                        key={item.id} 
+                        className="relative group p-4 bg-white/5 rounded-2xl hover:bg-primary transition-all cursor-pointer border border-white/5 hover:border-transparent flex flex-col items-center text-center overflow-visible"
+                      >
+                        <div onClick={() => !isShortcutsEditMode && handleFrequentPayment(item)} className="w-full h-full flex flex-col items-center">
+                          <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-3 font-black text-2xl bg-white/10 group-hover:bg-black/20" style={{ color: item.color }}>
+                            {item.type === 'Income' ? <ArrowUpRight size={24} /> : item.name.charAt(0)}
+                          </div>
+                          <p className="text-sm font-black group-hover:text-black transition-colors line-clamp-1">{item.name}</p>
+                          <p className="text-[10px] font-bold text-text-muted group-hover:text-black/60 mt-1">
+                            {item.type === 'Income' ? '+' : ''}${item.amount || '???'}
+                          </p>
+                        </div>
+                        {isShortcutsEditMode && (
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); deleteFrequentPayment(item.id); }}
+                            className="absolute -top-2 -right-2 w-7 h-7 bg-danger text-white rounded-full flex items-center justify-center shadow-xl z-30 border-2 border-card animate-scale-in"
+                          >
+                            <Trash2 size={12} />
+                          </button>
+                        )}
+                      </div>
+                  ))}
+                </div>
               </div>
-            ))}
+            )}
+
             {frequentPayments.length === 0 && (
               <div className="col-span-full py-10 border border-dashed border-white/10 rounded-2xl text-center text-text-muted text-xs font-bold">
                 No shortcuts found. Add your first one using the + button.
@@ -512,10 +572,28 @@ const Dashboard = () => {
                <button onClick={() => setIsShortcutModalOpen(false)}><X size={24} /></button>
              </div>
              <form onSubmit={handleAddShortcut} className="space-y-6">
-                <div>
-                   <label className="text-xs text-text-muted uppercase font-black tracking-widest mb-2 block">Name (e.g. Netflix)</label>
-                   <input required value={newShortcut.name} onChange={e => setNewShortcut({...newShortcut, name: e.target.value})} />
-                </div>
+                 <div className="grid grid-cols-2 gap-4">
+                   <div>
+                      <label className="text-xs text-text-muted uppercase font-black tracking-widest mb-2 block">Name (e.g. Netflix)</label>
+                      <input required value={newShortcut.name} onChange={e => setNewShortcut({...newShortcut, name: e.target.value})} />
+                   </div>
+                   <div>
+                      <label className="text-xs text-text-muted uppercase font-black tracking-widest mb-2 block">Type</label>
+                      <div className="flex gap-2">
+                        {['Expense', 'Income'].map(t => (
+                          <button 
+                            key={t}
+                            type="button"
+                            onClick={() => setNewShortcut({...newShortcut, type: t, category: t === 'Expense' ? 'Entertainment' : 'Salary'})}
+                            className={`flex-1 h-12 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all border-2 ${newShortcut.type === t ? 'bg-primary border-primary text-black' : 'bg-white/5 border-white/10 text-text-muted'}`}
+                          >
+                            {t}
+                          </button>
+                        ))}
+                      </div>
+                   </div>
+                 </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="text-xs text-text-muted uppercase font-black tracking-widest mb-2 block">Default Amount</label>
@@ -526,21 +604,22 @@ const Dashboard = () => {
                   <div>
                     <label className="text-xs text-text-muted uppercase font-black tracking-widest mb-2 block">Category</label>
                     <SearchableSelect 
-                      options={expenseCategories}
+                      options={newShortcut.type === 'Expense' ? expenseCategories : incomeCategories}
                       value={newShortcut.category}
                       onChange={(val) => {
-                        const exists = expenseCategories.some(c => c.id === val);
+                        const cats = newShortcut.type === 'Expense' ? expenseCategories : incomeCategories;
+                        const exists = cats.some(c => c.id === val);
                         if (!exists && val) {
-                          addCustomCategory('expense', val);
+                          addCustomCategory(newShortcut.type === 'Expense' ? 'expense' : 'income', val);
                         }
                         setNewShortcut(prev => ({ ...prev, category: val }));
                       }}
                       onEdit={(id, name) => {
                         const newName = prompt('New category name:', name);
-                        if (newName) updateCustomCategory('expense', id, newName);
+                        if (newName) updateCustomCategory(newShortcut.type === 'Expense' ? 'expense' : 'income', id, newName);
                       }}
                       onDelete={(id) => {
-                        if (confirm('Delete category?')) deleteCustomCategory('expense', id);
+                        if (confirm('Delete category?')) deleteCustomCategory(newShortcut.type === 'Expense' ? 'expense' : 'income', id);
                       }}
                       placeholder="Select Category"
                     />
