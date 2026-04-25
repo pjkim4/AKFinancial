@@ -109,6 +109,7 @@ const TransactionList = () => {
   } = useFinance();
 
   const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState('date-desc');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isWalletHubOpen, setIsWalletHubOpen] = useState(false);
   const [modalType, setModalType] = useState('expense'); 
@@ -243,6 +244,17 @@ const TransactionList = () => {
     const matchesMember = filterMember === 'all' || String(getMemberId(t)) === String(filterMember);
     
     return matchesSearch && matchesStartDate && matchesEndDate && matchesAccount && matchesCategory && matchesType && matchesMember;
+  }).sort((a, b) => {
+    switch (sortBy) {
+      case 'date-asc': return new Date(a.date) - new Date(b.date);
+      case 'amount-desc': return parseFloat(b.amount) - parseFloat(a.amount);
+      case 'amount-asc': return parseFloat(a.amount) - parseFloat(b.amount);
+      case 'category-asc': return (a.category || '').localeCompare(b.category || '');
+      case 'category-desc': return (b.category || '').localeCompare(a.category || '');
+      case 'date-desc':
+      default:
+        return new Date(b.date) - new Date(a.date);
+    }
   });
 
 
@@ -553,9 +565,24 @@ const TransactionList = () => {
                  </select>
               </div>
 
+              <div className="space-y-1.5">
+                 <label className="text-[10px] font-black uppercase tracking-widest text-text-muted ml-1">Sort By</label>
+                 <select 
+                  className="w-full h-12 px-3 bg-white/5 border border-white/10 rounded-xl text-xs font-black appearance-none cursor-pointer hover:bg-white/10 transition-all text-white"
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                 >
+                    <option value="date-desc" className="bg-[#181818]">Date (Newest)</option>
+                    <option value="date-asc" className="bg-[#181818]">Date (Oldest)</option>
+                    <option value="amount-desc" className="bg-[#181818]">Amount (High-Low)</option>
+                    <option value="amount-asc" className="bg-[#181818]">Amount (Low-High)</option>
+                    <option value="category-asc" className="bg-[#181818]">Category (A-Z)</option>
+                 </select>
+              </div>
+
               <div className="flex items-end">
                 <button 
-                  onClick={() => { setStartDate(''); setEndDate(''); setSearchTerm(''); setFilterAccount('all'); setFilterCategory('all'); setFilterType('all'); setFilterMember('all'); setIsGroupedByType(false); }}
+                  onClick={() => { setStartDate(''); setEndDate(''); setSearchTerm(''); setFilterAccount('all'); setFilterCategory('all'); setFilterType('all'); setFilterMember('all'); setIsGroupedByType(false); setSortBy('date-desc'); }}
                   className="w-full h-12 bg-white/5 border border-white/10 rounded-xl text-[10px] font-black uppercase hover:bg-white/10 hover:text-white transition-all text-text-muted"
                 >
                   {t('tx_clear')}
