@@ -390,8 +390,11 @@ const TransactionList = () => {
                <p className="col-span-full py-4 text-center text-text-muted text-[10px] font-bold uppercase tracking-widest">No active wallets sync'd</p>
              )}
           </div>
-            {/* Filter Toolbar */}
+        )}
+
+        {/* Filter Toolbar */}
         <div className="card glass p-4 space-y-4">
+
            {/* Row 1: Search & Dates */}
            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
               <div className="lg:col-span-6 relative group">
