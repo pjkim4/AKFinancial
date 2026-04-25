@@ -617,7 +617,7 @@ const TransactionList = () => {
 
               <div className="flex items-end">
                 <button 
-                  onClick={() => { setStartDate(''); setEndDate(''); setSearchTerm(''); setFilterAccount('all'); setFilterCategory('all'); setFilterType('all'); setFilterMember('all'); setIsGroupedByType(false); setSortBy('date-desc'); }}
+                  onClick={() => { setStartDate(''); setEndDate(''); setSearchTerm(''); setFilterAccount('all'); setFilterCategory('all'); setFilterType('all'); setFilterMember('all'); setIsGroupedByType(false); setSortBy('date-asc'); }}
                   className="w-full h-12 bg-white/5 border border-white/10 rounded-xl text-[10px] font-black uppercase hover:bg-white/10 hover:text-white transition-all text-text-muted"
                 >
                   {t('tx_clear')}
