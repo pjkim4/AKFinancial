@@ -30,6 +30,7 @@ export const translations = {
     tx_action: 'Action',
     tx_export: 'Export',
     tx_clear: 'Clear/Show All',
+    tx_transfer: 'Transfer',
     tx_delete_confirm: 'Delete transactions?',
     
     // Wallets
@@ -38,6 +39,9 @@ export const translations = {
     wallet_balance: 'Current Balance',
     wallet_initial: 'Initial Balance',
     wallet_create: 'Create Account',
+    show_wallets: 'Show Wallets',
+    hide_wallets: 'Hide Wallets',
+
     
     // Settings
     settings_security: 'Account Security',
@@ -102,6 +106,7 @@ export const translations = {
     tx_action: '관리',
     tx_export: '내보내기',
     tx_clear: '필터 초기화',
+    tx_transfer: '이체/송금',
     tx_delete_confirm: '내역을 삭제하시겠습니까?',
     
     // Wallets
@@ -110,6 +115,9 @@ export const translations = {
     wallet_balance: '현재 잔액',
     wallet_initial: '초기 잔고',
     wallet_create: '계좌 생성',
+    show_wallets: '지갑 보기',
+    hide_wallets: '지갑 숨기기',
+
     
     // Settings
     settings_security: '계정 보안',

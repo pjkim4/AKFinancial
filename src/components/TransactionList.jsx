@@ -246,7 +246,7 @@ const TransactionList = () => {
       <div className="space-y-6 animate-slide-up pb-10">
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h2 className="text-3xl font-black tracking-tight">Transactions</h2>
+            <h2 className="text-3xl font-black tracking-tight">{t('nav_history')}</h2>
             <div className="flex items-center gap-3">
               <p className="text-text-muted font-bold">Cloud-synced ledger history.</p>
               <div className="w-1 h-1 rounded-full bg-white/20" />
@@ -255,10 +255,11 @@ const TransactionList = () => {
                 className="text-[10px] font-black uppercase tracking-widest text-primary hover:text-white transition-colors flex items-center gap-1.5"
               >
                 <Wallet size={12} />
-                {isWalletHubOpen ? 'Hide Wallets' : 'Show Wallets'}
+                {isWalletHubOpen ? t('hide_wallets') : t('show_wallets')}
               </button>
             </div>
           </div>
+
           
           <div className="flex gap-3 items-center">
             <button 
@@ -279,7 +280,7 @@ const TransactionList = () => {
               className="btn btn-primary text-black font-black uppercase text-xs tracking-widest"
             >
               <Plus size={18} />
-              Log Entry
+              {t('dash_add_transaction')}
             </button>
             <button 
               onClick={() => { 
@@ -292,8 +293,9 @@ const TransactionList = () => {
               className="btn btn-secondary border-white/10 font-bold text-xs"
             >
               <Repeat size={18} />
-              Transfer
+              {t('tx_transfer')}
             </button>
+
           </div>
         </header>
         
