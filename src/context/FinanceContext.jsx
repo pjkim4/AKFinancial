@@ -313,11 +313,36 @@ export const FinanceProvider = ({ children }) => {
         .eq('user_id', targetId);
       
       if (error) throw error;
-      setFrequentPayments(data || []);
+      
+      // Parse fallbacks (TYPE:Income|CAT:Salary or ACC:id|CAT:Food)
+      const parsedData = (data || []).map(item => {
+        let { category, type, account_id } = item;
+        
+        // If type is missing in DB but encoded in category
+        if (!type && category?.startsWith('TYPE:')) {
+          const parts = category.split('|');
+          type = parts[0].replace('TYPE:', '');
+          category = parts[1]?.replace('CAT:', '') || category;
+        }
+        
+        // If account_id is missing in DB but encoded in category
+        if (!account_id && category?.includes('ACC:')) {
+          const parts = category.split('|');
+          const accPart = parts.find(p => p.startsWith('ACC:'));
+          const catPart = parts.find(p => p.startsWith('CAT:'));
+          if (accPart) account_id = accPart.replace('ACC:', '');
+          if (catPart) category = catPart.replace('CAT:', '');
+        }
+
+        return { ...item, type: type || 'Expense', account_id, category };
+      });
+
+      setFrequentPayments(parsedData);
     } catch (err) {
       console.error('[SYNC] Error fetching shortcuts:', err.message);
     }
   };
+
 
 
   const fetchRecurringSchedules = async (targetId) => {
@@ -859,28 +884,39 @@ export const FinanceProvider = ({ children }) => {
 
   const addFrequentPayment = async (item) => {
     try {
+      // Try normal insert first
       const { data, error } = await supabase
         .from('frequent_payments')
         .insert([{ ...item, user_id: currentHouseholdId || user.id }])
         .select();
       
       if (error) {
-        // Fallback: If account_id column is missing in DB (Postgres error or PostgREST cache error)
-        if (
-          error.message?.includes('column "account_id"') || 
-          error.message?.includes("find the 'account_id' column") ||
-          error.code === '42703'
-        ) {
-          const { account_id, ...itemWithoutAccount } = item;
+        // Fallback for missing columns (type or account_id)
+        if (error.code === '42703' || error.message?.includes('column')) {
+          console.warn('[DB] Missing shortcut columns, using category encoding fallback');
+          
+          const { type, account_id, category, ...rest } = item;
+          // Encode type and account_id into category string
+          // Format: TYPE:Income|ACC:uuid|CAT:Salary
+          let encodedCategory = `TYPE:${type || 'Expense'}|ACC:${account_id || ''}|CAT:${category}`;
+          
+          const fallbackItem = { 
+            ...rest, 
+            category: encodedCategory,
+            user_id: currentHouseholdId || user.id 
+          };
+
           const { data: retryData, error: retryError } = await supabase
             .from('frequent_payments')
-            .insert([{ ...itemWithoutAccount, user_id: user.id }])
+            .insert([fallbackItem])
             .select();
           
           if (retryError) throw retryError;
-          if (!retryData || retryData.length === 0) throw new Error('Shortcut created (fallback) but no data returned');
-          setFrequentPayments(prev => [...prev, retryData[0]]);
-          return { success: true, warning: 'Stored without account preference (DB update needed)' };
+          
+          // Manually parse back for local state
+          const localItem = { ...retryData[0], type: type || 'Expense', account_id, category };
+          setFrequentPayments(prev => [...prev, localItem]);
+          return { success: true };
         }
         throw error;
       }
@@ -893,6 +929,7 @@ export const FinanceProvider = ({ children }) => {
       return { error };
     }
   };
+
 
   const deleteFrequentPayment = async (id) => {
     try {
