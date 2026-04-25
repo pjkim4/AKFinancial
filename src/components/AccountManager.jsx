@@ -2,11 +2,20 @@ import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useFinance } from '../context/FinanceContext';
 import { 
+  Plus, 
+  CreditCard, 
+  Wallet, 
+  Settings2, 
+  X,
+  ShieldCheck,
+  ArrowRightLeft,
+  AlertCircle,
   Loader2,
   ChevronDown,
   Eye,
   EyeOff
 } from 'lucide-react';
+
 
 import SearchableSelect from './ui/SearchableSelect';
 
