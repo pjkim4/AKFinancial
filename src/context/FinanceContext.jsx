@@ -38,13 +38,16 @@ export const FinanceProvider = ({ children }) => {
 
   const [preferences, setPreferences] = useState(() => {
     const saved = localStorage.getItem('finance_preferences');
-    return saved ? JSON.parse(saved) : { 
+    const defaultPrefs = { 
       hideBalances: true,
       showInstantMove: true,
       showMonthlyTrend: true,
       showExpenseDistribution: true,
-      customCategories: { income: [], expense: [] }
+      customCategories: { income: [], expense: [] },
+      customRoles: []
     };
+    return saved ? { ...defaultPrefs, ...JSON.parse(saved) } : defaultPrefs;
+
 
   });
 
@@ -1330,6 +1333,25 @@ export const FinanceProvider = ({ children }) => {
           }
         }));
       },
+      addCustomRole: (name) => {
+        setPreferences(prev => ({
+          ...prev,
+          customRoles: [...(prev.customRoles || []), { id: name, name }]
+        }));
+      },
+      deleteCustomRole: (id) => {
+        setPreferences(prev => ({
+          ...prev,
+          customRoles: (prev.customRoles || []).filter(r => r.id !== id)
+        }));
+      },
+      updateCustomRole: (id, newName) => {
+        setPreferences(prev => ({
+          ...prev,
+          customRoles: (prev.customRoles || []).map(r => r.id === id ? { ...r, name: newName } : r)
+        }));
+      },
+
 
       syncError,
       showLogModal,

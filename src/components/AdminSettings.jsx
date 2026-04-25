@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useFinance } from '../context/FinanceContext';
-import { Shield, User, Key, Save, AlertCircle, Mail, Zap, Users, Trash2, Plus, X, Check, Edit2 } from 'lucide-react';
+import { Shield, User, Key, Save, AlertCircle, Mail, Zap, Users, Trash2, Plus, X, Check, Edit2, Briefcase } from 'lucide-react';
 
 const AdminSettings = () => {
   const { 
@@ -12,7 +12,10 @@ const AdminSettings = () => {
     t,
     updateCustomCategory,
     deleteCustomCategory,
-    addCustomCategory
+    addCustomCategory,
+    addCustomRole,
+    deleteCustomRole,
+    updateCustomRole
   } = useFinance();
 
   const [isAddingMember, setIsAddingMember] = useState(false);
@@ -29,6 +32,14 @@ const AdminSettings = () => {
   });
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const allRoles = [
+    { id: 'Parent', name: t('role_parent') || 'Parent' },
+    { id: 'Spouse', name: t('role_spouse') || 'Spouse' },
+    { id: 'Child', name: t('role_child') || 'Child' },
+    { id: 'Roommate', name: t('role_roommate') || 'Roommate' },
+    ...(preferences.customRoles || [])
+  ];
 
   const handleInvite = async () => {
     setLoading(true);
@@ -50,7 +61,7 @@ const AdminSettings = () => {
     if (error) {
       alert('Failed to add member: ' + error.message);
     } else {
-      setNewMember({ name: '', role: 'Spouse', color: '#c1ff72' });
+      setNewMember({ name: '', role: allRoles[0].id, color: '#c1ff72' });
       setIsAddingMember(false);
     }
   };
@@ -130,7 +141,7 @@ const AdminSettings = () => {
               <button 
                 key={inv.id}
                 onClick={() => respondToInvitation(inv.id, 'accepted')}
-                className="w-full p-6 bg-lime text-black font-black rounded-2xl text-sm flex justify-between items-center shadow-lime active:scale-95 transition-all"
+                className="w-full p-6 bg-lime text-black font-black rounded-2xl text-sm flex justify-between items-center shadow-lime active-scale-95 transition-all"
               >
                 <div className="text-left">
                   <span className="block text-xs uppercase tracking-tighter">{t('join_action')}</span>
@@ -152,6 +163,7 @@ const AdminSettings = () => {
         </div>
       </div>
 
+      {/* Profile/Security Section */}
       <section className="card glass divide-y divide-white/5 p-6">
         <h3 className="text-lg font-bold flex items-center gap-2 mb-6">
           <Shield size={20} className="text-primary" />
@@ -220,10 +232,66 @@ const AdminSettings = () => {
             <div className="space-y-4">
               <input 
                 placeholder="Full Name"
+                className="w-full"
                 value={newMember.name}
                 onChange={e => setNewMember({...newMember, name: e.target.value})}
               />
-              <button onClick={handleAddMember} className="btn btn-primary w-full h-12 text-black font-black">ADD MEMBER</button>
+              <div className="grid grid-cols-2 gap-4">
+                <select 
+                  className="w-full"
+                  value={newMember.role} 
+                  onChange={e => setNewMember({...newMember, role: e.target.value})}
+                >
+                  {allRoles.map(role => (
+                    <option key={role.id} value={role.id}>{role.name}</option>
+                  ))}
+                </select>
+                <input 
+                  type="color" 
+                  className="w-full h-12 p-1 bg-white/5 border-white/10" 
+                  value={newMember.color} 
+                  onChange={e => setNewMember({...newMember, color: e.target.value})} 
+                />
+              </div>
+              <button onClick={handleAddMember} className="btn btn-primary w-full h-12 text-black font-black uppercase text-xs tracking-widest">
+                Add Household Member
+              </button>
+            </div>
+          </div>
+        )}
+
+        {editingMemberId && (
+          <div className="mb-8 p-6 bg-white/5 border border-primary/20 rounded-2xl animate-scale-in">
+            <div className="flex justify-between items-center mb-6">
+              <h4 className="text-xs font-black uppercase tracking-widest text-primary">Edit Member</h4>
+              <button onClick={() => setEditingMemberId(null)}><X size={18} /></button>
+            </div>
+            <div className="space-y-4">
+              <input 
+                className="w-full"
+                value={editMemberData.name}
+                onChange={e => setEditMemberData({...editMemberData, name: e.target.value})}
+              />
+              <div className="grid grid-cols-2 gap-4">
+                <select 
+                  className="w-full"
+                  value={editMemberData.role} 
+                  onChange={e => setEditMemberData({...editMemberData, role: e.target.value})}
+                >
+                  {allRoles.map(role => (
+                    <option key={role.id} value={role.id}>{role.name}</option>
+                  ))}
+                </select>
+                <input 
+                  type="color" 
+                  className="w-full h-12 p-1 bg-white/5 border-white/10" 
+                  value={editMemberData.color} 
+                  onChange={e => setEditMemberData({...editMemberData, color: e.target.value})} 
+                />
+              </div>
+              <button onClick={handleEditMember} className="btn btn-primary w-full h-12 text-black font-black uppercase text-xs tracking-widest">
+                Update Member
+              </button>
             </div>
           </div>
         )}
@@ -235,12 +303,84 @@ const AdminSettings = () => {
                 <div className="w-10 h-10 rounded-full flex items-center justify-center font-black" style={{ backgroundColor: member.color || '#fff' }}>
                   {member.name.charAt(0)}
                 </div>
-                <span className="font-bold">{member.name}</span>
+                <div>
+                  <p className="font-bold">{member.name}</p>
+                  <p className="text-[10px] text-text-muted uppercase tracking-widest">{member.role}</p>
+                </div>
               </div>
-              <button onClick={() => deleteHouseholdMember(member.id)} className="p-2 text-danger opacity-0 group-hover:opacity-100"><Trash2 size={16} /></button>
+              <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                <button 
+                  onClick={() => {
+                    setEditingMemberId(member.id);
+                    setEditMemberData({ name: member.name, role: member.role, color: member.color });
+                  }}
+                  className="p-2 text-text-muted hover:text-primary"
+                >
+                  <Edit2 size={16} />
+                </button>
+                <button 
+                  onClick={() => {
+                    if (confirm(`Delete ${member.name}?`)) deleteHouseholdMember(member.id);
+                  }} 
+                  className="p-2 text-danger"
+                >
+                  <Trash2 size={16} />
+                </button>
+              </div>
             </div>
           ))}
         </div>
+      </section>
+
+      {/* Role Manager Section */}
+      <section className="card glass border-white/10 p-8 space-y-6">
+        <div className="flex items-center gap-3">
+          <Briefcase size={24} className="text-primary" />
+          <div>
+            <h3 className="font-black text-lg uppercase italic">Role Manager</h3>
+            <p className="text-[10px] text-text-muted uppercase tracking-widest">Manage available member roles</p>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          {preferences.customRoles?.map(role => (
+            <div key={role.id} className="flex items-center justify-between p-3 bg-white/5 border border-white/10 rounded-xl">
+              <span className="text-sm font-black uppercase tracking-wider text-white italic">{role.name}</span>
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={() => {
+                    const newName = prompt('New role name:', role.name);
+                    if (newName) updateCustomRole(role.id, newName);
+                  }}
+                  className="p-2 bg-blue-500/20 text-blue-400 rounded-lg"
+                >
+                  <Edit2 size={14} />
+                </button>
+                <button 
+                  onClick={() => {
+                    if (confirm('Delete role?')) deleteCustomRole(role.id);
+                  }}
+                  className="p-2 bg-danger/20 text-danger rounded-lg"
+                >
+                  <Trash2 size={14} />
+                </button>
+              </div>
+            </div>
+          ))}
+          <button 
+            onClick={() => {
+              const name = prompt('New role name:');
+              if (name) addCustomRole(name);
+            }}
+            className="w-full p-4 bg-white/5 border border-dashed border-white/20 rounded-xl text-[10px] font-black uppercase text-text-muted hover:text-primary transition-all flex items-center justify-center gap-2"
+          >
+            <Plus size={14} strokeWidth={3} /> Add Custom Role
+          </button>
+        </div>
+        
+        <p className="text-[10px] text-text-muted italic">
+          Standard roles like Parent, Spouse, and Child are always available.
+        </p>
       </section>
 
       {/* Category Manager Section */}
@@ -284,9 +424,9 @@ const AdminSettings = () => {
                     const name = prompt('Category name:');
                     if (name) addCustomCategory(type, name);
                   }}
-                  className="w-full p-3 bg-white/5 border border-dashed border-white/20 rounded-xl text-[10px] font-black uppercase text-text-muted hover:text-primary transition-all"
+                  className="w-full p-4 bg-white/5 border border-dashed border-white/20 rounded-xl text-[10px] font-black uppercase text-text-muted hover:text-primary transition-all flex items-center justify-center gap-2"
                 >
-                  + Add Category
+                  <Plus size={14} strokeWidth={3} /> Add Category
                 </button>
               </div>
             </div>
