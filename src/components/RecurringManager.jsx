@@ -206,8 +206,9 @@ const RecurringManager = () => {
                 <div className="flex items-center justify-between md:justify-end gap-x-8">
                   <div className="text-right">
                     <p className="text-2xl font-black text-white">
-                      {schedule.type === 'Income' ? '+' : '-'}${Number(schedule.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      {schedule.type === 'Income' ? '+' : '-'}{preferences.hideBalances ? '••••' : `$${Number(schedule.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                     </p>
+
                     <p className="text-[10px] text-text-muted font-bold uppercase tracking-widest mt-0.5">
                       Last Run: {schedule.last_run_date || 'Never'}
                     </p>

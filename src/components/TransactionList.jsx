@@ -24,6 +24,72 @@ import {
 } from 'lucide-react';
 import SearchableSelect from './ui/SearchableSelect';
 
+const TransactionRow = ({ transaction, accounts, householdMembers, preferences, getMemberId, getCleanDescription, toggleSelect, selectedIds, handleEditClick, setDeleteConfirmId, t }) => {
+  const memberId = getMemberId(transaction);
+  const member = householdMembers.find(m => String(m.id) === String(memberId));
+  const isSelected = selectedIds.includes(transaction.id);
+
+  return (
+    <div 
+      className={`card glass group relative overflow-visible transition-all hover:bg-white/5 border border-white/5 hover:border-white/10 ${isSelected ? 'border-primary ring-1 ring-primary bg-primary/5' : ''}`}
+      onClick={() => toggleSelect(transaction.id)}
+    >
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 p-2">
+         <div className="flex items-center gap-5">
+            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 ${transaction.type === 'Income' ? 'bg-primary/20 text-primary' : transaction.type === 'Transfer' ? 'bg-secondary/20 text-secondary' : 'bg-danger/20 text-danger'}`}>
+              {transaction.type === 'Income' ? <ArrowUpRight size={28} /> : transaction.type === 'Transfer' ? <Repeat size={28} /> : <ArrowDownRight size={28} />}
+            </div>
+            <div>
+              <div className="flex items-center gap-3">
+                <h4 className="font-black text-lg">{getCleanDescription(transaction.description)}</h4>
+                <span className="text-[10px] uppercase font-black tracking-widest px-2 py-0.5 rounded bg-white/5 text-text-muted">
+                  {transaction.category}
+                </span>
+              </div>
+              <div className="flex items-center gap-3 mt-1.5">
+                <div className="flex items-center gap-1.5">
+                  <Wallet size={12} className="text-text-muted" />
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-text-muted">
+                    {accounts.find(a => String(a.id) === String(transaction.account_id))?.name || 'Unknown'}
+                  </span>
+                </div>
+                {member && (
+                  <div className="flex items-center gap-1.5 px-2 py-0.5 bg-primary/10 rounded text-primary border border-primary/20">
+                    <span className="text-[9px] font-black uppercase tracking-tighter">{member.name}</span>
+                  </div>
+                )}
+                <p className="text-[10px] text-text-muted font-bold uppercase tracking-widest">{transaction.date}</p>
+              </div>
+            </div>
+         </div>
+         
+         <div className="flex items-center justify-between md:justify-end gap-6">
+            <div className="text-right">
+              <p className="text-2xl font-black text-white">
+                {transaction.type === 'Income' ? '+' : '-'}{preferences.hideBalances ? '••••' : `$${Number(transaction.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+              </p>
+            </div>
+            <div className="flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-all">
+              <button 
+                onClick={(e) => { e.stopPropagation(); handleEditClick(transaction); }}
+                className="p-3 rounded-xl bg-white/5 hover:bg-primary/20 hover:text-primary transition-all text-text-muted"
+              >
+                <Edit2 size={20} />
+              </button>
+              <button 
+                onClick={(e) => { e.stopPropagation(); setDeleteConfirmId(transaction.id); }}
+                className="p-3 rounded-xl bg-white/5 hover:bg-danger/20 hover:text-danger transition-all text-text-muted"
+              >
+                <Trash2 size={20} />
+              </button>
+            </div>
+         </div>
+      </div>
+    </div>
+  );
+};
+
+
 const TransactionList = () => {
   const { 
     transactions, 
@@ -80,6 +146,8 @@ const TransactionList = () => {
   const [filterCategory, setFilterCategory] = useState('all');
   const [filterType, setFilterType] = useState('all');
   const [filterMember, setFilterMember] = useState('all');
+  const [isGroupedByType, setIsGroupedByType] = useState(false);
+
 
 
   const [formData, setFormData] = useState({
@@ -446,17 +514,18 @@ const TransactionList = () => {
 
               <div className="space-y-1.5">
                  <label className="text-[10px] font-black uppercase tracking-widest text-text-muted ml-1">Category</label>
-                 <select 
-                  className="w-full h-12 px-3 bg-white/5 border border-white/10 rounded-xl text-xs font-black appearance-none cursor-pointer hover:bg-white/10 transition-all text-white"
-                  value={filterCategory}
-                  onChange={(e) => setFilterCategory(e.target.value)}
-                 >
-                    <option value="all" className="bg-[#181818]">All Categories</option>
-                    {[...allCategories.income, ...allCategories.expense].filter((v, i, a) => a.findIndex(t => t.id === v.id) === i).map(cat => (
-                      <option key={cat.id} value={cat.id} className="bg-[#181818]">{cat.name}</option>
-                    ))}
-                 </select>
+                 <SearchableSelect 
+                    options={[
+                      { id: 'all', name: 'All Categories' },
+                      ...[...allCategories.income, ...allCategories.expense].filter((v, i, a) => a.findIndex(t => t.id === v.id) === i)
+                    ]}
+                    value={filterCategory}
+                    onChange={(val) => setFilterCategory(val)}
+                    placeholder="Search Categories"
+                    className="!h-12 !rounded-xl !text-xs !font-black"
+                 />
               </div>
+
 
               <div className="space-y-1.5">
                  <label className="text-[10px] font-black uppercase tracking-widest text-text-muted ml-1">Type</label>
@@ -486,12 +555,22 @@ const TransactionList = () => {
 
               <div className="flex items-end">
                 <button 
-                  onClick={() => { setStartDate(''); setEndDate(''); setSearchTerm(''); setFilterAccount('all'); setFilterCategory('all'); setFilterType('all'); setFilterMember('all'); }}
+                  onClick={() => { setStartDate(''); setEndDate(''); setSearchTerm(''); setFilterAccount('all'); setFilterCategory('all'); setFilterType('all'); setFilterMember('all'); setIsGroupedByType(false); }}
                   className="w-full h-12 bg-white/5 border border-white/10 rounded-xl text-[10px] font-black uppercase hover:bg-white/10 hover:text-white transition-all text-text-muted"
                 >
                   {t('tx_clear')}
                 </button>
               </div>
+
+              <div className="flex items-end">
+                <button 
+                  onClick={() => setIsGroupedByType(!isGroupedByType)}
+                  className={`w-full h-12 border rounded-xl text-[10px] font-black uppercase transition-all ${isGroupedByType ? 'bg-primary border-primary text-black' : 'bg-white/5 border-white/10 text-text-muted hover:text-white'}`}
+                >
+                  {isGroupedByType ? 'Ungroup' : 'Group by Type'}
+                </button>
+              </div>
+
            </div>
         </div>
 
@@ -518,155 +597,71 @@ const TransactionList = () => {
 
 
         {/* Transaction Views */}
+        {/* Transaction Views */}
         <div className="space-y-4">
-          {/* Desktop Table View */}
-          <div className="hidden md:block card p-0 overflow-hidden border-white/10 bg-card shadow-2xl">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="border-b border-white/10 text-text-muted text-[10px] uppercase tracking-[0.2em] bg-white/[0.03]">
-                    <th className="pl-8 py-5 w-10">
-                       <button 
-                         onClick={toggleSelectAll}
-                         className={`w-6 h-6 rounded-md flex items-center justify-center transition-all ${selectedIds.length === filteredTransactions.length && filteredTransactions.length > 0 ? 'bg-primary text-black' : 'bg-white/5 border border-white/10'}`}
-                       >
-                         {selectedIds.length === filteredTransactions.length && filteredTransactions.length > 0 ? <Check size={14} strokeWidth={4} /> : <Square size={14} />}
-                       </button>
-                    </th>
-                    <th className="px-8 py-5 font-black">{t('tx_timestamp')}</th>
-                    <th className="px-8 py-5 font-black">{t('tx_activity')}</th>
-                    <th className="px-8 py-5 font-black">{t('tx_wallet')}</th>
-                    <th className="px-8 py-5 font-black text-right">{t('tx_action')}</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-white/5">
-                  {filteredTransactions.map(t => (
-                    <tr 
+           {isGroupedByType ? (
+             <div className="space-y-12">
+                {['Expense', 'Income', 'Transfer'].map(type => {
+                  const groupTransactions = filteredTransactions.filter(t => t.type === type);
+                  if (groupTransactions.length === 0) return null;
+
+                  return (
+                    <div key={type} className="space-y-4">
+                      <div className="flex items-center gap-3 px-2">
+                        <div className={`w-1.5 h-4 rounded-full ${type === 'Income' ? 'bg-primary' : type === 'Transfer' ? 'bg-secondary' : 'bg-danger'}`}></div>
+                        <h5 className={`text-sm font-black uppercase tracking-[0.2em] ${type === 'Income' ? 'text-primary' : type === 'Transfer' ? 'text-secondary' : 'text-danger'}`}>
+                          {type === 'Income' ? 'Income' : type === 'Transfer' ? 'Transfers' : 'Expenses'}
+                        </h5>
+                        <span className="text-[10px] font-black text-text-muted/50 ml-auto">{groupTransactions.length} items</span>
+                      </div>
+                      <div className="grid grid-cols-1 gap-4">
+                        {groupTransactions.map(t => (
+                          <TransactionRow 
+                            key={t.id} 
+                            transaction={t} 
+                            accounts={accounts}
+                            householdMembers={householdMembers}
+                            preferences={preferences}
+                            getMemberId={getMemberId}
+                            getCleanDescription={getCleanDescription}
+                            toggleSelect={toggleSelect}
+                            selectedIds={selectedIds}
+                            handleEditClick={handleEditClick}
+                            setDeleteConfirmId={setDeleteConfirmId}
+                            t={t}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+             </div>
+           ) : (
+              <div className="grid grid-cols-1 gap-4">
+                {filteredTransactions.length === 0 ? (
+                  <div className="p-20 text-center text-text-muted">No transactions found for the selected filters</div>
+                ) : (
+                  filteredTransactions.map(t => (
+                    <TransactionRow 
                       key={t.id} 
-                      className={`hover:bg-white/[0.04] transition-colors group cursor-pointer ${selectedIds.includes(t.id) ? 'bg-primary/[0.05]' : ''}`}
-                      style={getMemberId(t) ? { backgroundColor: `${householdMembers.find(m => m.id === getMemberId(t))?.color}0D` } : {}}
-                      onClick={() => toggleSelect(t.id)}
-                    >
-
-
-                      <td 
-                        className="pl-8 py-5 w-10 relative overflow-hidden" 
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                         {getMemberId(t) && (
-                           <div 
-                             className="absolute left-0 top-0 bottom-0 w-1.5 opacity-60"
-                             style={{ backgroundColor: householdMembers.find(m => m.id === getMemberId(t))?.color || '#fff' }}
-                           />
-                         )}
-                         <button 
-                           onClick={() => toggleSelect(t.id)}
-                           className={`w-6 h-6 rounded-md flex items-center justify-center transition-all ${selectedIds.includes(t.id) ? 'bg-primary text-black' : 'bg-white/5 border border-white/10 hover:border-primary/50'}`}
-                         >
-                           {selectedIds.includes(t.id) ? <Check size={14} strokeWidth={4} /> : <Square size={14} />}
-                         </button>
-                      </td>
-
-
-                      <td className="px-8 py-5 text-xs font-black text-text-muted">{t.date}</td>
-                      <td className="px-8 py-5">
-                        <div className="flex items-center gap-4">
-                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center shadow-lg ${t.type === 'Income' ? 'bg-primary/10 text-primary border border-primary/20' : 'bg-danger/10 text-danger border border-danger/20'}`}>
-                            {t.type === 'Income' ? <ArrowUpRight size={18} /> : <ArrowDownRight size={18} />}
-                          </div>
-                          <div>
-                            <div className="flex items-center gap-2 mb-1">
-                              <p className="font-black text-[15px] tracking-tight text-white leading-none">{getCleanDescription(t.description)}</p>
-                              {getMemberId(t) && (
-                                <div 
-                                  className="px-2 py-0.5 rounded-md text-[9px] font-black text-black shrink-0 animate-scale-in"
-                                  style={{ backgroundColor: householdMembers.find(m => m.id === getMemberId(t))?.color || '#fff' }}
-                                >
-                                  {householdMembers.find(m => m.id === getMemberId(t))?.name.toUpperCase()}
-                                </div>
-                              )}
-
-
-                            </div>
-                            <p className="text-[10px] text-primary uppercase font-black tracking-widest">{t.category}</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-8 py-5">
-                        <span className="px-3 py-1 bg-white/5 rounded-full text-[10px] font-black uppercase text-text-muted border border-white/5">
-                          {accounts.find(a => a.id === t.account_id)?.name || 'Removed'}
-                        </span>
-                      </td>
-                      <td className="px-8 py-5 text-right">
-                        <div className="flex items-center justify-end gap-6">
-                          <div className={`text-lg font-black ${t.type === 'Income' ? 'text-primary' : 'text-danger'}`}>
-                            {t.type === 'Income' ? '+' : '-'}${Number(t.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                          </div>
-                           <div className="flex gap-2 group-hover:opacity-100 opacity-60 transition-opacity">
-                              <button 
-                                onClick={(e) => { e.stopPropagation(); handleEditClick(t); }} 
-                                className="p-2 hover:bg-white/10 rounded-lg text-text-muted"
-                              >
-                                <Edit2 size={16} />
-                              </button>
-                              <button 
-                                onClick={(e) => { e.stopPropagation(); setDeleteConfirmId(t.id); }} 
-                                className="p-2 hover:bg-danger/10 rounded-lg text-danger"
-                              >
-                                <Trash2 size={16} />
-                              </button>
-                           </div>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* Mobile Card List View */}
-          <div className="md:hidden space-y-3">
-             {filteredTransactions.map(t => (
-                <div 
-                 key={t.id} 
-                 className={`card p-5 border-white/5 bg-card active:scale-[0.98] transition-transform relative overflow-hidden ${selectedIds.includes(t.id) ? 'border-primary/50' : ''}`}
-                 style={getMemberId(t) ? { backgroundColor: `${householdMembers.find(m => m.id === getMemberId(t))?.color}0D` } : {}}
-                 onClick={() => toggleSelect(t.id)}
-                >
-                  {getMemberId(t) && (
-                    <div 
-                      className="absolute left-0 top-0 bottom-0 w-1.5 opacity-60"
-                      style={{ backgroundColor: householdMembers.find(m => m.id === getMemberId(t))?.color || '#fff' }}
+                      transaction={t} 
+                      accounts={accounts}
+                      householdMembers={householdMembers}
+                      preferences={preferences}
+                      getMemberId={getMemberId}
+                      getCleanDescription={getCleanDescription}
+                      toggleSelect={toggleSelect}
+                      selectedIds={selectedIds}
+                      handleEditClick={handleEditClick}
+                      setDeleteConfirmId={setDeleteConfirmId}
+                      t={t}
                     />
-                  )}
+                  ))
+                )}
+              </div>
+           )}
+        </div>
 
-
-                 <div className="flex justify-between items-start mb-4">
-                    <div className="flex gap-3">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${t.type === 'Income' ? 'bg-primary/10 text-primary' : 'bg-danger/10 text-danger'}`}>
-                        {t.type === 'Income' ? <ArrowUpRight size={18} /> : <ArrowDownRight size={18} />}
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <p className="font-black text-sm text-white">{getCleanDescription(t.description)}</p>
-                          {getMemberId(t) && (
-                            <div 
-                              className="px-1.5 py-0.5 rounded-md text-[8px] font-black text-black shrink-0 animate-scale-in"
-                              style={{ backgroundColor: householdMembers.find(m => m.id === getMemberId(t))?.color || '#fff' }}
-                            >
-                              {householdMembers.find(m => m.id === getMemberId(t))?.name.toUpperCase()}
-                            </div>
-                          )}
-                        </div>
-
-                        <p className="text-[10px] text-text-muted font-bold uppercase tracking-widest">{t.date}</p>
-                      </div>
-                    </div>
-                    <div className={`text-lg font-bold ${t.type === 'Income' ? 'text-primary' : 'text-danger'}`}>
-                      {t.type === 'Income' ? '+' : '-'}${Number(t.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </div>
-                 </div>
                  
                  <div className="flex items-center justify-between pt-4 border-t border-white/5">
                     <span className="text-[9px] font-black uppercase text-text-muted tracking-widest">
@@ -849,7 +844,7 @@ const TransactionList = () => {
                 </button>
               </div>
             </form>
-          </div>
+
         </div>,
         document.body
       )}
