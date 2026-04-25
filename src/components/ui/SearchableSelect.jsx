@@ -76,27 +76,28 @@ const SearchableSelect = ({ options = [], value, onChange, onEdit, onDelete, pla
       <div 
         ref={triggerRef}
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center justify-between p-4 ${isOpen ? 'bg-white' : 'bg-[#1A1A1A]'} border ${isOpen ? 'border-gray-200' : 'border-white/10'} rounded-xl cursor-pointer transition-all ${!isOpen ? 'hover:bg-white/10' : ''} ${isOpen ? 'ring-2 ring-primary/50 border-primary' : ''}`}
+        className={`flex items-center justify-between p-4 ${isOpen ? 'bg-[#EEEEEE]' : 'bg-[#1A1A1A]'} border ${isOpen ? 'border-primary ring-2 ring-primary/20' : 'border-white/10'} rounded-xl cursor-pointer transition-all ${!isOpen ? 'hover:bg-white/10' : ''}`}
       >
         <div className="flex-1">
           {isOpen ? (
             <input
               autoFocus
               type="text"
-              placeholder="Type to search..."
-              className="w-full bg-transparent border-none p-0 focus:ring-0 text-sm font-black text-black placeholder-gray-500"
-
+              placeholder="TYPE TO SEARCH..."
+              className="w-full bg-transparent border-none p-0 focus:ring-0 text-lg font-black text-black placeholder-gray-500 uppercase tracking-tight"
+              style={{ color: '#000000', WebkitTextFillColor: '#000000' }}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               onClick={(e) => e.stopPropagation()}
             />
           ) : (
-            <span className={`text-sm font-bold ${selectedOption ? 'text-white' : 'text-text-muted'}`}>
+            <span className={`text-sm font-black uppercase tracking-wider ${selectedOption ? 'text-white' : 'text-text-muted'}`}>
               {selectedOption ? selectedOption.name : placeholder}
             </span>
           )}
         </div>
-        {isOpen ? <Search size={16} className="text-primary animate-pulse" /> : <ChevronDown size={16} className="text-text-muted" />}
+        {isOpen ? <Search size={20} className="text-primary" /> : <ChevronDown size={20} className="text-text-muted" />}
+
       </div>
 
       {/* FIXED Dropdown Menu (The "Portal" approach) */}
@@ -132,22 +133,22 @@ const SearchableSelect = ({ options = [], value, onChange, onEdit, onDelete, pla
                   </div>
                   
                   {opt.isCustom && (
-                    <div className="flex items-center gap-1 md:opacity-0 md:group-hover:opacity-100 opacity-100 transition-opacity ml-2 shrink-0">
-
+                    <div className="flex items-center gap-2 ml-4 shrink-0">
                        <button 
                         onClick={(e) => { e.stopPropagation(); onEdit?.(opt.id, opt.name); }} 
-                        className="p-1.5 hover:bg-black/5 rounded text-gray-400 hover:text-primary transition-colors"
+                        className="p-2 bg-blue-50 text-blue-600 rounded-lg border border-blue-100"
                        >
-                         <Edit2 size={12}/>
+                         <Edit2 size={16}/>
                        </button>
                        <button 
                         onClick={(e) => { e.stopPropagation(); onDelete?.(opt.id); }} 
-                        className="p-1.5 hover:bg-danger/10 rounded text-gray-400 hover:text-danger transition-colors"
+                        className="p-2 bg-red-50 text-red-600 rounded-lg border border-red-100"
                        >
-                         <Trash2 size={12}/>
+                         <Trash2 size={16}/>
                        </button>
                     </div>
                   )}
+
                 </div>
               ))}
 
