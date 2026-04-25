@@ -114,17 +114,18 @@ const RecurringManager = () => {
     <div className="space-y-8 animate-fade-in">
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-black tracking-tight">Recurring Payments</h2>
-          <p className="text-text-muted text-sm mt-1">Manage your automated schedules and subscriptions</p>
+          <h2 className="text-3xl font-black tracking-tight">{t('nav_auto')}</h2>
+          <p className="text-text-muted text-sm mt-1">{t('schedule_subtitle') || 'Manage your automated schedules'}</p>
         </div>
         <button 
           onClick={() => setIsModalOpen(true)}
           className="btn btn-primary flex items-center gap-2 px-6 h-12"
         >
           <Plus size={20} />
-          New Schedule
+          {t('schedule_create')}
         </button>
       </header>
+
 
       <div className="grid grid-cols-1 gap-4">
         {recurringSchedules.length === 0 ? (

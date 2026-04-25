@@ -277,8 +277,9 @@ const AdminSettings = () => {
                   onClick={() => setMemberType(tab)}
                   className={`flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all ${memberType === tab ? 'bg-primary text-black' : 'text-text-muted hover:text-white'}`}
                 >
-                  {tab === 'virtual' ? 'Simple Tag' : 'Cloud Invite'}
+                  {tab === 'virtual' ? t('settings_simple_tag') : t('settings_cloud_invite')}
                 </button>
+
               ))}
             </div>
 
@@ -295,7 +296,7 @@ const AdminSettings = () => {
             {memberType === 'virtual' ? (
               <div className="space-y-4">
                 <div>
-                  <label className="text-[10px] text-text-muted uppercase tracking-widest block mb-2 font-black">Full Name</label>
+                  <label className="text-[10px] text-text-muted uppercase tracking-widest block mb-2 font-black">{t('settings_full_name')}</label>
                   <input 
                     autoFocus
                     placeholder="e.g. John Doe"
@@ -303,35 +304,41 @@ const AdminSettings = () => {
                     onChange={e => setNewMember({...newMember, name: e.target.value})}
                   />
                 </div>
+
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-[10px] text-text-muted uppercase tracking-widest block mb-2 font-black">Role</label>
                     <select value={newMember.role} onChange={e => setNewMember({...newMember, role: e.target.value})}>
-                      <option>Spouse</option>
-                      <option>Child</option>
-                      <option>Roommate</option>
+                      <option>{t('role_parent')}</option>
+                      <option>{t('role_spouse')}</option>
+                      <option>{t('role_child')}</option>
+                      <option>{t('role_roommate')}</option>
                     </select>
+
                   </div>
                   <div>
-                    <label className="text-[10px] text-text-muted uppercase tracking-widest block mb-2 font-black">Color</label>
+                    <label className="text-[10px] text-text-muted uppercase tracking-widest block mb-2 font-black">{t('settings_color')}</label>
                     <input type="color" className="h-12 p-1" value={newMember.color} onChange={e => setNewMember({...newMember, color: e.target.value})} />
                   </div>
+
                 </div>
                 <button 
                   onClick={handleAddMember}
                   disabled={!newMember.name || loading}
                   className="btn btn-primary w-full h-14 font-black uppercase text-black disabled:opacity-50"
                 >
-                  {loading ? 'Adding...' : 'Add Member'}
+                  {loading ? t('loading') : t('settings_add_member')}
                 </button>
+
               </div>
             ) : (
               <div className="space-y-4">
                 <p className="text-[10px] text-text-muted uppercase leading-relaxed mb-4">
-                  The person will be invited to view your shared wallets. They must have their own account.
+                  {t('settings_invite_desc')}
                 </p>
                 <div>
-                  <label className="text-[10px] text-text-muted uppercase tracking-widest block mb-2 font-black">Member's Email Address</label>
+                  <label className="text-[10px] text-text-muted uppercase tracking-widest block mb-2 font-black">{t('settings_invite_email_label')}</label>
+
                   <div className="relative">
                     <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" />
                     <input 
