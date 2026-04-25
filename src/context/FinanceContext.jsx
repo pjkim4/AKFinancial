@@ -4,6 +4,67 @@ import { translations, useTranslation } from '../lib/translations';
 
 const FinanceContext = createContext();
 
+// Helper: Parse ISO Date as Local (YYYY-MM-DD)
+const parseLocalISO = (isoStr) => {
+  if (!isoStr) return null;
+  const [year, month, day] = isoStr.split('-').map(Number);
+  return new Date(year, month - 1, day);
+};
+
+// Helper: Format Date as Local YYYY-MM-DD
+const toLocalISO = (date) => {
+  if (!date) return '';
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+function getNextOccurrence(date, frequency) {
+  const next = new Date(date);
+  const dayOfMonth = date.getDate();
+
+  switch (frequency) {
+    case 'Daily': next.setDate(next.getDate() + 1); break;
+    case 'Weekly': next.setDate(next.getDate() + 7); break;
+    case 'Bi-weekly': next.setDate(next.getDate() + 14); break;
+    case 'Monthly': 
+      next.setMonth(next.getMonth() + 1); 
+      if (next.getDate() < dayOfMonth) next.setDate(0);
+      break;
+    case 'Bi-monthly':
+      next.setMonth(next.getMonth() + 2, 0);
+      break;
+    case 'Quarterly':
+      next.setMonth(next.getMonth() + 3); 
+      if (next.getDate() < dayOfMonth) next.setDate(0);
+      break;
+    case 'Semi-annually':
+      next.setMonth(next.getMonth() + 6); 
+      if (next.getDate() < dayOfMonth) next.setDate(0);
+      break;
+    case 'Annually':
+      next.setFullYear(next.getFullYear() + 1); 
+      if (next.getDate() < dayOfMonth) next.setDate(0);
+      break;
+    case 'Semi-monthly':
+      if (next.getDate() < 15) {
+        next.setDate(15);
+      } else {
+        next.setMonth(next.getMonth() + 1);
+        next.setDate(1);
+      }
+      break;
+    case 'Every 4 weeks':
+      next.setMonth(next.getMonth() + 1);
+      if (next.getDate() < dayOfMonth) next.setDate(0);
+      break;
+    default: return null;
+  }
+  return next;
+}
+
+
 export const useFinance = () => useContext(FinanceContext);
 
 export const FinanceProvider = ({ children }) => {
@@ -1036,20 +1097,7 @@ export const FinanceProvider = ({ children }) => {
   };
 
   // Helper: Parse YYYY-MM-DD as Local Midnight
-  const parseLocalISO = (isoStr) => {
-    if (!isoStr) return null;
-    const [year, month, day] = isoStr.split('-').map(Number);
-    return new Date(year, month - 1, day);
-  };
 
-  // Helper: Format Date as Local YYYY-MM-DD
-  const toLocalISO = (date) => {
-    if (!date) return '';
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
 
   const processRecurringTransactions = async (schedules, targetId) => {
     // Current date at local midnight
@@ -1122,47 +1170,7 @@ export const FinanceProvider = ({ children }) => {
   };
 
 
-  function getNextOccurrence(date, frequency) {
-    const next = new Date(date);
-    const dayOfMonth = date.getDate();
-    
-    switch (frequency) {
-      case 'Weekly': next.setDate(next.getDate() + 7); break;
-      case 'Bi-weekly': next.setDate(next.getDate() + 14); break;
-      case 'Monthly': 
-        next.setMonth(next.getMonth() + 1); 
-        // Logic: Clamping. (e.g. Jan 31 -> Feb 28)
-        if (next.getDate() < dayOfMonth) next.setDate(0);
-        break;
-      case 'Monthly (End of Month)':
-        next.setMonth(next.getMonth() + 2, 0); // Goes to end of next month
-        break;
-      case 'Quarterly': 
-        next.setMonth(next.getMonth() + 3); 
-        if (next.getDate() < dayOfMonth) next.setDate(0);
-        break;
-      case 'Semi-Yearly': 
-        next.setMonth(next.getMonth() + 6); 
-        if (next.getDate() < dayOfMonth) next.setDate(0);
-        break;
-      case 'Yearly': 
-        next.setFullYear(next.getFullYear() + 1); 
-        if (next.getDate() < dayOfMonth) next.setDate(0);
-        break;
-      case 'Semi-Monthly': 
-        if (next.getDate() < 15) {
-          next.setDate(15);
-        } else {
-          next.setMonth(next.getMonth() + 1);
-          next.setDate(1);
-        }
-        break;
-      default: 
-        next.setMonth(next.getMonth() + 1);
-        if (next.getDate() < dayOfMonth) next.setDate(0);
-    }
-    return next;
-  }
+
 
   const calculateNextPaymentDate = (schedule) => {
     if (!schedule || schedule.status !== 'Active') return null;

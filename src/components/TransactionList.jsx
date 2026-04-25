@@ -25,7 +25,7 @@ import {
 import SearchableSelect from './ui/SearchableSelect';
 
 const TransactionRow = ({ transaction, accounts, householdMembers, preferences, getMemberId, getCleanDescription, toggleSelect, selectedIds, handleEditClick, setDeleteConfirmId, t, runningBalance }) => {
-  const memberId = getMemberId(transaction);
+  const memberId = getMemberId(transaction, householdMembers);
   const member = householdMembers.find(m => String(m.id) === String(memberId));
   const isSelected = selectedIds.includes(transaction.id);
 
@@ -94,39 +94,41 @@ const TransactionRow = ({ transaction, accounts, householdMembers, preferences, 
   );
 };
 
+// Utility Functions
+function getToday() {
+  const d = new Date();
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function getLastMonthDate() {
+  const d = new Date();
+  d.setMonth(d.getMonth() - 1);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function getMemberId(tx, householdMembers) {
+  if (tx.member_id) return tx.member_id;
+  const match = (tx.description || '').match(/^\[(.*?)\]/);
+  if (match) {
+    const name = match[1];
+    return householdMembers?.find(m => m.name === name)?.id;
+  }
+  return null;
+}
+
+function getCleanDescription(desc) {
+  return (desc || '').replace(/^\[.*?\]\s*/, '');
+}
+
 
 const TransactionList = () => {
-  // Utility Functions (Hoisted)
-  function getToday() {
-    const d = new Date();
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  }
 
-  function getLastMonthDate() {
-    const d = new Date();
-    d.setMonth(d.getMonth() - 1);
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  }
-
-  function getMemberId(tx) {
-    if (tx.member_id) return tx.member_id;
-    const match = (tx.description || '').match(/^\[(.*?)\]/);
-    if (match) {
-      const name = match[1];
-      return householdMembers.find(m => m.name === name)?.id;
-    }
-    return null;
-  }
-
-  function getCleanDescription(desc) {
-    return (desc || '').replace(/^\[.*?\]\s*/, '');
-  }
 
   const { 
     transactions, 
@@ -248,7 +250,7 @@ const TransactionList = () => {
     const matchesType = filterType === 'all' || t.type === filterType;
 
     // 6. Member Filter
-    const matchesMember = filterMember === 'all' || String(getMemberId(t)) === String(filterMember);
+    const matchesMember = filterMember === 'all' || String(getMemberId(t, householdMembers)) === String(filterMember);
     
     return matchesSearch && matchesStartDate && matchesEndDate && matchesAccount && matchesCategory && matchesType && matchesMember;
   }).sort((a, b) => {
