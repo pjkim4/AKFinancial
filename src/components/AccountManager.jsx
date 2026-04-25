@@ -43,7 +43,7 @@ const AccountManager = () => {
 
   const [newAcc, setNewAcc] = useState({ name: '', type: 'Checking', balance: 0, color: '#c1ff72', parent_account_id: '' });
   const [editAcc, setEditAcc] = useState({ name: '', type: '', color: '', parent_account_id: '' });
-  const [adjust, setAdjust] = useState({ balance: 0, reason: '' });
+  const [adjust, setAdjust] = useState({ type: 'set', value: 0, reason: '', date: new Date().toISOString().split('T')[0] });
   const [ccPayment, setCcPayment] = useState({ fromId: '', toId: '', amount: 0 });
   const [transfer, setTransfer] = useState({ toId: '', amount: 0 });
   const [settingsTab, setSettingsTab] = useState('details'); // 'details', 'adjust', 'delete'
@@ -87,7 +87,7 @@ const AccountManager = () => {
     setLoading(true);
     setError('');
     try {
-      const result = await adjustBalance(selectedAccount.id, parseFloat(adjust.balance), adjust.reason);
+      const result = await adjustBalance(selectedAccount.id, parseFloat(adjust.value), adjust.type === 'diff', adjust.reason, adjust.date);
       if (result?.error) {
         setError(result.error.message);
       } else {
@@ -242,7 +242,7 @@ const AccountManager = () => {
                   onClick={() => { 
                     setSelectedAccount(acc); 
                     setEditAcc({ name: acc.name, type: acc.type, color: acc.color, parent_account_id: acc.parent_account_id || '' });
-                    setAdjust({ balance: acc.balance, reason: '' }); 
+                    setAdjust({ type: 'set', value: acc.balance, reason: '', date: new Date().toISOString().split('T')[0] }); 
                     setModalType('settings'); 
                     setSettingsTab('details');
                     setBackupDownloaded(false);
@@ -452,9 +452,28 @@ const AccountManager = () => {
                       </p>
                       <p className="text-[10px] opacity-80 mt-1 uppercase tracking-tight leading-relaxed">This will create a ledger adjustment. Use only for sync fixes.</p>
                     </div>
-                    <div>
-                      <label className="text-[10px] text-text-muted uppercase tracking-widest block mb-2 font-black">New Balance</label>
-                      <input type="number" step="0.01" required value={adjust.balance} onChange={e => setAdjust({...adjust, balance: e.target.value})} />
+                    <div className="flex gap-4 mb-4">
+                      <label className="flex items-center gap-2 text-xs font-black uppercase text-white cursor-pointer">
+                        <input type="radio" name="adjustType" checked={adjust.type === 'set'} onChange={() => setAdjust({...adjust, type: 'set', value: selectedAccount?.balance || 0})} className="accent-primary" />
+                        Set Total Balance
+                      </label>
+                      <label className="flex items-center gap-2 text-xs font-black uppercase text-white cursor-pointer">
+                        <input type="radio" name="adjustType" checked={adjust.type === 'diff'} onChange={() => setAdjust({...adjust, type: 'diff', value: 0})} className="accent-primary" />
+                        Adjust by Amount
+                      </label>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-[10px] text-text-muted uppercase tracking-widest block mb-2 font-black">
+                          {adjust.type === 'set' ? 'New Balance' : 'Adjustment Amount (+/-)'}
+                        </label>
+                        <input type="number" step="0.01" required value={adjust.value} onChange={e => setAdjust({...adjust, value: e.target.value})} />
+                      </div>
+                      <div>
+                        <label className="text-[10px] text-text-muted uppercase tracking-widest block mb-2 font-black">As of Date</label>
+                        <input type="date" required value={adjust.date} onChange={e => setAdjust({...adjust, date: e.target.value})} />
+                      </div>
                     </div>
                     <div>
                       <label className="text-[10px] text-text-muted uppercase tracking-widest block mb-2 font-black">Reason</label>

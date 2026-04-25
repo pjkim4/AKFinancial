@@ -728,10 +728,20 @@ export const FinanceProvider = ({ children }) => {
     }
   };
 
-  const adjustBalance = async (accountId, newBalance, reason) => {
+  const adjustBalance = async (accountId, value, isDifference, reason, date) => {
     try {
       const account = accounts.find(acc => acc.id === accountId);
-      const diff = newBalance - account.balance;
+      
+      let diff = 0;
+      let newBalance = 0;
+
+      if (isDifference) {
+        diff = value;
+        newBalance = account.balance + diff;
+      } else {
+        newBalance = value;
+        diff = newBalance - account.balance;
+      }
 
       // Create adjustment record
       await addTransaction({
@@ -740,7 +750,7 @@ export const FinanceProvider = ({ children }) => {
         description: `Adjustment: ${reason}`,
         account_id: accountId,
         category: 'Adjustment',
-        date: new Date().toISOString().split('T')[0]
+        date: date || new Date().toISOString().split('T')[0]
       });
 
       const roundedBalance = Number(newBalance.toFixed(2));
