@@ -29,11 +29,13 @@ import {
 } from 'recharts';
 
 const Reports = () => {
-  const { transactions, accounts, availableHouseholds, currentHouseholdId } = useFinance();
+  const { transactions, accounts, availableHouseholds, currentHouseholdId, t } = useFinance();
+
 
   const currentWorkspaceName = useMemo(() => {
-    return availableHouseholds.find(h => h.id === currentHouseholdId)?.name || 'Personal Account';
+    return availableHouseholds.find(h => h.id === currentHouseholdId)?.name || t('dash_personal_account');
   }, [availableHouseholds, currentHouseholdId]);
+
 
   const reportData = useMemo(() => {
     const incomes = transactions.filter(t => t.type === 'Income');
@@ -120,19 +122,20 @@ const Reports = () => {
         <div className="flex gap-2">
           <button onClick={printReport} className="btn bg-white/5 border-white/10 h-12 px-6 hover:bg-white/10">
             <Printer size={18} />
-            <span className="font-black text-[10px] uppercase tracking-widest">Print / PDF</span>
+            <span className="font-black text-[10px] uppercase tracking-widest">{t('report_print')}</span>
           </button>
           <button onClick={exportFullLedger} className="btn btn-primary h-12 px-6 text-black">
             <Download size={18} />
-            <span className="font-black text-[10px] uppercase tracking-widest">Master Ledger</span>
+            <span className="font-black text-[10px] uppercase tracking-widest">{t('report_master')}</span>
           </button>
         </div>
+
       </header>
 
       {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 print:grid-cols-3">
         <div className="card bg-success/10 border-success/20 p-8">
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-success mb-4">Total Liquidity In</p>
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-success mb-4">{t('report_liquidity')}</p>
           <p className="text-4xl font-black tracking-tighter">${reportData.totalIncome.toLocaleString()}</p>
           <div className="flex items-center gap-2 mt-4 text-success/60">
             <ArrowUpRight size={14} />
@@ -140,7 +143,7 @@ const Reports = () => {
           </div>
         </div>
         <div className="card bg-danger/10 border-danger/20 p-8">
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-danger mb-4">Total Capital Out</p>
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-danger mb-4">{t('report_capital')}</p>
           <p className="text-4xl font-black tracking-tighter">${reportData.totalExpense.toLocaleString()}</p>
           <div className="flex items-center gap-2 mt-4 text-danger/60">
             <ArrowDownRight size={14} />
@@ -148,7 +151,7 @@ const Reports = () => {
           </div>
         </div>
         <div className="card bg-primary/10 border-primary/20 p-8">
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary mb-4">Net Retention</p>
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary mb-4">{t('report_retention')}</p>
           <p className="text-4xl font-black tracking-tighter">${(reportData.totalIncome - reportData.totalExpense).toLocaleString()}</p>
           <div className="flex items-center gap-2 mt-4 text-primary/60">
             <Target size={14} />
@@ -157,15 +160,17 @@ const Reports = () => {
         </div>
       </div>
 
+
       {/* Visual Analytics */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="card bg-white/5 border-white/10 p-8 print:border-black/10">
           <div className="flex items-center justify-between mb-8">
             <h3 className="font-black uppercase tracking-widest text-xs flex items-center gap-2">
               <PieChart className="text-primary" size={18} />
-              Expense Distribution
+              {t('report_distribution')}
             </h3>
           </div>
+
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <RePieChart>
@@ -206,9 +211,10 @@ const Reports = () => {
           <div className="flex items-center justify-between mb-8">
             <h3 className="font-black uppercase tracking-widest text-xs flex items-center gap-2">
               <TableIcon className="text-primary" size={18} />
-              Monthly Momentum
+              {t('report_momentum')}
             </h3>
           </div>
+
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={reportData.barData}>
