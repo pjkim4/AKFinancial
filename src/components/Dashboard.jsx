@@ -979,7 +979,7 @@ const Dashboard = () => {
                     </Pie>
                     <Tooltip 
                       contentStyle={{ background: '#181818', border: '1px solid #333' }} 
-                      formatter={(value) => [`$${Number(value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 'Amount']}
+                      formatter={(value, name) => [`$${Number(value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, name]}
                     />
                     <Legend verticalAlign="bottom" align="center" iconType="circle" wrapperStyle={{ paddingTop: '20px' }} />
                   </PieChart>
