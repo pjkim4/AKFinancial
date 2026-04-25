@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
-import { Search, ChevronDown, Check } from 'lucide-react';
+import { Search, ChevronDown, Check, Plus } from 'lucide-react';
+
 
 const SearchableSelect = ({ options = [], value, onChange, placeholder = "Select option...", className = "" }) => {
   const [isOpen, setIsOpen] = useState(false);
