@@ -306,7 +306,7 @@ const AppContent = () => {
         <div className="flex items-center gap-3">
           <Logo size={20} />
           <div className="flex flex-col">
-            <span className="font-black text-sm tracking-tight leading-none">AK Finance</span>
+            <span className="font-black text-sm tracking-tight leading-none italic">AK Finance <span className="text-primary">Master</span></span>
             <span className="text-[8px] text-primary uppercase tracking-[0.2em] font-black mt-0.5">
               {profile?.username || user?.email?.split('@')[0]}
             </span>
@@ -332,7 +332,8 @@ const AppContent = () => {
           <div className="flex items-center gap-3">
             <Logo size={24} />
             <div className="flex flex-col">
-              <span className="font-bold text-xl tracking-tight leading-none">AK Finance</span>
+              <span className="font-bold text-xl tracking-tight leading-none italic">AK Finance <span className="text-primary">Master</span></span>
+
               <span className="text-[10px] text-primary uppercase tracking-[0.2em] font-black mt-1">
                 {profile?.username || user?.email?.split('@')[0]}
               </span>
