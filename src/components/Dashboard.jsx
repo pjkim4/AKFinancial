@@ -128,8 +128,11 @@ const Dashboard = () => {
 
   const [pendingShortcut, setPendingShortcut] = useState(null);
   const [isAccountPickerOpen, setIsAccountPickerOpen] = useState(false);
+  const [isLogConfirmationOpen, setIsLogConfirmationOpen] = useState(false);
+  const [logFormData, setLogFormData] = useState({ amount: '', date: '' });
 
   const stats = useMemo(() => {
+
 
     const income = filteredTransactions
       .filter(t => t.type === 'Income' && t.category !== 'Transfer')
@@ -213,39 +216,43 @@ const Dashboard = () => {
     }
 
     const account = accounts.find(a => String(a.id) === String(finalAccountId)) || accounts[0];
-    let finalAmount = item.amount;
     
-    // If no amount is set, or it's 0, ask for it
+    // Set up confirmation modal instead of prompt/confirm
+    setPendingShortcut({ ...item, account_id: finalAccountId });
+    setLogFormData({ 
+      amount: item.amount || '', 
+      date: new Date().toISOString().split('T')[0] 
+    });
+    setIsLogConfirmationOpen(true);
+  };
+
+  const executeLogShortcut = async () => {
+    if (!pendingShortcut || loading) return;
+    
+    const finalAmount = logFormData.amount;
+    const finalDate = logFormData.date;
+
     if (!finalAmount || Number(finalAmount) === 0) {
-      const promptedAmount = prompt(`Enter amount for ${item.name}\nFrom Wallet: [${account.name}]`);
-      if (promptedAmount === null || promptedAmount === '') return;
-      finalAmount = promptedAmount;
-    } else {
-      if (!window.confirm(`Log ${item.name} for $${item.amount}\nFrom Wallet: [${account.name}]?`)) return;
+      alert('Please enter a valid amount');
+      return;
     }
-
-    // Ask for Date
-    const today = new Date().toISOString().split('T')[0];
-    const finalDate = prompt(`Date for ${item.name}:`, today);
-    if (finalDate === null || finalDate === '') return;
-
-
 
     setLoading(true);
     await addTransaction({
       amount: finalAmount,
-      type: item.type || 'Expense',
-      description: `${item.name}`,
-      account_id: item.account_id || accounts[0].id,
-      category: item.category,
+      type: pendingShortcut.type || 'Expense',
+      description: `${pendingShortcut.name}`,
+      account_id: pendingShortcut.account_id || accounts[0].id,
+      category: pendingShortcut.category,
       date: finalDate,
       member_id: user?.id
     });
 
-
     setLoading(false);
-    alert(`Successfully logged ${item.name} ($${finalAmount}) to [${account.name}]`);
+    setIsLogConfirmationOpen(false);
+    setPendingShortcut(null);
   };
+
 
   const handlePickAccount = (accId) => {
     setIsAccountPickerOpen(false);
@@ -723,7 +730,63 @@ const Dashboard = () => {
         document.body
       )}
 
+      {/* Log Confirmation Modal for Shortcuts (Fixes INP issue) */}
+      {isLogConfirmationOpen && createPortal(
+        <div className="fixed inset-0 z-max flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+          <div className="card w-full max-w-sm shadow-2xl bg-card border-white/10 overflow-visible">
+             <div className="flex justify-between items-center mb-6">
+               <h3 className="text-lg font-bold">Log Transaction</h3>
+               <button onClick={() => setIsLogConfirmationOpen(false)}><X size={20} /></button>
+             </div>
+             
+             <div className="flex flex-col items-center text-center mb-8">
+                <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 text-primary">
+                   {pendingShortcut?.type === 'Income' ? <ArrowUpRight size={32} /> : <Zap size={32} />}
+                </div>
+                <h4 className="text-xl font-black">{pendingShortcut?.name}</h4>
+                <p className="text-xs text-text-muted mt-1 italic">
+                  To: {accounts.find(a => String(a.id) === String(pendingShortcut?.account_id))?.name || 'Primary Wallet'}
+                </p>
+             </div>
+
+             <div className="space-y-4 mb-8">
+                <div>
+                   <label className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-2 block text-center">Amount</label>
+                   <input 
+                    type="number" 
+                    step="0.01" 
+                    autoFocus
+                    className="text-3xl font-black text-center bg-transparent border-none focus:ring-0 text-primary"
+                    placeholder="0.00"
+                    value={logFormData.amount}
+                    onChange={e => setLogFormData({...logFormData, amount: e.target.value})}
+                   />
+                </div>
+                <div>
+                   <label className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-2 block text-center">Date</label>
+                   <input 
+                    type="date" 
+                    className="text-center bg-white/5 border-white/10 rounded-xl"
+                    value={logFormData.date}
+                    onChange={e => setLogFormData({...logFormData, date: e.target.value})}
+                   />
+                </div>
+             </div>
+
+             <button 
+                onClick={executeLogShortcut}
+                disabled={loading || !logFormData.amount}
+                className="btn btn-primary w-full h-14 font-black uppercase tracking-widest text-black"
+             >
+                {loading ? <Loader2 className="animate-spin" size={20} /> : 'Confirm Log'}
+             </button>
+          </div>
+        </div>,
+        document.body
+      )}
+
       {/* Charts */}
+
 
       {(showMonthlyTrend || showExpenseDistribution) && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pb-10">
