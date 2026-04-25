@@ -35,8 +35,10 @@ const TransactionList = () => {
     transferFunds,
     preferences,
     toggleBalances,
-    householdMembers
+    householdMembers,
+    t
   } = useFinance();
+
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isWalletHubOpen, setIsWalletHubOpen] = useState(false);
@@ -352,8 +354,9 @@ const TransactionList = () => {
               className="btn btn-secondary border-white/10 h-14 px-4 text-[10px] font-black uppercase flex-1"
               title="Reset Filters"
             >
-              Clear/Show All
+              {t('tx_clear')}
             </button>
+
 
             {selectedIds.length > 0 && (
               <button 
@@ -371,8 +374,9 @@ const TransactionList = () => {
               className="btn btn-secondary border-white/10 px-8 h-14 shrink-0 transition-all active:scale-95 flex-1 lg:flex-none"
             >
               <Download size={18} />
-              <span className="font-bold">Export</span>
+              <span className="font-bold">{t('tx_export')}</span>
             </button>
+
           </div>
         </div>
 
@@ -392,10 +396,10 @@ const TransactionList = () => {
                          {selectedIds.length === filteredTransactions.length && filteredTransactions.length > 0 ? <Check size={14} strokeWidth={4} /> : <Square size={14} />}
                        </button>
                     </th>
-                    <th className="px-8 py-5 font-black">Timestamp</th>
-                    <th className="px-8 py-5 font-black">Activity / Classification</th>
-                    <th className="px-8 py-5 font-black">Wallet</th>
-                    <th className="px-8 py-5 font-black text-right">Action</th>
+                    <th className="px-8 py-5 font-black">{t('tx_timestamp')}</th>
+                    <th className="px-8 py-5 font-black">{t('tx_activity')}</th>
+                    <th className="px-8 py-5 font-black">{t('tx_wallet')}</th>
+                    <th className="px-8 py-5 font-black text-right">{t('tx_action')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
