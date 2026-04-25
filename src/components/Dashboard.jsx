@@ -485,21 +485,23 @@ const Dashboard = () => {
                     <div className="w-1.5 h-4 bg-primary rounded-full"></div>
                     <h5 className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted">{acc.name}</h5>
                   </div>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3">
+
                     {shortcuts.map((item) => (
-                      <div 
-                        key={item.id} 
-                        className="relative group p-4 bg-white/5 rounded-2xl hover:bg-primary transition-all cursor-pointer border border-white/5 hover:border-transparent flex flex-col items-center text-center overflow-visible"
-                      >
-                        <div onClick={() => !isShortcutsEditMode && handleFrequentPayment(item)} className="w-full h-full flex flex-col items-center">
-                          <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-3 font-black text-2xl bg-white/10 group-hover:bg-black/20" style={{ color: item.color }}>
-                            {item.type === 'Income' ? <ArrowUpRight size={24} /> : item.name.charAt(0)}
+                        <div 
+                          key={item.id} 
+                          className="relative group p-3 bg-white/5 rounded-2xl hover:bg-primary transition-all cursor-pointer border border-white/5 hover:border-transparent flex flex-col items-center text-center overflow-visible"
+                        >
+                          <div onClick={() => !isShortcutsEditMode && handleFrequentPayment(item)} className="w-full h-full flex flex-col items-center">
+                            <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-2 font-black text-lg bg-white/10 group-hover:bg-black/20" style={{ color: item.color }}>
+                              {item.type === 'Income' ? <ArrowUpRight size={18} /> : item.name.charAt(0)}
+                            </div>
+                            <p className="text-[11px] font-black group-hover:text-black transition-colors line-clamp-1">{item.name}</p>
+                            <p className="text-[9px] font-bold text-text-muted group-hover:text-black/60 mt-0.5">
+                              {item.type === 'Income' ? '+' : ''}${item.amount || '???'}
+                            </p>
                           </div>
-                          <p className="text-sm font-black group-hover:text-black transition-colors line-clamp-1">{item.name}</p>
-                          <p className="text-[10px] font-bold text-text-muted group-hover:text-black/60 mt-1">
-                            {item.type === 'Income' ? '+' : ''}${item.amount || '???'}
-                          </p>
-                        </div>
+
                         
                         {isShortcutsEditMode && (
                           <button 
@@ -523,19 +525,19 @@ const Dashboard = () => {
                   <div className="w-1.5 h-4 bg-gray-500 rounded-full"></div>
                   <h5 className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted">Other / Unassigned</h5>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3">
                   {frequentPayments.filter(p => !p.account_id || !accounts.some(acc => String(acc.id) === String(p.account_id))).map((item) => (
-
+  
                      <div 
                         key={item.id} 
-                        className="relative group p-4 bg-white/5 rounded-2xl hover:bg-primary transition-all cursor-pointer border border-white/5 hover:border-transparent flex flex-col items-center text-center overflow-visible"
+                        className="relative group p-3 bg-white/5 rounded-2xl hover:bg-primary transition-all cursor-pointer border border-white/5 hover:border-transparent flex flex-col items-center text-center overflow-visible"
                       >
                         <div onClick={() => !isShortcutsEditMode && handleFrequentPayment(item)} className="w-full h-full flex flex-col items-center">
-                          <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-3 font-black text-2xl bg-white/10 group-hover:bg-black/20" style={{ color: item.color }}>
-                            {item.type === 'Income' ? <ArrowUpRight size={24} /> : item.name.charAt(0)}
+                          <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-2 font-black text-lg bg-white/10 group-hover:bg-black/20" style={{ color: item.color }}>
+                            {item.type === 'Income' ? <ArrowUpRight size={18} /> : item.name.charAt(0)}
                           </div>
-                          <p className="text-sm font-black group-hover:text-black transition-colors line-clamp-1">{item.name}</p>
-                          <p className="text-[10px] font-bold text-text-muted group-hover:text-black/60 mt-1">
+                          <p className="text-[11px] font-black group-hover:text-black transition-colors line-clamp-1">{item.name}</p>
+                          <p className="text-[9px] font-bold text-text-muted group-hover:text-black/60 mt-0.5">
                             {item.type === 'Income' ? '+' : ''}${item.amount || '???'}
                           </p>
                           {isShortcutsEditMode && (
@@ -548,10 +550,9 @@ const Dashboard = () => {
                                    addFrequentPayment({ ...cleanItem, account_id: accounts[0].id });
                                  }
                                }}
-
-                               className="mt-2 text-[8px] font-black uppercase tracking-widest text-primary hover:underline"
+                               className="mt-2 text-[7px] font-black uppercase tracking-widest text-primary hover:underline"
                              >
-                               Link to {accounts[0]?.name || 'Wallet'}
+                               Link
                              </button>
                           )}
                         </div>
@@ -569,6 +570,7 @@ const Dashboard = () => {
                 </div>
               </div>
             )}
+
 
             {frequentPayments.length === 0 && (
               <div className="col-span-full py-10 border border-dashed border-white/10 rounded-2xl text-center text-text-muted text-xs font-bold">
