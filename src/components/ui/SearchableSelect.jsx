@@ -170,6 +170,27 @@ const SearchableSelect = ({ options = [], value, onChange, onEdit, onDelete, pla
               <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest italic">No matches found</p>
             </div>
           )}
+
+          {/* PERMANENT ADD NEW BUTTON AT BOTTOM */}
+          {!searchTerm && (
+            <div className="p-2 border-t border-gray-100 bg-gray-50/50">
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const name = prompt('Enter new category name:');
+                  if (name) {
+                    if (typeof onChange === 'function') onChange(name);
+                    setIsOpen(false);
+                  }
+                }}
+                className="w-full p-4 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-primary hover:bg-primary/10 rounded-xl transition-all border-2 border-dashed border-primary/20"
+              >
+                <Plus size={14} strokeWidth={3} />
+                Add New Category
+              </button>
+            </div>
+          )}
+
         </div>
       )}
     </div>
