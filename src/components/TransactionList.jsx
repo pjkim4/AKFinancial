@@ -37,8 +37,11 @@ const TransactionList = () => {
     toggleBalances,
     householdMembers,
     addCustomCategory,
+    deleteCustomCategory,
+    updateCustomCategory,
     t
   } = useFinance();
+
 
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -689,10 +692,23 @@ const TransactionList = () => {
                       options={allCategories[modalType] || []} 
                       value={formData.category} 
                       onChange={handleCategoryChange} 
+                      onEdit={(id, currentName) => {
+                        const newName = prompt('Enter new category name:', currentName);
+                        if (newName && newName !== currentName) {
+                          updateCustomCategory(modalType, id, newName);
+                        }
+                      }}
+                      onDelete={(id) => {
+                        if (confirm('Delete this custom category?')) {
+                          deleteCustomCategory(modalType, id);
+                          if (formData.category === id) setFormData(prev => ({ ...prev, category: '' }));
+                        }
+                      }}
                       placeholder={t('category') + '...'} 
                     />
                   </div>
                 )}
+
 
 
                 {modalType === 'transfer' && !editingId && (

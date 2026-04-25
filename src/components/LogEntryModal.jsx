@@ -12,8 +12,11 @@ const LogEntryModal = ({ isOpen, onClose }) => {
     householdMembers,
     preferences,
     addCustomCategory,
+    deleteCustomCategory,
+    updateCustomCategory,
     t
   } = useFinance();
+
 
 
 
@@ -185,9 +188,22 @@ const LogEntryModal = ({ isOpen, onClose }) => {
                   options={allCategories[modalType] || []} 
                   value={formData.category} 
                   onChange={handleCategoryChange} 
+                  onEdit={(id, currentName) => {
+                    const newName = prompt('Enter new category name:', currentName);
+                    if (newName && newName !== currentName) {
+                      updateCustomCategory(modalType, id, newName);
+                    }
+                  }}
+                  onDelete={(id) => {
+                    if (confirm('Delete this custom category?')) {
+                      deleteCustomCategory(modalType, id);
+                      if (formData.category === id) setFormData(prev => ({ ...prev, category: '' }));
+                    }
+                  }}
                   placeholder={t('tx_search_cat') || "Search Category..."} 
                 />
               </div>
+
 
             )}
             

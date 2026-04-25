@@ -1304,9 +1304,10 @@ export const FinanceProvider = ({ children }) => {
             ...prev,
             customCategories: {
               ...prev.customCategories,
-              [type]: [...current, { id: name, name }]
+              [type]: [...current, { id: name, name, isCustom: true }]
             }
           };
+
         });
       },
       deleteCustomCategory: (type, id) => {
@@ -1318,6 +1319,18 @@ export const FinanceProvider = ({ children }) => {
           }
         }));
       },
+      updateCustomCategory: (type, id, newName) => {
+        setPreferences(prev => ({
+          ...prev,
+          customCategories: {
+            ...prev.customCategories,
+            [type]: (prev.customCategories?.[type] || []).map(c => 
+              c.id === id ? { ...c, name: newName } : c
+            )
+          }
+        }));
+      },
+
       syncError,
       showLogModal,
       setShowLogModal,

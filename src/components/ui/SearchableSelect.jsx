@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
-import { Search, ChevronDown, Check, Plus } from 'lucide-react';
+import { Search, ChevronDown, Check, Plus, Edit2, Trash2 } from 'lucide-react';
 
 
-const SearchableSelect = ({ options = [], value, onChange, placeholder = "Select option...", className = "" }) => {
+
+const SearchableSelect = ({ options = [], value, onChange, onEdit, onDelete, placeholder = "Select option...", className = "" }) => {
+
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [coords, setCoords] = useState({ top: 0, left: 0, width: 0 });
@@ -114,17 +116,39 @@ const SearchableSelect = ({ options = [], value, onChange, placeholder = "Select
               {filteredOptions.map((opt) => (
                 <div
                   key={opt.id}
-                  onClick={() => {
-                    onChange(opt.id);
-                    setIsOpen(false);
-                    setSearchTerm('');
-                  }}
-                  className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors ${value === opt.id ? 'bg-primary/10 text-primary' : 'hover:bg-gray-100 text-gray-900'}`}
+                  className={`flex items-center justify-between p-2 rounded-lg transition-colors group ${value === opt.id ? 'bg-primary/10 text-primary' : 'hover:bg-gray-100 text-gray-900'}`}
                 >
-                  <span className={`text-sm font-bold uppercase tracking-wider ${value === opt.id ? 'text-primary' : 'text-gray-900'}`}>{opt.name}</span>
-                  {value === opt.id && <Check size={14} className="text-primary" />}
+                  <div 
+                    className="flex-1 flex items-center justify-between cursor-pointer py-1"
+                    onClick={() => {
+                      onChange(opt.id);
+                      setIsOpen(false);
+                      setSearchTerm('');
+                    }}
+                  >
+                    <span className={`text-sm font-bold uppercase tracking-wider ${value === opt.id ? 'text-primary' : 'text-gray-900'}`}>{opt.name}</span>
+                    {value === opt.id && <Check size={14} className="text-primary" />}
+                  </div>
+                  
+                  {opt.isCustom && (
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity ml-2">
+                       <button 
+                        onClick={(e) => { e.stopPropagation(); onEdit?.(opt.id, opt.name); }} 
+                        className="p-1.5 hover:bg-black/5 rounded text-gray-400 hover:text-primary transition-colors"
+                       >
+                         <Edit2 size={12}/>
+                       </button>
+                       <button 
+                        onClick={(e) => { e.stopPropagation(); onDelete?.(opt.id); }} 
+                        className="p-1.5 hover:bg-danger/10 rounded text-gray-400 hover:text-danger transition-colors"
+                       >
+                         <Trash2 size={12}/>
+                       </button>
+                    </div>
+                  )}
                 </div>
               ))}
+
             </div>
           ) : searchTerm ? (
             <div className="p-1">
