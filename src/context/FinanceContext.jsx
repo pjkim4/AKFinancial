@@ -42,8 +42,10 @@ export const FinanceProvider = ({ children }) => {
       hideBalances: true,
       showInstantMove: true,
       showMonthlyTrend: true,
-      showExpenseDistribution: true
+      showExpenseDistribution: true,
+      customCategories: { income: [], expense: [] }
     };
+
   });
 
   useEffect(() => {
@@ -1294,6 +1296,28 @@ export const FinanceProvider = ({ children }) => {
       preferences,
       updatePreferences: (newPrefs) => setPreferences(prev => ({ ...prev, ...newPrefs })),
       toggleBalances: () => setPreferences(prev => ({ ...prev, hideBalances: !prev.hideBalances })),
+      addCustomCategory: (type, name) => {
+        setPreferences(prev => {
+          const current = prev.customCategories?.[type] || [];
+          if (current.some(c => c.id === name)) return prev;
+          return {
+            ...prev,
+            customCategories: {
+              ...prev.customCategories,
+              [type]: [...current, { id: name, name }]
+            }
+          };
+        });
+      },
+      deleteCustomCategory: (type, id) => {
+        setPreferences(prev => ({
+          ...prev,
+          customCategories: {
+            ...prev.customCategories,
+            [type]: (prev.customCategories?.[type] || []).filter(c => c.id !== id)
+          }
+        }));
+      },
       syncError,
       showLogModal,
       setShowLogModal,

@@ -36,8 +36,10 @@ const TransactionList = () => {
     preferences,
     toggleBalances,
     householdMembers,
+    addCustomCategory,
     t
   } = useFinance();
+
 
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -84,26 +86,24 @@ const TransactionList = () => {
     member_id: ''
   });
 
-  const categories = {
-    income: [
-      { id: 'Salary', name: t('cat_salary') },
-      { id: 'Bonus', name: t('cat_bonus') },
-      { id: 'Investment', name: t('cat_investment') },
-      { id: 'Gift', name: t('cat_gift') },
-      { id: 'Other', name: t('cat_other') }
-    ],
-    expense: [
-      { id: 'Food', name: t('cat_food') },
-      { id: 'Rent', name: t('cat_rent') },
-      { id: 'Transport', name: t('cat_transport') },
-      { id: 'Entertainment', name: t('cat_entertainment') },
-      { id: 'Utilities', name: t('cat_utilities') },
-      { id: 'Shopping', name: t('cat_shopping') },
-      { id: 'Health', name: t('cat_health') },
-      { id: 'Other', name: t('cat_other') }
-    ],
     transfer: []
   };
+
+  const allCategories = {
+    income: [...categories.income, ...(preferences.customCategories?.income || [])],
+    expense: [...categories.expense, ...(preferences.customCategories?.expense || [])],
+    transfer: []
+  };
+
+  const handleCategoryChange = (val) => {
+    // Check if this is a NEW category
+    const exists = allCategories[modalType]?.some(c => c.id === val);
+    if (!exists && val && modalType !== 'transfer') {
+      addCustomCategory(modalType, val);
+    }
+    setFormData(prev => ({ ...prev, category: val }));
+  };
+
 
   const getMemberId = (tx) => {
     if (tx.member_id) return tx.member_id;
@@ -138,19 +138,20 @@ const TransactionList = () => {
     setEditingId(transaction.id);
     setModalType(transaction.type.toLowerCase());
     const typeKey = transaction.type.toLowerCase();
-    const availableCategories = categories[typeKey] || [];
+    const availableCategories = allCategories[typeKey] || [];
     
     setFormData({
       amount: transaction.amount,
       description: transaction.description,
       account_id: transaction.account_id,
-      category: availableCategories.includes(transaction.category) ? transaction.category : 'Other',
-      customCategory: availableCategories.includes(transaction.category) ? '' : transaction.category,
+      category: availableCategories.some(c => c.id === transaction.category) ? transaction.category : 'Other',
+      customCategory: availableCategories.some(c => c.id === transaction.category) ? '' : transaction.category,
       date: transaction.date,
       member_id: transaction.member_id || ''
     });
     setIsModalOpen(true);
   };
+
 
   const handleDelete = async () => {
     if (!deleteConfirmId) return;
@@ -684,9 +685,15 @@ const TransactionList = () => {
                 {modalType !== 'transfer' && (
                   <div>
                     <label className="text-[10px] text-text-muted uppercase tracking-[0.2em] font-black block mb-2">{t('category')}</label>
-                    <SearchableSelect options={categories[modalType] || []} value={formData.category} onChange={(val) => setFormData({...formData, category: val})} placeholder={t('category') + '...'} />
+                    <SearchableSelect 
+                      options={allCategories[modalType] || []} 
+                      value={formData.category} 
+                      onChange={handleCategoryChange} 
+                      placeholder={t('category') + '...'} 
+                    />
                   </div>
                 )}
+
 
                 {modalType === 'transfer' && !editingId && (
                   <div>

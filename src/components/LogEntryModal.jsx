@@ -10,8 +10,11 @@ const LogEntryModal = ({ isOpen, onClose }) => {
     addTransaction,
     transferFunds,
     householdMembers,
+    preferences,
+    addCustomCategory,
     t
   } = useFinance();
+
 
 
   const [modalType, setModalType] = useState('expense'); 
@@ -43,28 +46,24 @@ const LogEntryModal = ({ isOpen, onClose }) => {
     }
   }, [accounts]);
 
-  const categories = {
-    income: [
-      { id: 'Salary', name: t('cat_salary') },
-      { id: 'Bonus', name: t('cat_bonus') },
-      { id: 'Investment', name: t('cat_investment') },
-      { id: 'Gift', name: t('cat_gift') },
-      { id: 'Other', name: t('cat_other') }
-    ],
-
-    expense: [
-      { id: 'Food', name: t('cat_food') },
-      { id: 'Rent', name: t('cat_rent') },
-      { id: 'Transport', name: t('cat_transport') },
-      { id: 'Entertainment', name: t('cat_entertainment') },
-      { id: 'Utilities', name: t('cat_utilities') },
-      { id: 'Shopping', name: t('cat_shopping') },
-      { id: 'Health', name: t('cat_health') },
-      { id: 'Other', name: t('cat_other') }
-    ],
-
     transfer: []
   };
+
+  const allCategories = {
+    income: [...categories.income, ...(preferences.customCategories?.income || [])],
+    expense: [...categories.expense, ...(preferences.customCategories?.expense || [])],
+    transfer: []
+  };
+
+  const handleCategoryChange = (val) => {
+    // Check if this is a NEW category (not in allCategories)
+    const exists = allCategories[modalType]?.some(c => c.id === val);
+    if (!exists && val) {
+      addCustomCategory(modalType, val);
+    }
+    setFormData(prev => ({ ...prev, category: val }));
+  };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -183,12 +182,13 @@ const LogEntryModal = ({ isOpen, onClose }) => {
               <div>
                 <label className="text-xs text-text-muted uppercase tracking-[0.2em] font-black block mb-2">{t('category')}</label>
                 <SearchableSelect 
-                  options={categories[modalType] || []} 
+                  options={allCategories[modalType] || []} 
                   value={formData.category} 
-                  onChange={(val) => setFormData({...formData, category: val})} 
+                  onChange={handleCategoryChange} 
                   placeholder={t('tx_search_cat') || "Search Category..."} 
                 />
               </div>
+
             )}
             
             {modalType === 'transfer' && (

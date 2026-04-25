@@ -125,11 +125,33 @@ const SearchableSelect = ({ options = [], value, onChange, placeholder = "Select
                 </div>
               ))}
             </div>
+          ) : searchTerm ? (
+            <div className="p-1">
+               <div 
+                onClick={() => {
+                  if (typeof onChange === 'function') {
+                    onChange(searchTerm);
+                  }
+                  setIsOpen(false);
+                  setSearchTerm('');
+                }}
+                className="flex items-center gap-3 p-4 bg-primary/5 hover:bg-primary/10 rounded-xl cursor-pointer border border-primary/20 group transition-all"
+               >
+                 <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+                   <Plus size={16} strokeWidth={3} />
+                 </div>
+                 <div>
+                   <p className="text-[10px] text-primary font-black uppercase tracking-widest leading-none mb-1">Create New</p>
+                   <p className="text-sm font-black text-black leading-none italic">"{searchTerm}"</p>
+                 </div>
+               </div>
+            </div>
           ) : (
             <div className="p-8 text-center">
               <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest italic">No matches found</p>
             </div>
           )}
+
         </div>
       )}
     </div>
