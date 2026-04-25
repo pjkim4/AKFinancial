@@ -529,9 +529,7 @@ const AdminSettings = () => {
             </div>
           )}
         </div>
-      </div>
-
-      <div className="card glass bg-white/5 border-white/10">
+          <div className="card glass bg-white/5 border-white/10">
         <h3 className="font-bold mb-4 flex items-center gap-2">
           <Zap size={18} className="text-primary" />
           Network Connectivity
@@ -545,6 +543,86 @@ const AdminSettings = () => {
         <p className="text-[10px] text-text-muted mt-4 uppercase tracking-tighter">
           <span className="text-warning mr-1">Note:</span> Use this exact URL on your iPhone to avoid "localhost" connection errors.
         </p>
+      </div>
+
+      {/* NEW Category Manager Section */}
+      <section className="card glass border-white/10 p-8 space-y-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-primary/10 rounded-xl">
+              <Plus size={24} className="text-primary" />
+            </div>
+            <div>
+              <h3 className="font-black text-lg uppercase tracking-tight italic">Category Manager</h3>
+              <p className="text-[10px] text-text-muted uppercase tracking-widest">Manage your custom classifications</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {['expense', 'income'].map(type => (
+            <div key={type} className="space-y-4">
+              <h4 className="text-[10px] text-primary font-black uppercase tracking-[0.2em] border-b border-white/10 pb-2">
+                {type} Categories
+              </h4>
+              <div className="space-y-2">
+                {(preferences.customCategories?.[type] || []).map(cat => (
+                  <div key={cat.id} className="flex items-center justify-between p-3 bg-white/5 border border-white/10 rounded-xl group hover:border-primary/30 transition-all">
+                    <span className="text-sm font-black uppercase tracking-wider text-white italic">{cat.name}</span>
+                    <div className="flex items-center gap-2">
+                      <button 
+                        onClick={() => {
+                          const newName = prompt('Enter new name for ' + cat.name, cat.name);
+                          if (newName && newName !== cat.name) {
+                            useFinance().updateCustomCategory(type, cat.id, newName);
+                          }
+                        }}
+                        className="p-2 bg-blue-500/20 text-blue-400 rounded-lg hover:bg-blue-500 hover:text-white transition-all"
+                      >
+                        <Edit2 size={14} />
+                      </button>
+                      <button 
+                        onClick={() => {
+                          if (confirm('Delete ' + cat.name + '?')) {
+                            useFinance().deleteCustomCategory(type, cat.id);
+                          }
+                        }}
+                        className="p-2 bg-danger/20 text-danger rounded-lg hover:bg-danger hover:text-white transition-all"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+                {(preferences.customCategories?.[type] || []).length === 0 && (
+                  <p className="text-[10px] text-text-muted italic py-4 text-center border-2 border-dashed border-white/5 rounded-xl">
+                    No custom {type} categories added yet.
+                  </p>
+                )}
+                
+                {/* Inline Add Category */}
+                <div className="pt-2">
+                  <button 
+                    onClick={() => {
+                      const name = prompt('Enter new category name:');
+                      if (name) useFinance().addCustomCategory(type, name);
+                    }}
+                    className="w-full p-3 bg-white/5 border border-white/10 border-dashed rounded-xl text-[10px] font-black uppercase tracking-widest text-text-muted hover:bg-primary/10 hover:text-primary hover:border-primary/30 transition-all flex items-center justify-center gap-2"
+                  >
+                    <Plus size={14} /> Add {type} category
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        
+        <div className="p-4 bg-primary/5 rounded-xl border border-primary/10">
+          <p className="text-[10px] text-text-muted leading-relaxed uppercase tracking-tight">
+            <span className="text-primary font-black mr-1">Note:</span> Standard categories like Food, Rent, and Salary are protected and cannot be edited or deleted to ensure system stability.
+          </p>
+        </div>
+      </section>
       </div>
     </div>
   );
