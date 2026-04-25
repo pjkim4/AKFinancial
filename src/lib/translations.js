@@ -73,9 +73,23 @@ export const translations = {
     delete: 'Delete',
     loading: 'Loading...',
     success: 'Success',
-    error: 'Error'
+    error: 'Error',
+    
+    // Form Labels
+    amount: 'Amount',
+    date: 'Date',
+    description: 'Description',
+    category: 'Category',
+    member: 'Member',
+    income: 'Income',
+    expense: 'Expense',
+    transfer: 'Transfer',
+    from_wallet: 'From Wallet',
+    to_wallet: 'To Wallet',
+    wallet: 'Wallet'
   },
   ko: {
+
     // Navigation
     nav_home: '개요',
     nav_history: '거래 내역',
@@ -149,9 +163,23 @@ export const translations = {
     delete: '삭제',
     loading: '로딩 중...',
     success: '완료되었습니다',
-    error: '오류가 발생했습니다'
+    error: '오류가 발생했습니다',
+    
+    // Form Labels
+    amount: '금액',
+    date: '날짜',
+    description: '내용 / 메모',
+    category: '카테고리',
+    member: '구성원 태그',
+    income: '수입',
+    expense: '지출',
+    transfer: '이체',
+    from_wallet: '출금 지갑',
+    to_wallet: '입금 지갑',
+    wallet: '지갑'
   }
 };
+
 
 export const useTranslation = (lang) => {
   return (key) => translations[lang]?.[key] || key;

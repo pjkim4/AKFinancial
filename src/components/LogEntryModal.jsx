@@ -6,11 +6,11 @@ import SearchableSelect from './ui/SearchableSelect';
 
 const LogEntryModal = ({ isOpen, onClose }) => {
   const { 
-    accounts, 
-    addTransaction, 
     transferFunds,
-    householdMembers
+    householdMembers,
+    t
   } = useFinance();
+
 
   const [modalType, setModalType] = useState('expense'); 
   const [loading, setLoading] = useState(false);
@@ -107,32 +107,50 @@ const LogEntryModal = ({ isOpen, onClose }) => {
         {error && <div className="mb-6 p-4 bg-danger/10 border border-danger/20 rounded-2xl text-danger text-xs font-black">{error}</div>}
         
         <form onSubmit={handleSubmit} className="space-y-6 md:space-y-8">
-          <div className="flex bg-white/5 p-1 rounded-2xl mb-4 border border-white/10">
-            <button type="button" onClick={() => setModalType('expense')} className={`flex-1 py-2 md:py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${modalType === 'expense' ? 'bg-danger text-white' : 'text-text-muted'}`}>Outgoing</button>
-            <button type="button" onClick={() => setModalType('income')} className={`flex-1 py-2 md:py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${modalType === 'income' ? 'bg-primary text-black' : 'text-text-muted'}`}>Incoming</button>
-            <button type="button" onClick={() => setModalType('transfer')} className={`flex-1 py-2 md:py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${modalType === 'transfer' ? 'bg-white/20 text-white' : 'text-text-muted'}`}>Transfer</button>
+          <div className="flex bg-white/5 p-1 rounded-2xl w-full">
+            <button 
+              type="button"
+              onClick={() => setModalType('expense')}
+              className={`flex-1 py-4 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${modalType === 'expense' ? 'bg-danger text-white shadow-lg' : 'text-text-muted hover:text-white'}`}
+            >
+              {t('expense')}
+            </button>
+            <button 
+              type="button"
+              onClick={() => setModalType('income')}
+              className={`flex-1 py-4 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${modalType === 'income' ? 'bg-success text-white shadow-lg' : 'text-text-muted hover:text-white'}`}
+            >
+              {t('income')}
+            </button>
+            <button 
+              type="button"
+              onClick={() => setModalType('transfer')}
+              className={`flex-1 py-4 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${modalType === 'transfer' ? 'bg-primary text-black shadow-lg' : 'text-text-muted hover:text-white'}`}
+            >
+              {t('transfer')}
+            </button>
           </div>
 
           <div className="grid grid-cols-2 gap-4 md:gap-6">
             <div>
-              <label className="text-xs text-text-muted uppercase tracking-widest font-black block mb-2 md:mb-3">Net Value</label>
+              <label className="text-xs text-text-muted uppercase tracking-widest font-black block mb-2 md:mb-3">{t('amount')}</label>
               <input type="number" step="0.01" required className="h-12 md:h-14 text-base md:text-lg font-black" value={formData.amount} onChange={(e) => setFormData({...formData, amount: e.target.value})} />
             </div>
             <div>
-              <label className="text-xs text-text-muted uppercase tracking-widest font-black block mb-2 md:mb-3">Timestamp</label>
+              <label className="text-xs text-text-muted uppercase tracking-widest font-black block mb-2 md:mb-3">{t('date') || 'Date'}</label>
               <input type="date" required className="h-12 md:h-14 text-sm font-bold" value={formData.date} onChange={(e) => setFormData({...formData, date: e.target.value})} />
             </div>
           </div>
 
           <div>
-            <label className="text-xs text-text-muted uppercase tracking-widest font-black block mb-2 md:mb-3">Description / Memo</label>
+            <label className="text-xs text-text-muted uppercase tracking-widest font-black block mb-2 md:mb-3">{t('description')}</label>
             <input type="text" required className="h-12 md:h-14 text-sm font-black" value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} />
           </div>
 
           <div className="space-y-4 md:space-y-6">
             <div>
               <label className="text-xs text-text-muted uppercase tracking-[0.2em] font-black block mb-2">
-                {modalType === 'transfer' ? 'From Wallet' : 'Wallet'}
+                {modalType === 'transfer' ? t('from_wallet') : t('wallet')}
               </label>
               <SearchableSelect 
                 options={accounts?.map(acc => ({ id: acc.id, name: acc.name }))} 
@@ -144,7 +162,7 @@ const LogEntryModal = ({ isOpen, onClose }) => {
             
             {modalType !== 'transfer' && (
               <div>
-                <label className="text-xs text-text-muted uppercase tracking-[0.2em] font-black block mb-2">Classification</label>
+                <label className="text-xs text-text-muted uppercase tracking-[0.2em] font-black block mb-2">{t('category')}</label>
                 <SearchableSelect 
                   options={(categories[modalType] || []).map(cat => ({ id: cat, name: cat }))} 
                   value={formData.category} 
@@ -156,7 +174,7 @@ const LogEntryModal = ({ isOpen, onClose }) => {
             
             {modalType === 'transfer' && (
               <div>
-                <label className="text-xs text-text-muted uppercase tracking-[0.2em] font-black block mb-2">To Wallet</label>
+                <label className="text-xs text-text-muted uppercase tracking-[0.2em] font-black block mb-2">{t('to_wallet')}</label>
                 <SearchableSelect 
                   options={accounts?.map(acc => ({ id: acc.id, name: acc.name }))} 
                   value={formData.to_account_id} 
@@ -168,7 +186,7 @@ const LogEntryModal = ({ isOpen, onClose }) => {
 
             {householdMembers.length > 0 && (
               <div>
-                <label className="text-xs text-text-muted uppercase tracking-[0.2em] font-black block mb-2">Member Tag (Optional)</label>
+                <label className="text-xs text-text-muted uppercase tracking-[0.2em] font-black block mb-2">{t('member')}</label>
                 <SearchableSelect 
                   options={householdMembers.map(m => ({ id: m.id, name: m.name }))} 
                   value={formData.member_id} 
@@ -179,11 +197,13 @@ const LogEntryModal = ({ isOpen, onClose }) => {
             )}
           </div>
 
-          <div className="pt-4 md:pt-6">
-            <button type="submit" disabled={loading} className="btn btn-primary w-full h-14 md:h-16 font-black uppercase text-black">
-              {loading ? <Loader2 className="animate-spin" /> : 'Log Transaction'}
-            </button>
-          </div>
+          <button 
+            type="submit" 
+            disabled={loading || !formData.amount}
+            className={`btn w-full h-16 rounded-2xl text-black font-black uppercase tracking-[0.2em] shadow-xl ${modalType === 'expense' ? 'bg-danger text-white' : modalType === 'income' ? 'bg-success text-white' : 'bg-primary'} disabled:opacity-50 mt-4`}
+          >
+            {loading ? <Loader2 className="animate-spin" size={24} /> : t('save')}
+          </button>
         </form>
       </div>
     </div>,
