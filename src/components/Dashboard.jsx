@@ -1,5 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
+import SearchableSelect from './ui/SearchableSelect';
+
 import { useFinance } from '../context/FinanceContext';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
@@ -44,8 +46,12 @@ const Dashboard = () => {
     setShowLogModal,
     currentHouseholdId,
     availableHouseholds,
-    t
+    t,
+    addCustomCategory,
+    updateCustomCategory,
+    deleteCustomCategory
   } = useFinance();
+
 
 
 
@@ -58,6 +64,19 @@ const Dashboard = () => {
   const [qtSource, setQtSource] = useState(accounts[0]?.id || '');
   const [qtTarget, setQtTarget] = useState('');
   const [qtAmount, setQtAmount] = useState('');
+
+  const expenseCategories = [
+    { id: 'Food', name: t('cat_food') },
+    { id: 'Rent', name: t('cat_rent') },
+    { id: 'Transport', name: t('cat_transport') },
+    { id: 'Entertainment', name: t('cat_entertainment') },
+    { id: 'Utilities', name: t('cat_utilities') },
+    { id: 'Shopping', name: t('cat_shopping') },
+    { id: 'Health', name: t('cat_health') },
+    { id: 'Other', name: t('cat_other') },
+    ...(preferences.customCategories?.expense || []).map(c => ({ ...c, isCustom: true }))
+  ];
+
   
   // Shortcut Modal State
   const [isShortcutModalOpen, setIsShortcutModalOpen] = useState(false);
@@ -466,20 +485,32 @@ const Dashboard = () => {
                    <label className="text-xs text-text-muted uppercase font-black tracking-widest mb-2 block">Name (e.g. Netflix)</label>
                    <input required value={newShortcut.name} onChange={e => setNewShortcut({...newShortcut, name: e.target.value})} />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="text-xs text-text-muted uppercase font-black tracking-widest mb-2 block">Default Amount</label>
                     <input type="number" step="0.01" required value={newShortcut.amount} onChange={e => setNewShortcut({...newShortcut, amount: e.target.value})} />
                   </div>
                   <div>
                     <label className="text-xs text-text-muted uppercase font-black tracking-widest mb-2 block">Category</label>
-                    <select value={newShortcut.category} onChange={e => setNewShortcut({...newShortcut, category: e.target.value})}>
-                       <option>Food</option>
-                       <option>Entertainment</option>
-                       <option>Subscription</option>
-                       <option>Productivity</option>
-                       <option>Health</option>
-                    </select>
+                    <SearchableSelect 
+                      options={expenseCategories}
+                      value={newShortcut.category}
+                      onChange={(val) => {
+                        const exists = expenseCategories.some(c => c.id === val);
+                        if (!exists && val) {
+                          addCustomCategory('expense', val);
+                        }
+                        setNewShortcut(prev => ({ ...prev, category: val }));
+                      }}
+                      onEdit={(id, name) => {
+                        const newName = prompt('New category name:', name);
+                        if (newName) updateCustomCategory('expense', id, newName);
+                      }}
+                      onDelete={(id) => {
+                        if (confirm('Delete category?')) deleteCustomCategory('expense', id);
+                      }}
+                      placeholder="Select Category"
+                    />
                   </div>
                 </div>
                 <div>
