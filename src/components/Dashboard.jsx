@@ -504,14 +504,14 @@ const Dashboard = () => {
                     {shortcuts.map((item) => (
                         <div 
                           key={item.id} 
-                          className="relative group p-2 bg-white/5 rounded-xl hover:bg-primary transition-all cursor-pointer border border-white/5 hover:border-transparent flex flex-col items-center text-center overflow-visible"
+                          className="relative group p-2 bg-white/5 rounded-xl hover:bg-primary transition-all cursor-pointer border border-white/5 hover:border-transparent flex flex-col items-end text-right overflow-visible"
                         >
-                        <div onClick={() => !isShortcutsEditMode && handleFrequentPayment(item)} className="w-full h-full flex flex-col items-center">
+                        <div onClick={() => !isShortcutsEditMode && handleFrequentPayment(item)} className="w-full h-full flex flex-col items-end">
                           <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-2 font-black text-base bg-white/10 group-hover:bg-black/20 shrink-0 shadow-sm" style={{ color: item.color }}>
                             {item.type === 'Income' ? <ArrowUpRight size={18} /> : item.name.charAt(0)}
                           </div>
-                          <div className="flex-1 flex flex-col items-center justify-center min-h-[36px] w-full px-1">
-                             <p className="w-full text-[10px] font-black group-hover:text-black transition-colors truncate leading-tight text-center mb-0.5">{item.name}</p>
+                          <div className="flex-1 flex flex-col items-end justify-center min-h-[36px] w-full px-1">
+                             <p className="w-full text-[10px] font-black group-hover:text-black transition-colors truncate leading-tight text-right mb-0.5">{item.name}</p>
                              <p className="text-[9px] font-black text-text-muted group-hover:text-black/60 shrink-0">
                                {item.type === 'Income' ? '+' : ''}${item.amount || '???'}
                              </p>
@@ -566,14 +566,14 @@ const Dashboard = () => {
   
                      <div 
                         key={item.id} 
-                        className="relative group p-2 bg-white/5 rounded-xl hover:bg-primary transition-all cursor-pointer border border-white/5 hover:border-transparent flex flex-col items-center text-center overflow-visible"
+                        className="relative group p-2 bg-white/5 rounded-xl hover:bg-primary transition-all cursor-pointer border border-white/5 hover:border-transparent flex flex-col items-end text-right overflow-visible"
                       >
-                        <div onClick={() => !isShortcutsEditMode && handleFrequentPayment(item)} className="w-full h-full flex flex-col items-center">
+                        <div onClick={() => !isShortcutsEditMode && handleFrequentPayment(item)} className="w-full h-full flex flex-col items-end">
                           <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-2 font-black text-base bg-white/10 group-hover:bg-black/20 shrink-0 shadow-sm" style={{ color: item.color }}>
                             {item.type === 'Income' ? <ArrowUpRight size={18} /> : item.name.charAt(0)}
                           </div>
-                          <div className="flex-1 flex flex-col items-center justify-center min-h-[36px] w-full px-1">
-                             <p className="w-full text-[10px] font-black group-hover:text-black transition-colors truncate leading-tight text-center mb-0.5">{item.name}</p>
+                          <div className="flex-1 flex flex-col items-end justify-center min-h-[36px] w-full px-1">
+                             <p className="w-full text-[10px] font-black group-hover:text-black transition-colors truncate leading-tight text-right mb-0.5">{item.name}</p>
                              <p className="text-[9px] font-black text-text-muted group-hover:text-black/60 shrink-0">
                                {item.type === 'Income' ? '+' : ''}${item.amount || '???'}
                              </p>
