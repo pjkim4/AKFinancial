@@ -109,14 +109,15 @@ const SearchableSelect = ({ options = [], value, onChange, onEdit, onDelete, pla
       {isOpen && (
         <div 
           style={{
-            position: 'fixed',
-            top: coords.isUp ? `${coords.top}px` : `${coords.top}px`,
-            left: `${coords.left}px`,
-            width: `${coords.width}px`,
-            zIndex: 99999, // Extremely high z-index
-            transform: coords.isUp ? 'translateY(-100%)' : 'none',
+            position: 'absolute',
+            top: coords.isUp ? 'auto' : 'calc(100% + 8px)',
+            bottom: coords.isUp ? 'calc(100% + 8px)' : 'auto',
+            left: 0,
+            width: '100%',
+            zIndex: 99999,
             maxHeight: '300px'
           }}
+
           className="bg-white border border-gray-200 rounded-2xl shadow-2xl overflow-y-auto animate-in fade-in zoom-in duration-100 flex flex-col"
         >
           <div className="flex-1 overflow-y-auto scrollbar-hide">
