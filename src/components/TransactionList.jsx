@@ -76,6 +76,12 @@ const TransactionList = () => {
   const [startDate, setStartDate] = useState(getLastMonthDate());
   const [endDate, setEndDate] = useState(getToday());
 
+  const [filterAccount, setFilterAccount] = useState('all');
+  const [filterCategory, setFilterCategory] = useState('all');
+  const [filterType, setFilterType] = useState('all');
+  const [filterMember, setFilterMember] = useState('all');
+
+
   const [formData, setFormData] = useState({
     amount: '',
     description: '',
@@ -155,9 +161,22 @@ const TransactionList = () => {
     const txDate = new Date(t.date);
     const matchesStartDate = !startDate || txDate >= new Date(startDate);
     const matchesEndDate = !endDate || txDate <= new Date(endDate);
+
+    // 3. Account Filter
+    const matchesAccount = filterAccount === 'all' || String(t.account_id) === String(filterAccount);
+
+    // 4. Category Filter
+    const matchesCategory = filterCategory === 'all' || t.category === filterCategory;
+
+    // 5. Type Filter
+    const matchesType = filterType === 'all' || t.type === filterType;
+
+    // 6. Member Filter
+    const matchesMember = filterMember === 'all' || String(t.member_id) === String(filterMember);
     
-    return matchesSearch && matchesStartDate && matchesEndDate;
+    return matchesSearch && matchesStartDate && matchesEndDate && matchesAccount && matchesCategory && matchesType && matchesMember;
   });
+
 
   const handleEditClick = (transaction) => {
     setEditingId(transaction.id);
@@ -371,73 +390,130 @@ const TransactionList = () => {
                <p className="col-span-full py-4 text-center text-text-muted text-[10px] font-bold uppercase tracking-widest">No active wallets sync'd</p>
              )}
           </div>
-        )}
+            {/* Filter Toolbar */}
+        <div className="card glass p-4 space-y-4">
+           {/* Row 1: Search & Dates */}
+           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
+              <div className="lg:col-span-6 relative group">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted group-focus-within:text-primary transition-colors" size={20} />
+                <input 
+                  type="text" 
+                  placeholder="Search description or category..." 
+                  className="w-full pl-12 h-14 bg-white/5 border-white/10 rounded-xl focus:ring-2 focus:ring-primary/20 transition-all font-black text-sm"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+              <div className="lg:col-span-3">
+                <div className="flex items-center gap-2 bg-white/5 border border-white/20 p-2 rounded-xl h-14 hover:border-primary/50 transition-all">
+                  <span className="text-[10px] font-black uppercase text-white px-2">From</span>
+                  <input 
+                    type="date" 
+                    className="bg-transparent border-none p-0 h-auto w-full text-xs font-black focus:shadow-none text-white indicator-white"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="lg:col-span-3">
+                <div className="flex items-center gap-2 bg-white/5 border border-white/20 p-2 rounded-xl h-14 hover:border-primary/50 transition-all">
+                  <span className="text-[10px] font-black uppercase text-white px-2">To</span>
+                  <input 
+                    type="date" 
+                    className="bg-transparent border-none p-0 h-auto w-full text-xs font-black focus:shadow-none text-white indicator-white"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                  />
+                </div>
+              </div>
+           </div>
 
-        {/* Toolbar */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:flex lg:flex-row gap-4">
-          <div className="relative flex-1 md:col-span-2 lg:col-auto">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-primary" size={20} />
-            <input 
-              type="text" 
-              placeholder="Search records..." 
-              className="pl-12 bg-card border-white/10 w-full h-14 font-black text-sm"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
+           {/* Row 2: Select Filters */}
+           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+              <div className="space-y-1.5">
+                 <label className="text-[10px] font-black uppercase tracking-widest text-text-muted ml-1">Wallet</label>
+                 <select 
+                  className="w-full h-12 px-3 bg-white/5 border border-white/10 rounded-xl text-xs font-black appearance-none cursor-pointer hover:bg-white/10 transition-all text-white"
+                  value={filterAccount}
+                  onChange={(e) => setFilterAccount(e.target.value)}
+                 >
+                    <option value="all" className="bg-[#181818]">All Wallets</option>
+                    {accounts.map(acc => <option key={acc.id} value={acc.id} className="bg-[#181818]">{acc.name}</option>)}
+                 </select>
+              </div>
 
-          <div className="flex flex-row gap-4">
-            <div className="flex-1 flex items-center gap-2 bg-white/5 border border-white/20 p-2 rounded-xl h-14 hover:border-primary/50 transition-all">
-              <span className="text-[10px] font-black uppercase text-white px-2">From</span>
-              <input 
-                type="date" 
-                className="bg-transparent border-none p-0 h-auto w-full text-xs font-black focus:shadow-none text-white indicator-white"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-              />
-            </div>
-            <div className="flex-1 flex items-center gap-2 bg-white/5 border border-white/20 p-2 rounded-xl h-14 hover:border-primary/50 transition-all">
-              <span className="text-[10px] font-black uppercase text-white px-2">To</span>
-              <input 
-                type="date" 
-                className="bg-transparent border-none p-0 h-auto w-full text-xs font-black focus:shadow-none text-white indicator-white"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-              />
-            </div>
-          </div>
+              <div className="space-y-1.5">
+                 <label className="text-[10px] font-black uppercase tracking-widest text-text-muted ml-1">Category</label>
+                 <select 
+                  className="w-full h-12 px-3 bg-white/5 border border-white/10 rounded-xl text-xs font-black appearance-none cursor-pointer hover:bg-white/10 transition-all text-white"
+                  value={filterCategory}
+                  onChange={(e) => setFilterCategory(e.target.value)}
+                 >
+                    <option value="all" className="bg-[#181818]">All Categories</option>
+                    {[...allCategories.income, ...allCategories.expense].filter((v, i, a) => a.findIndex(t => t.id === v.id) === i).map(cat => (
+                      <option key={cat.id} value={cat.id} className="bg-[#181818]">{cat.name}</option>
+                    ))}
+                 </select>
+              </div>
 
-          <div className="flex flex-wrap gap-2 md:col-span-2 lg:col-auto">
-            <button 
-              onClick={() => { setStartDate(''); setEndDate(''); setSearchTerm(''); }}
-              className="btn btn-secondary border-white/10 h-14 px-4 text-[10px] font-black uppercase flex-1"
-              title="Reset Filters"
-            >
-              {t('tx_clear')}
-            </button>
+              <div className="space-y-1.5">
+                 <label className="text-[10px] font-black uppercase tracking-widest text-text-muted ml-1">Type</label>
+                 <select 
+                  className="w-full h-12 px-3 bg-white/5 border border-white/10 rounded-xl text-xs font-black appearance-none cursor-pointer hover:bg-white/10 transition-all text-white"
+                  value={filterType}
+                  onChange={(e) => setFilterType(e.target.value)}
+                 >
+                    <option value="all" className="bg-[#181818]">All Types</option>
+                    <option value="Expense" className="bg-[#181818]">Expense</option>
+                    <option value="Income" className="bg-[#181818]">Income</option>
+                    <option value="Transfer" className="bg-[#181818]">Transfer</option>
+                 </select>
+              </div>
 
+              <div className="space-y-1.5">
+                 <label className="text-[10px] font-black uppercase tracking-widest text-text-muted ml-1">Member</label>
+                 <select 
+                  className="w-full h-12 px-3 bg-white/5 border border-white/10 rounded-xl text-xs font-black appearance-none cursor-pointer hover:bg-white/10 transition-all text-white"
+                  value={filterMember}
+                  onChange={(e) => setFilterMember(e.target.value)}
+                 >
+                    <option value="all" className="bg-[#181818]">All Members</option>
+                    {householdMembers.map(m => <option key={m.id} value={m.id} className="bg-[#181818]">{m.name}</option>)}
+                 </select>
+              </div>
 
-            {selectedIds.length > 0 && (
-              <button 
-                onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowBulkConfirm(true); }}
-                disabled={loading}
-                className="btn bg-danger text-white border border-danger/20 hover:bg-danger/90 h-14 px-6 transition-all animate-scale-in shadow-lg shadow-danger/20 flex-1 lg:flex-none"
-              >
-                <Trash2 size={18} />
-                <span className="font-black text-xs uppercase">Delete ({selectedIds.length})</span>
-              </button>
-            )}
-
-            <button 
-              onClick={exportCSV}
-              className="btn btn-secondary border-white/10 px-8 h-14 shrink-0 transition-all active:scale-95 flex-1 lg:flex-none"
-            >
-              <Download size={18} />
-              <span className="font-bold">{t('tx_export')}</span>
-            </button>
-
-          </div>
+              <div className="flex items-end">
+                <button 
+                  onClick={() => { setStartDate(''); setEndDate(''); setSearchTerm(''); setFilterAccount('all'); setFilterCategory('all'); setFilterType('all'); setFilterMember('all'); }}
+                  className="w-full h-12 bg-white/5 border border-white/10 rounded-xl text-[10px] font-black uppercase hover:bg-white/10 hover:text-white transition-all text-text-muted"
+                >
+                  {t('tx_clear')}
+                </button>
+              </div>
+           </div>
         </div>
+
+        <div className="flex flex-wrap gap-3">
+          {selectedIds.length > 0 && (
+            <button 
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowBulkConfirm(true); }}
+              disabled={loading}
+              className="btn bg-danger text-white border border-danger/20 hover:bg-danger/90 h-14 px-6 transition-all animate-scale-in shadow-lg shadow-danger/20 flex-1 md:flex-none"
+            >
+              <Trash2 size={18} />
+              <span className="font-black text-xs uppercase">Delete ({selectedIds.length})</span>
+            </button>
+          )}
+
+          <button 
+            onClick={exportCSV}
+            className="btn btn-secondary border-white/10 px-8 h-14 shrink-0 transition-all active:scale-95 flex-1 md:flex-none"
+          >
+            <Download size={18} />
+            <span className="font-bold">{t('tx_export')}</span>
+          </button>
+        </div>
+
 
         {/* Transaction Views */}
         <div className="space-y-4">
