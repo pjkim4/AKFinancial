@@ -505,12 +505,12 @@ const Dashboard = () => {
                           key={item.id} 
                           className="relative group p-2 bg-white/5 rounded-xl hover:bg-primary transition-all cursor-pointer border border-white/5 hover:border-transparent flex flex-col items-center text-center overflow-visible"
                         >
-                          <div onClick={() => !isShortcutsEditMode && handleFrequentPayment(item)} className="w-full h-full flex flex-col items-center">
-                            <div className="w-9 h-9 rounded-lg flex items-center justify-center mb-1.5 font-black text-base bg-white/10 group-hover:bg-black/20" style={{ color: item.color }}>
+                          <div onClick={() => !isShortcutsEditMode && handleFrequentPayment(item)} className="w-full h-full flex flex-col items-center overflow-hidden">
+                            <div className="w-9 h-9 rounded-lg flex items-center justify-center mb-1.5 font-black text-base bg-white/10 group-hover:bg-black/20 shrink-0" style={{ color: item.color }}>
                               {item.type === 'Income' ? <ArrowUpRight size={16} /> : item.name.charAt(0)}
                             </div>
-                            <p className="text-[10px] font-black group-hover:text-black transition-colors line-clamp-1 leading-tight">{item.name}</p>
-                            <p className="text-[8px] font-bold text-text-muted group-hover:text-black/60 mt-0.5">
+                            <p className="w-full text-[10px] font-black group-hover:text-black transition-colors truncate leading-tight text-center">{item.name}</p>
+                            <p className="text-[8px] font-bold text-text-muted group-hover:text-black/60 mt-0.5 shrink-0">
                               {item.type === 'Income' ? '+' : ''}${item.amount || '???'}
                             </p>
                           </div>
@@ -556,12 +556,12 @@ const Dashboard = () => {
                         key={item.id} 
                         className="relative group p-2 bg-white/5 rounded-xl hover:bg-primary transition-all cursor-pointer border border-white/5 hover:border-transparent flex flex-col items-center text-center overflow-visible"
                       >
-                        <div onClick={() => !isShortcutsEditMode && handleFrequentPayment(item)} className="w-full h-full flex flex-col items-center">
-                          <div className="w-9 h-9 rounded-lg flex items-center justify-center mb-1.5 font-black text-base bg-white/10 group-hover:bg-black/20" style={{ color: item.color }}>
+                        <div onClick={() => !isShortcutsEditMode && handleFrequentPayment(item)} className="w-full h-full flex flex-col items-center overflow-hidden">
+                          <div className="w-9 h-9 rounded-lg flex items-center justify-center mb-1.5 font-black text-base bg-white/10 group-hover:bg-black/20 shrink-0" style={{ color: item.color }}>
                             {item.type === 'Income' ? <ArrowUpRight size={16} /> : item.name.charAt(0)}
                           </div>
-                          <p className="text-[10px] font-black group-hover:text-black transition-colors line-clamp-1 leading-tight">{item.name}</p>
-                          <p className="text-[8px] font-bold text-text-muted group-hover:text-black/60 mt-0.5">
+                          <p className="w-full text-[10px] font-black group-hover:text-black transition-colors truncate leading-tight text-center">{item.name}</p>
+                          <p className="text-[8px] font-bold text-text-muted group-hover:text-black/60 mt-0.5 shrink-0">
                             {item.type === 'Income' ? '+' : ''}${item.amount || '???'}
                           </p>
 
