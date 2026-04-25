@@ -473,14 +473,16 @@ const Dashboard = () => {
                 </button>
              </div>
           </div>
-          <div className="space-y-10">
+          <div className="space-y-6">
+
             {accounts.map((acc) => {
               const shortcuts = frequentPayments.filter(p => p.account_id && String(p.account_id) === String(acc.id));
               if (shortcuts.length === 0) return null;
 
               
               return (
-                <div key={acc.id} className="space-y-4">
+                <div key={acc.id} className="p-4 border border-white/5 rounded-2xl bg-white/[0.02] space-y-4">
+
                   <div className="flex items-center gap-3 px-2">
                     <div className="w-1.5 h-4 bg-primary rounded-full"></div>
                     <h5 className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted">{acc.name}</h5>
@@ -522,7 +524,8 @@ const Dashboard = () => {
 
             {/* Handle unassigned shortcuts or catch-all if no accounts matched */}
             {frequentPayments.filter(p => !p.account_id || !accounts.some(acc => String(acc.id) === String(p.account_id))).length > 0 && (
-              <div className="space-y-4">
+              <div className="p-4 border border-white/5 rounded-2xl bg-white/[0.02] space-y-4">
+
                 <div className="flex items-center gap-3 px-2">
                   <div className="w-1.5 h-4 bg-gray-500 rounded-full"></div>
                   <h5 className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted">Other / Unassigned</h5>
