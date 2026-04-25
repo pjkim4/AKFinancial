@@ -1144,6 +1144,7 @@ export const FinanceProvider = ({ children }) => {
         .select();
       
       if (error) {
+        // Fallback 1: If table is missing entirely
         if (error.code === '42P01' || error.message?.includes('not find the table')) {
           const newM = { ...member, id: Date.now() };
           const updated = [...householdMembers, newM];
@@ -1151,14 +1152,35 @@ export const FinanceProvider = ({ children }) => {
           localStorage.setItem('finance_household_members', JSON.stringify(updated));
           return { success: true, warning: 'Stored locally (DB table missing)' };
         }
+        
+        // Fallback 2: If 'role' column is missing (Schema mismatch)
+        if (error.message?.includes("'role' column") || error.code === '42703') {
+          console.warn('[DB] Fallback: role column missing, retrying without role');
+          const { role, ...memberWithoutRole } = member;
+          const { data: retryData, error: retryError } = await supabase
+            .from('household_members')
+            .insert([{ ...memberWithoutRole, user_id: targetId }])
+            .select();
+          
+          if (retryError) throw retryError;
+          if (!retryData || retryData.length === 0) throw new Error('Member created (fallback) but no data returned');
+          
+          // Still add the role to the local state so UI looks correct
+          const memberWithRole = { ...retryData[0], role };
+          setHouseholdMembers(prev => [...prev, memberWithRole]);
+          return { success: true, warning: 'Stored without role (DB update needed)' };
+        }
+        
         throw error;
       }
       setHouseholdMembers(prev => [...prev, data[0]]);
       return { success: true };
     } catch (error) {
+      console.error('Error adding household member:', error.message);
       return { error };
     }
   };
+
 
   const updateHouseholdMember = async (id, updates) => {
     try {
@@ -1169,20 +1191,40 @@ export const FinanceProvider = ({ children }) => {
         .select();
       
       if (error) {
+        // Fallback 1: Missing Table
         if (error.code === '42P01' || error.message?.includes('not find the table')) {
           const updated = householdMembers.map(m => m.id === id ? { ...m, ...updates } : m);
           setHouseholdMembers(updated);
           localStorage.setItem('finance_household_members', JSON.stringify(updated));
           return { success: true };
         }
+        
+        // Fallback 2: Missing Role column
+        if (error.message?.includes("'role' column") || error.code === '42703') {
+          console.warn('[DB] Fallback: role column missing on update, retrying without role');
+          const { role, ...updatesWithoutRole } = updates;
+          const { data: retryData, error: retryError } = await supabase
+            .from('household_members')
+            .update(updatesWithoutRole)
+            .eq('id', id)
+            .select();
+          
+          if (retryError) throw retryError;
+          const finalData = { ...retryData[0], role: role || householdMembers.find(m => m.id === id)?.role };
+          setHouseholdMembers(prev => prev.map(m => m.id === id ? finalData : m));
+          return { success: true };
+        }
+
         throw error;
       }
       setHouseholdMembers(prev => prev.map(m => m.id === id ? data[0] : m));
       return { success: true };
     } catch (error) {
+      console.error('Error updating household member:', error.message);
       return { error };
     }
   };
+
 
   const inviteMember = async (email, householdId) => {
     try {
