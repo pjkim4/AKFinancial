@@ -74,6 +74,13 @@ export const translations = {
     report_momentum: 'Monthly Momentum',
     report_print: 'Print / PDF',
     report_master: 'Master Ledger',
+    report_ai_strat: 'AI Strategy Report',
+    report_ai_desc: 'Generate a full audit of your financial habits, including category overspending alerts, savings rate optimization, and custom investment pathing.',
+    report_gen_pdf: 'Generate PDF Audit',
+    report_email_acc: 'Email to Accountant',
+    report_analysis_for: 'Deep analysis for',
+    report_synced: 'Cloud Synced',
+    report_verified: 'Verified Outflow',
 
     // AI
     ai_header: 'AK Finance Planning',
@@ -222,6 +229,13 @@ export const translations = {
     report_momentum: '월별 자금 흐름',
     report_print: '인쇄 / PDF 저장',
     report_master: '전체 장부 추출',
+    report_ai_strat: 'AI 맞춤형 전략 리포트',
+    report_ai_desc: '소비 습관에 대한 정밀 분석, 카테고리별 지출 경고, 저축률 최적화 및 맞춤형 투자 경로가 포함된 전체 감사 보고서를 생성합니다.',
+    report_gen_pdf: 'PDF 감사 리포트 생성',
+    report_email_acc: '회계사에게 이메일 전송',
+    report_analysis_for: '상세 분석 대상:',
+    report_synced: '클라우드 동기화 완료',
+    report_verified: '지출 검증 완료',
 
     // AI
     ai_header: 'AI 지능형 자산 분석',

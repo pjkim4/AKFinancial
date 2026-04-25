@@ -226,8 +226,9 @@ const Reports = () => {
                   cursor={{ fill: 'rgba(255,255,255,0.05)' }}
                   contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
                 />
-                <Bar dataKey="income" fill="#c1ff72" radius={[4, 4, 0, 0]} name="Income" />
-                <Bar dataKey="expense" fill="rgba(255,255,255,0.1)" radius={[4, 4, 0, 0]} name="Expense" />
+                <Bar dataKey="income" fill="#c1ff72" radius={[4, 4, 0, 0]} name={t('income')} />
+                <Bar dataKey="expense" fill="rgba(255,255,255,0.1)" radius={[4, 4, 0, 0]} name={t('expense')} />
+
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -240,21 +241,22 @@ const Reports = () => {
         <div className="relative z-10">
           <h3 className="text-xl font-black uppercase italic tracking-tight mb-4 flex items-center gap-3">
             <Sparkles className="text-primary" />
-            AI Strategy Report
+            {t('report_ai_strat')}
           </h3>
           <p className="text-sm text-text-muted mb-8 max-w-xl leading-relaxed">
-            Generate a full audit of your financial habits, including category overspending alerts, savings rate optimization, and custom investment pathing.
+            {t('report_ai_desc')}
           </p>
           <div className="flex flex-wrap gap-4">
             <button className="btn btn-primary h-14 px-10 text-black font-black uppercase tracking-widest shadow-xl shadow-primary/20">
-              Generate PDF Audit
+              {t('report_gen_pdf')}
             </button>
             <button className="btn bg-white/5 border-white/10 h-14 px-8 text-text-muted hover:text-white uppercase font-black text-[10px] tracking-widest">
-              Email to Accountant
+              {t('report_email_acc')}
             </button>
           </div>
         </div>
       </div>
+
     </div>
   );
 };
