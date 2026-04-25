@@ -99,16 +99,19 @@ const SearchableSelect = ({ options = [], value, onChange, onEdit, onDelete, pla
         <div 
           style={{
             position: 'fixed',
-            top: `${coords.top}px`,
+            top: coords.isUp ? `${coords.top}px` : `${coords.top}px`,
             left: `${coords.left}px`,
             width: `${coords.width}px`,
-            zIndex: 9999,
-            transform: coords.isUp ? 'translateY(-100%)' : 'none'
+            zIndex: 99999, // Extremely high z-index
+            transform: coords.isUp ? 'translateY(-100%)' : 'none',
+            maxHeight: '300px'
           }}
-          className="bg-white border border-gray-200 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-100 max-h-80 overflow-y-auto"
+          className="bg-white border border-gray-200 rounded-2xl shadow-2xl overflow-y-auto animate-in fade-in zoom-in duration-100 flex flex-col"
         >
-          {filteredOptions.length > 0 ? (
-            <div className="p-2 space-y-1">
+          <div className="flex-1 overflow-y-auto scrollbar-hide">
+            {filteredOptions.length > 0 ? (
+              <div className="p-2 space-y-1">
+
               {filteredOptions.map((opt) => (
                 <div
                   key={opt.id}
@@ -170,6 +173,8 @@ const SearchableSelect = ({ options = [], value, onChange, onEdit, onDelete, pla
               <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest italic">No matches found</p>
             </div>
           )}
+          </div>
+
 
           {/* PERMANENT ADD NEW BUTTON AT BOTTOM */}
           {!searchTerm && (
