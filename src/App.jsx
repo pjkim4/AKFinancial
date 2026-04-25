@@ -41,8 +41,10 @@ const Logo = ({ size = 24 }) => (
 const AppContent = () => {
   const { 
     user, profile, login, signup, logout, loading, sendPasswordResetEmail, updatePassword, 
-    showLogModal, setShowLogModal, availableHouseholds, currentHouseholdId, setCurrentHouseholdId 
+    showLogModal, setShowLogModal, availableHouseholds, currentHouseholdId, setCurrentHouseholdId,
+    language, setLanguage, t
   } = useFinance();
+
 
 
 
@@ -310,22 +312,41 @@ const AppContent = () => {
             </span>
           </div>
         </div>
-        <button onClick={logout} className="p-2 text-danger hover:bg-danger/10 rounded-lg transition-all">
-          <LogOut size={18} />
-        </button>
+        <div className="flex items-center gap-2">
+          <button 
+            onClick={() => setLanguage(language === 'en' ? 'ko' : 'en')}
+            className="w-10 h-10 flex items-center justify-center bg-white/10 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-white/20 transition-all border border-white/10"
+          >
+            {language === 'en' ? 'KO' : 'EN'}
+          </button>
+          <button onClick={logout} className="p-2 text-danger hover:bg-danger/10 rounded-lg transition-all">
+            <LogOut size={18} />
+          </button>
+        </div>
+
       </header>
 
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex w-64 glass border-r border-white/10 h-screen sticky top-0 z-20 flex-col">
-        <div className="p-6 flex items-center gap-3">
-          <Logo size={24} />
-          <div className="flex flex-col">
-            <span className="font-bold text-xl tracking-tight leading-none">AK Finance</span>
-            <span className="text-[10px] text-primary uppercase tracking-[0.2em] font-black mt-1">
-              {profile?.username || user?.email?.split('@')[0]}
-            </span>
+        <div className="p-6 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Logo size={24} />
+            <div className="flex flex-col">
+              <span className="font-bold text-xl tracking-tight leading-none">AK Finance</span>
+              <span className="text-[10px] text-primary uppercase tracking-[0.2em] font-black mt-1">
+                {profile?.username || user?.email?.split('@')[0]}
+              </span>
+            </div>
           </div>
+          <button 
+            onClick={() => setLanguage(language === 'en' ? 'ko' : 'en')}
+            className="w-10 h-10 flex items-center justify-center bg-white/5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all border border-white/5"
+            title={language === 'en' ? 'Switch to Korean' : 'Switch to English'}
+          >
+            {language === 'en' ? 'KO' : 'EN'}
+          </button>
         </div>
+
 
         {availableHouseholds.length > 1 && (
           <div className="px-6 mb-4">
@@ -355,44 +376,45 @@ const AppContent = () => {
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${activeTab === 'dashboard' ? 'bg-primary text-black shadow-lg shadow-primary/20' : 'hover:bg-white/5 text-text-muted hover:text-white'}`}
           >
             <BarChart3 size={20} />
-            Dashboard
+            {t('nav_home')}
           </button>
           <button 
             onClick={() => setActiveTab('transactions')}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${activeTab === 'transactions' ? 'bg-primary text-black shadow-lg shadow-primary/20' : 'hover:bg-white/5 text-text-muted hover:text-white'}`}
           >
             <History size={20} />
-            Transactions
+            {t('nav_history')}
           </button>
           <button 
             onClick={() => setActiveTab('accounts')}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${activeTab === 'accounts' ? 'bg-primary text-black shadow-lg shadow-primary/20' : 'hover:bg-white/5 text-text-muted hover:text-white'}`}
           >
             <CreditCard size={20} />
-            Accounts
+            {t('nav_wallets')}
           </button>
           <button 
             onClick={() => setActiveTab('recurring')}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${activeTab === 'recurring' ? 'bg-primary text-black shadow-lg shadow-primary/20' : 'hover:bg-white/5 text-text-muted hover:text-white'}`}
           >
             <CalendarClock size={20} />
-            Recurring
+            {t('nav_auto')}
           </button>
           <button 
             onClick={() => setActiveTab('ai')}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${activeTab === 'ai' ? 'bg-primary text-black shadow-lg shadow-primary/20' : 'hover:bg-white/5 text-text-muted hover:text-white'}`}
           >
             <BrainCircuit size={20} />
-            AI Planning
+            {t('nav_insights')}
           </button>
           <button 
             onClick={() => setActiveTab('reports')}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${activeTab === 'reports' ? 'bg-primary text-black shadow-lg shadow-primary/20' : 'hover:bg-white/5 text-text-muted hover:text-white'}`}
           >
             <FileText size={20} />
-            Financial Intel
+            {t('nav_intel')}
           </button>
         </nav>
+
 
 
         <div className="p-4 border-t border-white/5">
@@ -408,8 +430,9 @@ const AppContent = () => {
             className="w-full flex items-center gap-3 px-4 py-3 rounded-xl mt-2 hover:bg-danger/10 text-danger transition-all"
           >
             <LogOut size={20} />
-            Logout
+            {t('nav_logout')}
           </button>
+
         </div>
       </aside>
 
@@ -457,54 +480,55 @@ const AppContent = () => {
                 className={`flex-1 flex flex-col items-center gap-0.5 py-2 transition-all ${activeTab === 'dashboard' ? 'text-primary' : 'text-text-muted hover:text-white'}`}
               >
                 <BarChart3 size={20} />
-                <span className="text-[8px] font-black uppercase tracking-tighter">Home</span>
+                <span className="text-[8px] font-black uppercase tracking-tighter">{t('nav_home')}</span>
               </button>
+
               <button 
                 onClick={() => setActiveTab('transactions')}
                 className={`flex-1 flex flex-col items-center gap-0.5 py-2 transition-all ${activeTab === 'transactions' ? 'text-primary' : 'text-text-muted hover:text-white'}`}
               >
                 <History size={20} />
-                <span className="text-[8px] font-black uppercase tracking-tighter">History</span>
+                <span className="text-[8px] font-black uppercase tracking-tighter">{t('nav_history')}</span>
               </button>
               <button 
                 onClick={() => setActiveTab('accounts')}
                 className={`flex-1 flex flex-col items-center gap-0.5 py-2 transition-all ${activeTab === 'accounts' ? 'text-primary' : 'text-text-muted hover:text-white'}`}
               >
                 <CreditCard size={20} />
-                <span className="text-[8px] font-black uppercase tracking-tighter">Wallets</span>
+                <span className="text-[8px] font-black uppercase tracking-tighter">{t('nav_wallets')}</span>
               </button>
               <button 
                 onClick={() => setActiveTab('recurring')}
                 className={`flex-1 flex flex-col items-center gap-0.5 py-2 transition-all ${activeTab === 'recurring' ? 'text-primary' : 'text-text-muted hover:text-white'}`}
               >
                 <CalendarClock size={20} />
-                <span className="text-[8px] font-black uppercase tracking-tighter">Auto</span>
+                <span className="text-[8px] font-black uppercase tracking-tighter">{t('nav_auto')}</span>
               </button>
               <button 
                 onClick={() => setActiveTab('ai')}
                 className={`flex-1 flex flex-col items-center gap-0.5 py-2 transition-all ${activeTab === 'ai' ? 'text-primary' : 'text-text-muted hover:text-white'}`}
               >
                 <BrainCircuit size={20} />
-                <span className="text-[8px] font-black uppercase tracking-tighter">Insights</span>
+                <span className="text-[8px] font-black uppercase tracking-tighter">{t('nav_insights')}</span>
               </button>
               <button 
                 onClick={() => setActiveTab('reports')}
                 className={`flex-1 flex flex-col items-center gap-0.5 py-2 transition-all ${activeTab === 'reports' ? 'text-primary' : 'text-text-muted hover:text-white'}`}
               >
                 <FileText size={20} />
-                <span className="text-[8px] font-black uppercase tracking-tighter">Intel</span>
+                <span className="text-[8px] font-black uppercase tracking-tighter">{t('nav_intel')}</span>
               </button>
-
 
               <button 
                 onClick={() => setActiveTab('settings')}
                 className={`flex-1 flex flex-col items-center gap-0.5 py-2 transition-all ${activeTab === 'settings' ? 'text-primary' : 'text-text-muted hover:text-white'}`}
               >
                 <Settings size={20} />
-                <span className="text-[8px] font-black uppercase tracking-tighter">Setup</span>
+                <span className="text-[8px] font-black uppercase tracking-tighter">{t('nav_setup')}</span>
               </button>
             </nav>
           </div>
+
 
           <ErrorBoundary key={activeTab}>
             {renderContent()}

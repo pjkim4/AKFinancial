@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { translations, useTranslation } from '../lib/translations';
 
 const FinanceContext = createContext();
 
@@ -23,7 +24,12 @@ export const FinanceProvider = ({ children }) => {
     return saved || null;
   }); 
   const [loading, setLoading] = useState(true);
+  const [language, setLanguage] = useState(() => {
+    return localStorage.getItem('finance_language') || 'en';
+  });
+  const t = useTranslation(language);
   const [showLogModal, setShowLogModal] = useState(false);
+
   const [syncError, setSyncError] = useState(null);
 
   
@@ -83,7 +89,12 @@ export const FinanceProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
+    localStorage.setItem('finance_language', language);
+  }, [language]);
+
+  useEffect(() => {
     if (user) {
+
       // Default to my own account as the first household
       if (!currentHouseholdId) {
         setCurrentHouseholdId(user.id);
@@ -1234,8 +1245,12 @@ export const FinanceProvider = ({ children }) => {
       toggleBalances: () => setPreferences(prev => ({ ...prev, hideBalances: !prev.hideBalances })),
       syncError,
       showLogModal,
-      setShowLogModal
+      setShowLogModal,
+      language,
+      setLanguage,
+      t
     }}>
+
 
 
 
