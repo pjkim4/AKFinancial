@@ -37,9 +37,20 @@ const SearchableSelect = ({ options = [], value, onChange, onEdit, onDelete, pla
     const handleSync = () => {
       if (isOpen && triggerRef.current) {
         const rect = triggerRef.current.getBoundingClientRect();
-        setCoords({ top: rect.bottom + 8, left: rect.left, width: rect.width });
+        const windowHeight = window.innerHeight;
+        const spaceBelow = windowHeight - rect.bottom;
+        const spaceAbove = rect.top;
+        const shouldPopUp = spaceBelow < 250 && spaceAbove > spaceBelow;
+        
+        setCoords({
+          top: shouldPopUp ? rect.top - 8 : rect.bottom + 8,
+          left: rect.left,
+          width: rect.width,
+          isUp: shouldPopUp
+        });
       }
     };
+
     if (isOpen) {
       document.addEventListener('mousedown', handleEvents);
       window.addEventListener('resize', handleSync);
