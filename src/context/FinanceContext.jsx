@@ -446,9 +446,12 @@ export const FinanceProvider = ({ children }) => {
           
           if (retryError) throw retryError;
           if (!retryData || retryData.length === 0) throw new Error('Transaction created (fallback) but no data returned');
-          setTransactions(prev => [retryData[0], ...prev]);
-          // Balance update logic will use retryData[0]
-          return updateAccountBalancesAfterTx(retryData[0], 'add');
+          
+          // Re-attach member_id for local UI state
+          const localTx = { ...retryData[0], member_id: member_id };
+          setTransactions(prev => [localTx, ...prev]);
+          return updateAccountBalancesAfterTx(localTx, 'add');
+
         }
         throw error;
       }
@@ -540,8 +543,12 @@ export const FinanceProvider = ({ children }) => {
           
           if (retryError) throw retryError;
           if (!retryData || retryData.length === 0) throw new Error('Update failed');
-          setTransactions(prev => prev.map(t => t.id === id ? retryData[0] : t));
-          return updateAccountBalancesAfterTx(retryData[0], 'update', oldTx);
+          
+          // Re-attach member_id for local UI state
+          const localTx = { ...retryData[0], member_id: member_id };
+          setTransactions(prev => prev.map(t => t.id === id ? localTx : t));
+          return updateAccountBalancesAfterTx(localTx, 'update', oldTx);
+
         }
         throw error;
       }
