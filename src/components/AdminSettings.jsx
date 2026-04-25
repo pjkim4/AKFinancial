@@ -102,23 +102,23 @@ const AdminSettings = () => {
           <Shield className="text-primary" size={32} />
           <h2 className="text-3xl font-black tracking-tight uppercase italic">{t('nav_setup')}</h2>
         </div>
-        <p className="text-text-muted font-bold uppercase text-[10px] tracking-[0.2em]">{t('settings_security')} & Global Logic</p>
+        <p className="text-text-muted font-bold uppercase text-[10px] tracking-[0.2em]">{t('settings_security_global')}</p>
       </header>
 
       {/* EMERGENCY TROUBLESHOOTING BOX - MOVED TO TOP */}
       <div className="p-4 bg-danger/10 border-2 border-danger rounded-2xl animate-pulse-slow">
-        <p className="text-[10px] text-danger font-black uppercase tracking-widest mb-3 text-center">Diagnostic Mode Active</p>
+        <p className="text-[10px] text-danger font-black uppercase tracking-widest mb-3 text-center">{t('diagnostic_mode')}</p>
         <div className="grid grid-cols-3 gap-2">
           <div className="bg-black/20 p-2 rounded-xl border border-danger/20">
-            <p className="text-[7px] text-text-muted mb-1 uppercase">User</p>
+            <p className="text-[7px] text-text-muted mb-1 uppercase">{t('user')}</p>
             <p className="text-[9px] font-mono truncate text-white">{user?.email?.split('@')[0]}</p>
           </div>
           <div className="bg-black/20 p-2 rounded-xl border border-danger/20">
-            <p className="text-[7px] text-text-muted mb-1 uppercase">Pending</p>
+            <p className="text-[7px] text-text-muted mb-1 uppercase">{t('pending')}</p>
             <p className="text-md font-black font-mono text-danger">{pendingInvitations.length}</p>
           </div>
           <div className="bg-black/20 p-2 rounded-xl border border-danger/20">
-            <p className="text-[7px] text-text-muted mb-1 uppercase">Joined</p>
+            <p className="text-[7px] text-text-muted mb-1 uppercase">{t('joined')}</p>
             <p className="text-md font-black font-mono text-success">{availableHouseholds.length}</p>
           </div>
         </div>
@@ -127,7 +127,7 @@ const AdminSettings = () => {
         {pendingInvitations.length > 0 && (
           <div className="mt-4 space-y-3">
             <p className="text-[10px] text-white font-black uppercase mb-2 border-b border-white/20 pb-2 text-center">
-              Tap Green Button to Join:
+              {t('join_shared_household')}:
             </p>
             {pendingInvitations.map(inv => (
               <button 
@@ -136,7 +136,7 @@ const AdminSettings = () => {
                 className="w-full p-6 bg-lime text-black font-black rounded-2xl text-sm flex justify-between items-center shadow-lime active-scale-95 transition-all"
               >
                 <div className="text-left">
-                  <span className="block text-xs uppercase tracking-tighter">JOIN SHARED HOUSEHOLD</span>
+                  <span className="block text-xs uppercase tracking-tighter">{t('join_action')}</span>
                   <span className="text-[8px] opacity-50 font-mono">ID: {inv.household_id?.slice(0, 8) || '??'}...</span>
                 </div>
                 <Check size={24} strokeWidth={3} />
@@ -148,7 +148,7 @@ const AdminSettings = () => {
         {/* JOINED HOUSEHOLDS / SWITCHER */}
         <div className="mt-6 pt-4 border-t border-white/20">
           <p className="text-[10px] text-white font-black uppercase mb-3 text-center">
-            Your Accounts (Switch Below):
+            {t('your_accounts')}:
           </p>
           <div className="space-y-2">
             {availableHouseholds.map(hh => (
@@ -171,98 +171,77 @@ const AdminSettings = () => {
           onClick={() => window.location.reload()}
           className="w-full mt-6 py-5 bg-white text-black font-black rounded-2xl text-[10px] uppercase tracking-[0.2em] shadow-xl active:scale-95 transition-all"
         >
-          Force App Refresh
+          {t('refresh_app')}
         </button>
       </div>
 
-      <div className="card glass border-white/10">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-6">
-            {/* Email (Read-only) */}
-            <div>
-              <label className="text-[10px] text-text-muted uppercase tracking-widest block mb-1">Email Address (Login)</label>
-              <div className="flex items-center gap-3 p-4 bg-white/5 border border-white/10 rounded-xl opacity-60">
-                <Mail size={16} className="text-text-muted" />
-                <span className="text-sm">{user?.email}</span>
-              </div>
-            </div>
-
-            {/* Username */}
-            <div>
-            <label className="text-[10px] text-text-muted uppercase font-black tracking-widest mb-2 block">
-              {t('settings_username')}
-            </label>
+      <section className="card glass divide-y divide-white/5">
+        <div className="p-6">
+          <h3 className="text-lg font-bold flex items-center gap-2 mb-6">
+            <Shield size={20} className="text-primary" />
+            {t('settings_security')}
+          </h3>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
+              <label className="text-xs font-black uppercase tracking-widest text-text-muted">{t('settings_username')}</label>
               <div className="relative">
-                <User size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" />
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" size={18} />
                 <input 
                   type="text" 
-                  className="pl-12 w-full bg-white/5 border-white/10"
+                  className="pl-12 w-full"
                   value={formData.username}
-                  onChange={e => setFormData({...formData, username: e.target.value})}
-                  placeholder="Your display name"
+                  onChange={(e) => setFormData({...formData, username: e.target.value})}
                 />
               </div>
             </div>
 
-            <hr className="border-white/5" />
-
-            {/* Password Update */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="text-[10px] text-text-muted uppercase tracking-widest block mb-1">{t('settings_new_password')}</label>
+              <div className="space-y-2">
+                <label className="text-xs font-black uppercase tracking-widest text-text-muted">{t('settings_password')}</label>
                 <div className="relative">
-                  <Key size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" />
+                  <Key className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" size={18} />
                   <input 
                     type="password" 
-                    className="pl-12 w-full bg-white/5 border-white/10"
+                    className="pl-12 w-full"
+                    placeholder="••••••••"
                     value={formData.password}
-                    onChange={e => setFormData({...formData, password: e.target.value})}
-                    placeholder="Minimal 6 characters"
+                    onChange={(e) => setFormData({...formData, password: e.target.value})}
                   />
                 </div>
               </div>
-              <div>
-                <label className="text-[10px] text-text-muted uppercase tracking-widest block mb-1">{t('settings_confirm_password')}</label>
-                <input 
-                  type="password" 
-                  className="w-full bg-white/5 border-white/10"
-                  value={formData.confirmPassword}
-                  onChange={e => setFormData({...formData, confirmPassword: e.target.value})}
-                  placeholder="Repeat new password"
-                />
+              <div className="space-y-2">
+                <label className="text-xs font-black uppercase tracking-widest text-text-muted">{t('settings_confirm')}</label>
+                <div className="relative">
+                  <Key className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" size={18} />
+                  <input 
+                    type="password" 
+                    className="pl-12 w-full"
+                    placeholder="••••••••"
+                    value={formData.confirmPassword}
+                    onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
+                  />
+                </div>
               </div>
             </div>
-          </div>
+
+            <button 
+              type="submit" 
+              disabled={loading}
+              className="btn btn-primary w-full h-12 flex items-center justify-center gap-2 font-black uppercase text-xs tracking-widest text-black"
+            >
+              <Save size={18} />
+              {loading ? t('loading') : t('settings_sync')}
+            </button>
+          </form>
 
           {message && (
-            <div className={`p-4 rounded-xl flex items-center gap-3 ${message.includes('success') ? 'bg-success/10 text-success border border-success/20' : 'bg-danger/10 text-danger border border-danger/20'}`}>
+            <div className={`mt-6 p-4 rounded-xl flex items-center gap-3 ${message.includes('success') ? 'bg-success/10 text-success border border-success/20' : 'bg-danger/10 text-danger border border-danger/20'}`}>
               <AlertCircle size={18} />
               <p className="text-xs font-bold">{message}</p>
             </div>
           )}
-
-          <div className="pt-4">
-            <button 
-            type="submit"
-            disabled={loading}
-            className="btn btn-primary w-full h-14 text-black font-black uppercase tracking-widest shadow-xl shadow-primary/20"
-          >
-            {loading ? <Zap className="animate-spin" size={18} /> : <Save size={18} />}
-            {t('settings_sync')}
-          </button>
-          </div>
-        </form>
-      </div>
-
-      <div className="card glass bg-primary/5 border-primary/10">
-        <h3 className="font-bold mb-4 flex items-center gap-2">
-          <Shield size={18} className="text-primary" />
-          Cloud Security Active
-        </h3>
-        <p className="text-xs text-text-muted leading-relaxed">
-          Your credentials are encrypted and managed by Supabase. Changing your password here will update your cloud identity immediately. Ensure you use a strong, unique password.
-        </p>
-      </div>
+        </div>
+      </section>
 
       {/* Household Management */}
       <div className="card border-white/5 bg-card">
@@ -273,7 +252,7 @@ const AdminSettings = () => {
             </div>
             <div>
               <h3 className="font-black text-lg">{t('settings_household')}</h3>
-              <p className="text-[10px] text-text-muted uppercase tracking-widest">Shared Ledger Roles</p>
+              <p className="text-[10px] text-text-muted uppercase tracking-widest">{t('settings_household_subtitle')}</p>
             </div>
           </div>
           <button 
@@ -285,8 +264,8 @@ const AdminSettings = () => {
         </div>
 
         <p className="text-[10px] text-text-muted uppercase tracking-widest mb-6 leading-relaxed">
-          Add family members or roommates to track who is spending. 
-          <span className="text-primary block mt-1">Note: This creates "Virtual Profiles" for tagging transactions.</span>
+          {t('settings_member_hint')}
+          <span className="text-primary block mt-1">{t('settings_member_note')}</span>
         </p>
 
         {isAddingMember && (
@@ -305,12 +284,13 @@ const AdminSettings = () => {
 
             <div className="flex justify-between items-center mb-6">
               <h4 className="text-xs font-black uppercase tracking-widest text-primary">
-                {memberType === 'virtual' ? 'Create Virtual Profile' : 'Invite Cloud Member'}
+                {memberType === 'virtual' ? t('settings_add_member') : t('settings_invite')}
               </h4>
               <button onClick={() => setIsAddingMember(false)} className="text-text-muted hover:text-white">
                 <X size={18} />
               </button>
             </div>
+
 
             {memberType === 'virtual' ? (
               <div className="space-y-4">

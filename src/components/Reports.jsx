@@ -113,11 +113,12 @@ const Reports = () => {
         <div>
           <div className="flex items-center gap-3 mb-2">
             <FileText className="text-primary" size={32} />
-            <h2 className="text-3xl font-black tracking-tight uppercase italic">Financial Intel</h2>
+            <h2 className="text-3xl font-black tracking-tight uppercase italic">{t('nav_intel')}</h2>
           </div>
           <p className="text-text-muted font-bold uppercase text-[10px] tracking-[0.2em]">
-            Deep analysis for <span className="text-primary">{currentWorkspaceName}</span>
+            {t('report_analysis_for')} <span className="text-primary">{currentWorkspaceName}</span>
           </p>
+
         </div>
         <div className="flex gap-2">
           <button onClick={printReport} className="btn bg-white/5 border-white/10 h-12 px-6 hover:bg-white/10">
@@ -139,7 +140,7 @@ const Reports = () => {
           <p className="text-4xl font-black tracking-tighter">${reportData.totalIncome.toLocaleString()}</p>
           <div className="flex items-center gap-2 mt-4 text-success/60">
             <ArrowUpRight size={14} />
-            <span className="text-[10px] font-bold uppercase">Cloud Synced</span>
+            <span className="text-[10px] font-bold uppercase">{t('report_synced')}</span>
           </div>
         </div>
         <div className="card bg-danger/10 border-danger/20 p-8">
@@ -147,7 +148,7 @@ const Reports = () => {
           <p className="text-4xl font-black tracking-tighter">${reportData.totalExpense.toLocaleString()}</p>
           <div className="flex items-center gap-2 mt-4 text-danger/60">
             <ArrowDownRight size={14} />
-            <span className="text-[10px] font-bold uppercase">Verified Outflow</span>
+            <span className="text-[10px] font-bold uppercase">{t('report_verified')}</span>
           </div>
         </div>
         <div className="card bg-primary/10 border-primary/20 p-8">
