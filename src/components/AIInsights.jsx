@@ -31,8 +31,8 @@ const AIInsights = () => {
     
     if (categories['Rent'] > totalIncome * 0.4) {
       strategies.push({
-        title: 'Rent Optimization',
-        description: 'Your rent is currently 60% of your income. The recommended limit is 30%. Consider finding a roommate or a more affordable location.',
+        title: t('ai_strat_rent_title'),
+        description: t('ai_strat_rent_desc'),
         impact: 'High',
         icon: <TrendingDown className="text-danger" />
       });
@@ -40,8 +40,8 @@ const AIInsights = () => {
 
     if (categories['Shopping'] > 300) {
       strategies.push({
-        title: 'Impulse Control',
-        description: 'Monthly shopping exceeds $300. Try the "48-hour rule": Wait 48 hours before purchasing non-essential items like clothing or cosmetics.',
+        title: t('ai_strat_shopping_title'),
+        description: t('ai_strat_shopping_desc'),
         impact: 'Medium',
         icon: <Zap className="text-warning" />
       });
@@ -49,19 +49,20 @@ const AIInsights = () => {
 
     if (savingsRate < 20) {
       strategies.push({
-        title: 'Savings Boost',
-        description: 'Your savings rate is ~1.6%. We suggest setting up an automatic transfer of $300 (10%) to your Savings account at the start of the month.',
+        title: t('ai_strat_savings_title'),
+        description: t('ai_strat_savings_desc'),
         impact: 'Critical',
         icon: <Target className="text-primary" />
       });
     } else {
       strategies.push({
-        title: 'Investment Opportunity',
-        description: 'Great job saving! You have enough surplus to start micro-investing. Consider a low-cost index fund.',
+        title: t('ai_strat_invest_title'),
+        description: t('ai_strat_invest_desc'),
         impact: 'Growth',
         icon: <TrendingUp className="text-success" />
       });
     }
+
 
     return {
       totalIncome,

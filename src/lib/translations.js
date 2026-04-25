@@ -87,7 +87,18 @@ export const translations = {
     ai_health_title: 'Account Health Check',
     ai_health_desc: 'Your liquidity position is strong. All balances are covered by reserves.',
     
+    // AI Strategies
+    ai_strat_rent_title: 'Rent Optimization',
+    ai_strat_rent_desc: 'Your rent is currently high relative to income. Consider finding a roommate or a more affordable location.',
+    ai_strat_shopping_title: 'Impulse Control',
+    ai_strat_shopping_desc: 'Monthly shopping is high. Try the "48-hour rule" before purchasing non-essential items.',
+    ai_strat_savings_title: 'Savings Boost',
+    ai_strat_savings_desc: 'Your savings rate is low. We suggest setting up an automatic transfer to your Savings account.',
+    ai_strat_invest_title: 'Investment Opportunity',
+    ai_strat_invest_desc: 'Great job saving! You have enough surplus to start micro-investing in index funds.',
+    
     // General
+
     save: 'Save',
     cancel: 'Cancel',
     delete: 'Delete',
@@ -198,7 +209,18 @@ export const translations = {
     ai_health_title: '계좌 건강 상태 체크',
     ai_health_desc: '유동성 상태가 매우 양호합니다. 모든 지출이 예비비로 충당 가능한 수준입니다.',
     
+    // AI Strategies
+    ai_strat_rent_title: '주거비 최적화',
+    ai_strat_rent_desc: '수입 대비 주거비 비중이 높습니다. 룸메이트를 구하거나 더 저렴한 지역으로의 이동을 고려해보세요.',
+    ai_strat_shopping_title: '충동 구매 조절',
+    ai_strat_shopping_desc: '쇼핑 지출이 많습니다. 비필수 품목 구매 전 "48시간 대기 규칙"을 적용해보세요.',
+    ai_strat_savings_title: '저축 가속화',
+    ai_strat_savings_desc: '저축률이 낮습니다. 매달 초에 일정 금액을 자동으로 저축 계좌에 이체하는 것을 추천합니다.',
+    ai_strat_invest_title: '투자 기회 포착',
+    ai_strat_invest_desc: '훌륭한 저축 습관입니다! 여유 자금을 인덱스 펀드 등에 소액 투자하기 좋은 시기입니다.',
+    
     // General
+
     save: '저장',
     cancel: '취소',
     delete: '삭제',
