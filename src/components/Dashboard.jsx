@@ -423,9 +423,10 @@ const Dashboard = () => {
                   </div>
                   <p className="text-sm font-black group-hover:text-black transition-colors line-clamp-1">{item.name}</p>
                   <p className="text-[10px] font-bold text-text-muted group-hover:text-black/60 mt-1">${item.amount}</p>
-                  <p className="text-[7px] uppercase font-black tracking-widest text-text-muted group-hover:text-black/40 mt-2 truncate w-full px-2 border-t border-white/5 group-hover:border-black/5 pt-1">
+                  <p className="text-[8px] font-medium text-text-muted group-hover:text-black/50 mt-2 truncate w-full px-2 border-t border-white/5 group-hover:border-black/5 pt-1 leading-none">
                     {accounts.find(a => a.id === item.account_id)?.name || 'Default Account'}
                   </p>
+
                 </div>
 
                 
