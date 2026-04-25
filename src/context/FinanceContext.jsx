@@ -808,8 +808,10 @@ export const FinanceProvider = ({ children }) => {
   const deleteAccount = async (accountId) => {
     console.log('[DEBUG] Starting deleteAccount for ID:', accountId);
     try {
-      // 1. Delete associated transactions first
-      console.log('[DEBUG] Step 1: Deleting associated transactions...');
+      // 1. Delete associated data first to satisfy foreign key constraints
+      console.log('[DEBUG] Step 1: Cleaning up associated data...');
+      
+      // Delete transactions
       const { error: txError } = await supabase
         .from('transactions')
         .delete()
@@ -819,7 +821,31 @@ export const FinanceProvider = ({ children }) => {
         console.error('[DEBUG] Transaction deletion failed:', txError);
         throw txError;
       }
-      console.log('[DEBUG] Transactions cleared.');
+
+      // Delete associated recurring transactions
+      const { error: recError } = await supabase
+        .from('recurring_transactions')
+        .delete()
+        .eq('account_id', accountId);
+      
+      if (recError) {
+        console.error('[DEBUG] Recurring transaction deletion failed:', recError);
+        throw recError;
+      }
+
+      // Delete frequent payments (shortcuts)
+      const { error: freqError } = await supabase
+        .from('frequent_payments')
+        .delete()
+        .eq('account_id', accountId);
+      
+      if (freqError) {
+        console.warn('[DEBUG] Frequent payments deletion failed (might be legacy encoded):', freqError);
+        // Note: Some legacy frequent payments might not have account_id column and are handled via encoding
+        // If this fails due to missing column, we can ignore it as it won't block the account deletion
+      }
+      
+      console.log('[DEBUG] Associated data cleared.');
 
       // 2. Delete the account
       console.log('[DEBUG] Step 2: Deleting account from database...');
@@ -837,6 +863,8 @@ export const FinanceProvider = ({ children }) => {
       console.log('[DEBUG] Step 3: Updating local state...');
       setAccounts(prev => prev.filter(acc => acc.id !== accountId));
       setTransactions(prev => prev.filter(tx => tx.account_id !== accountId));
+      setRecurringSchedules(prev => prev.filter(s => s.account_id !== accountId));
+      setFrequentPayments(prev => prev.filter(p => p.account_id !== accountId));
       console.log('[DEBUG] Local state updated.');
       return { success: true };
     } catch (error) {

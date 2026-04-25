@@ -627,6 +627,14 @@ const TransactionList = () => {
         </div>
 
         <div className="flex flex-wrap gap-3">
+          <button 
+            onClick={toggleSelectAll}
+            className={`btn h-14 px-6 border transition-all flex-1 md:flex-none ${selectedIds.length === filteredTransactions.length && filteredTransactions.length > 0 ? 'bg-primary border-primary text-black font-black' : 'bg-white/5 border-white/10 text-text-muted hover:text-white'}`}
+          >
+            {selectedIds.length === filteredTransactions.length && filteredTransactions.length > 0 ? <CheckSquare size={18} /> : <Square size={18} />}
+            <span className="font-black text-xs uppercase">{selectedIds.length === filteredTransactions.length && filteredTransactions.length > 0 ? 'Deselect All' : 'Select All'}</span>
+          </button>
+
           {selectedIds.length > 0 && (
             <button 
               onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowBulkConfirm(true); }}
@@ -667,10 +675,10 @@ const TransactionList = () => {
                         <span className="text-[10px] font-black text-text-muted/50 ml-auto">{groupTransactions.length} items</span>
                       </div>
                       <div className="grid grid-cols-1 gap-4">
-                        {groupTransactions.map(t => (
+                        {groupTransactions.map(tx => (
                           <TransactionRow 
-                            key={t.id} 
-                            transaction={t} 
+                            key={tx.id} 
+                            transaction={tx} 
                             accounts={accounts}
                             householdMembers={householdMembers}
                             preferences={preferences}
@@ -681,7 +689,7 @@ const TransactionList = () => {
                             handleEditClick={handleEditClick}
                             setDeleteConfirmId={setDeleteConfirmId}
                             t={t}
-                            runningBalance={runningBalances[t.id]}
+                            runningBalance={runningBalances[tx.id]}
                           />
                         ))}
                       </div>
@@ -694,10 +702,10 @@ const TransactionList = () => {
                 {filteredTransactions.length === 0 ? (
                   <div className="p-20 text-center text-text-muted">No transactions found for the selected filters</div>
                 ) : (
-                  filteredTransactions.map(t => (
+                  filteredTransactions.map(tx => (
                     <TransactionRow 
-                      key={t.id} 
-                      transaction={t} 
+                      key={tx.id} 
+                      transaction={tx} 
                       accounts={accounts}
                       householdMembers={householdMembers}
                       preferences={preferences}
@@ -708,7 +716,7 @@ const TransactionList = () => {
                       handleEditClick={handleEditClick}
                       setDeleteConfirmId={setDeleteConfirmId}
                       t={t}
-                      runningBalance={runningBalances[t.id]}
+                      runningBalance={runningBalances[tx.id]}
                     />
                   ))
                 )}
