@@ -427,7 +427,16 @@ const TransactionList = () => {
                       className={`hover:bg-white/[0.02] transition-colors group cursor-pointer ${selectedIds.includes(t.id) ? 'bg-primary/[0.05]' : ''}`}
                       onClick={() => toggleSelect(t.id)}
                     >
-                      <td className="pl-8 py-5 w-10" onClick={(e) => e.stopPropagation()}>
+                      <td 
+                        className="pl-8 py-5 w-10 relative overflow-hidden" 
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                         {t.member_id && (
+                           <div 
+                             className="absolute left-0 top-0 bottom-0 w-1.5 opacity-60"
+                             style={{ backgroundColor: householdMembers.find(m => m.id === t.member_id)?.color || '#fff' }}
+                           />
+                         )}
                          <button 
                            onClick={() => toggleSelect(t.id)}
                            className={`w-6 h-6 rounded-md flex items-center justify-center transition-all ${selectedIds.includes(t.id) ? 'bg-primary text-black' : 'bg-white/5 border border-white/10 hover:border-primary/50'}`}
@@ -435,6 +444,7 @@ const TransactionList = () => {
                            {selectedIds.includes(t.id) ? <Check size={14} strokeWidth={4} /> : <Square size={14} />}
                          </button>
                       </td>
+
                       <td className="px-8 py-5 text-xs font-black text-text-muted">{t.date}</td>
                       <td className="px-8 py-5">
                         <div className="flex items-center gap-4">
@@ -446,13 +456,13 @@ const TransactionList = () => {
                               <p className="font-black text-[15px] tracking-tight text-white leading-none">{t.description}</p>
                               {t.member_id && (
                                 <div 
-                                  className="w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-black text-black shrink-0"
+                                  className="px-2 py-0.5 rounded-md text-[9px] font-black text-black shrink-0 animate-scale-in"
                                   style={{ backgroundColor: householdMembers.find(m => m.id === t.member_id)?.color || '#fff' }}
-                                  title={householdMembers.find(m => m.id === t.member_id)?.name}
                                 >
-                                  {householdMembers.find(m => m.id === t.member_id)?.name.charAt(0)}
+                                  {householdMembers.find(m => m.id === t.member_id)?.name.toUpperCase()}
                                 </div>
                               )}
+
                             </div>
                             <p className="text-[10px] text-primary uppercase font-black tracking-widest">{t.category}</p>
                           </div>
@@ -494,11 +504,18 @@ const TransactionList = () => {
           {/* Mobile Card List View */}
           <div className="md:hidden space-y-3">
              {filteredTransactions.map(t => (
-               <div 
-                key={t.id} 
-                className={`card p-5 border-white/5 bg-card active:scale-[0.98] transition-transform ${selectedIds.includes(t.id) ? 'border-primary/50' : ''}`}
-                onClick={() => toggleSelect(t.id)}
-               >
+                <div 
+                 key={t.id} 
+                 className={`card p-5 border-white/5 bg-card active:scale-[0.98] transition-transform relative overflow-hidden ${selectedIds.includes(t.id) ? 'border-primary/50' : ''}`}
+                 onClick={() => toggleSelect(t.id)}
+                >
+                  {t.member_id && (
+                    <div 
+                      className="absolute left-0 top-0 bottom-0 w-1.5 opacity-60"
+                      style={{ backgroundColor: householdMembers.find(m => m.id === t.member_id)?.color || '#fff' }}
+                    />
+                  )}
+
                  <div className="flex justify-between items-start mb-4">
                     <div className="flex gap-3">
                       <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${t.type === 'Income' ? 'bg-primary/10 text-primary' : 'bg-danger/10 text-danger'}`}>
@@ -509,12 +526,13 @@ const TransactionList = () => {
                           <p className="font-black text-sm text-white">{t.description}</p>
                           {t.member_id && (
                             <div 
-                              className="w-4 h-4 rounded-full flex items-center justify-center text-[7px] font-black text-black shrink-0"
+                              className="px-1.5 py-0.5 rounded-md text-[8px] font-black text-black shrink-0 animate-scale-in"
                               style={{ backgroundColor: householdMembers.find(m => m.id === t.member_id)?.color || '#fff' }}
                             >
-                              {householdMembers.find(m => m.id === t.member_id)?.name.charAt(0)}
+                              {householdMembers.find(m => m.id === t.member_id)?.name.toUpperCase()}
                             </div>
                           )}
+
                         </div>
                         <p className="text-[10px] text-text-muted font-bold uppercase tracking-widest">{t.date}</p>
                       </div>
