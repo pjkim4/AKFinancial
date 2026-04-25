@@ -189,15 +189,16 @@ const Dashboard = () => {
   const handleFrequentPayment = async (item) => {
     if (accounts.length === 0 || loading) return;
     
+    const account = accounts.find(a => a.id === item.account_id) || accounts[0];
     let finalAmount = item.amount;
     
     // If no amount is set, or it's 0, ask for it
     if (!finalAmount || Number(finalAmount) === 0) {
-      const promptedAmount = prompt(`Enter amount for ${item.name}:`);
+      const promptedAmount = prompt(`Enter amount for ${item.name}\nFrom Wallet: [${account.name}]`);
       if (promptedAmount === null || promptedAmount === '') return;
       finalAmount = promptedAmount;
     } else {
-      if (!window.confirm(`Log ${item.name} for $${item.amount}?`)) return;
+      if (!window.confirm(`Log ${item.name} for $${item.amount}\nFrom Wallet: [${account.name}]?`)) return;
     }
 
     setLoading(true);
@@ -210,8 +211,9 @@ const Dashboard = () => {
       date: new Date().toISOString().split('T')[0]
     });
     setLoading(false);
-    alert(`Successfully logged ${item.name} ($${finalAmount})`);
+    alert(`Successfully logged ${item.name} ($${finalAmount}) to [${account.name}]`);
   };
+
 
 
   const handleQuickTransfer = async () => {
@@ -416,7 +418,11 @@ const Dashboard = () => {
                   </div>
                   <p className="text-sm font-black group-hover:text-black transition-colors line-clamp-1">{item.name}</p>
                   <p className="text-[10px] font-bold text-text-muted group-hover:text-black/60 mt-1">${item.amount}</p>
+                  <p className="text-[7px] uppercase font-black tracking-widest text-text-muted group-hover:text-black/40 mt-2 truncate w-full px-2 border-t border-white/5 group-hover:border-black/5 pt-1">
+                    {accounts.find(a => a.id === item.account_id)?.name || 'Default Account'}
+                  </p>
                 </div>
+
                 
                 {isShortcutsEditMode && (
                   <button 
