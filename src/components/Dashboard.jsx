@@ -21,8 +21,11 @@ import {
   BarChart as BarChartIcon,
   PieChart as PieChartIcon,
   Edit2,
-  Check
+  Check,
+  Zap,
+  History
 } from 'lucide-react';
+
 
 const Dashboard = () => {
   const { 
