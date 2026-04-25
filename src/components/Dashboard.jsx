@@ -38,7 +38,7 @@ const Dashboard = () => {
     transferFunds, 
     createAccount,
     addFrequentPayment, 
-
+    updateFrequentPayment,
     deleteFrequentPayment,
     preferences,
     updatePreferences,
@@ -92,6 +92,7 @@ const Dashboard = () => {
   // Shortcut Modal State
   const [isShortcutModalOpen, setIsShortcutModalOpen] = useState(false);
   const [isShortcutsEditMode, setIsShortcutsEditMode] = useState(false);
+  const [linkingShortcut, setLinkingShortcut] = useState(null);
   const [newShortcut, setNewShortcut] = useState({ 
     name: '', 
     amount: '', 
@@ -513,10 +514,19 @@ const Dashboard = () => {
                             <p className="text-[8px] font-bold text-text-muted group-hover:text-black/60 mt-0.5 shrink-0">
                               {item.type === 'Income' ? '+' : ''}${item.amount || '???'}
                             </p>
-                          </div>
+                          {isShortcutsEditMode && (
+                             <button 
+                               onClick={(e) => { 
+                                 e.stopPropagation(); 
+                                 setLinkingShortcut(item);
+                               }}
+                               className="mt-2 text-[7px] font-black uppercase tracking-widest text-primary hover:underline"
+                             >
+                               Link
+                             </button>
+                          )}
+                        </div>
 
-
-                        
                         {isShortcutsEditMode && (
                           <button 
                             onClick={(e) => { e.stopPropagation(); deleteFrequentPayment(item.id); }}
@@ -569,11 +579,7 @@ const Dashboard = () => {
                              <button 
                                onClick={(e) => { 
                                  e.stopPropagation(); 
-                                 if (accounts[0]) {
-                                   const { id, created_at, ...cleanItem } = item;
-                                   deleteFrequentPayment(item.id);
-                                   addFrequentPayment({ ...cleanItem, account_id: accounts[0].id });
-                                 }
+                                 setLinkingShortcut(item);
                                }}
                                className="mt-2 text-[7px] font-black uppercase tracking-widest text-primary hover:underline"
                              >
@@ -889,6 +895,47 @@ const Dashboard = () => {
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Account Linking Modal */}
+      {linkingShortcut && (
+        <div className="fixed inset-0 z-max flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl animate-fade-in">
+          <div className="card w-full max-w-sm border-primary/20 bg-card p-10 text-center shadow-2xl animate-scale-in">
+            <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-6">
+              <Zap className="text-primary" size={32} />
+            </div>
+            <h3 className="text-xl font-black mb-2 uppercase">Link Account</h3>
+            <p className="text-xs text-text-muted mb-8 uppercase tracking-widest font-bold">Select the account for "{linkingShortcut.name}"</p>
+            
+            <div className="space-y-3 max-h-[300px] overflow-y-auto mb-8 pr-2 custom-scrollbar">
+              {accounts.map(acc => (
+                <button
+                  key={acc.id}
+                  onClick={() => {
+                    updateFrequentPayment(linkingShortcut.id, { account_id: acc.id });
+                    setLinkingShortcut(null);
+                  }}
+                  className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl hover:bg-primary hover:text-black transition-all flex items-center gap-4 group"
+                >
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-white/10 group-hover:bg-black/20">
+                    <Wallet size={16} />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-xs font-black uppercase">{acc.name}</p>
+                    <p className="text-[10px] font-bold opacity-60">${Number(acc.balance).toLocaleString()}</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            <button 
+              onClick={() => setLinkingShortcut(null)}
+              className="btn btn-secondary w-full h-14 font-black uppercase tracking-widest text-xs"
+            >
+              Cancel
+            </button>
+          </div>
         </div>
       )}
     </div>

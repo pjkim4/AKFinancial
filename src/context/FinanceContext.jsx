@@ -978,6 +978,21 @@ export const FinanceProvider = ({ children }) => {
     }
   };
 
+  const updateFrequentPayment = async (id, updates) => {
+    try {
+      const { error } = await supabase
+        .from('frequent_payments')
+        .update(updates)
+        .eq('id', id);
+      if (error) throw error;
+      setFrequentPayments(prev => prev.map(p => p.id === id ? { ...p, ...updates } : p));
+      return { success: true };
+    } catch (error) {
+      console.error('Error updating shortcut:', error.message);
+      return { error };
+    }
+  };
+
   // Helper: Parse YYYY-MM-DD as Local Midnight
   const parseLocalISO = (isoStr) => {
     if (!isoStr) return null;
@@ -1362,7 +1377,7 @@ export const FinanceProvider = ({ children }) => {
       availableHouseholds, pendingInvitations, sentInvitations, currentHouseholdId, setCurrentHouseholdId, loading,
       addTransaction, updateTransaction, deleteTransaction, deleteTransactions,
       transferFunds, adjustBalance, createAccount, updateAccount, deleteAccount,
-      addFrequentPayment, deleteFrequentPayment,
+      addFrequentPayment, updateFrequentPayment, deleteFrequentPayment,
       addRecurringSchedule, updateRecurringSchedule, deleteRecurringSchedule, skipNextOccurrence,
       addHouseholdMember, updateHouseholdMember, deleteHouseholdMember, inviteMember, revokeInvitation, respondToInvitation,
       calculateNextPaymentDate,
