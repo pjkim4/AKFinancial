@@ -40,8 +40,11 @@ const Dashboard = () => {
     toggleBalances,
     setShowLogModal,
     currentHouseholdId,
-    availableHouseholds
+    availableHouseholds,
+    t
   } = useFinance();
+
+
 
   const { showInstantMove, showMonthlyTrend, showExpenseDistribution } = preferences;
   
@@ -207,12 +210,12 @@ const Dashboard = () => {
         <div className="hidden md:block">
           <h2 className="text-2xl md:text-4xl font-black tracking-tighter">Financial Overview</h2>
           <p className="text-[10px] text-primary uppercase font-black tracking-widest mt-1">
-            Active Workspace: {availableHouseholds.find(h => h.id === currentHouseholdId)?.name || 'Personal Account'}
+            {t('dash_active_workspace')}: {availableHouseholds.find(h => h.id === currentHouseholdId)?.name || t('dash_personal_account')}
           </p>
           <div className="flex items-center gap-2 mt-2">
             <div className={`w-1.5 h-1.5 rounded-full ${accounts.length > 0 ? 'bg-success' : 'bg-warning animate-pulse'}`}></div>
             <p className="text-[8px] text-text-muted uppercase font-black tracking-[0.2em]">
-              Cloud Sync: {accounts.length} Wallets Active
+              {t('dash_cloud_sync')}: {accounts.length} {t('dash_wallets_active')}
             </p>
           </div>
         </div>
@@ -225,7 +228,7 @@ const Dashboard = () => {
             className="btn btn-primary h-12 px-6 text-black font-black uppercase text-xs tracking-widest shadow-xl shadow-primary/20"
           >
             <Plus size={18} strokeWidth={3} />
-            Log Entry
+            {t('dash_add_transaction')}
           </button>
 
           <div className="flex items-center gap-2 bg-white/5 p-1 rounded-xl border border-white/10">
@@ -277,7 +280,7 @@ const Dashboard = () => {
             </div>
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <p className="text-text-muted text-[10px] uppercase tracking-[0.2em] font-black">Total Assets</p>
+                <p className="text-text-muted text-[10px] uppercase tracking-[0.2em] font-black">{t('dash_total_assets')}</p>
                 <button 
                   onClick={toggleBalances}
                   className="p-1 hover:bg-white/10 rounded-md text-text-muted hover:text-white transition-all"
@@ -313,7 +316,7 @@ const Dashboard = () => {
               <ArrowUpRight className="text-success" size={28} />
             </div>
             <div>
-              <p className="text-text-muted text-[10px] uppercase tracking-[0.2em] font-black mb-1">Cash Inflow</p>
+              <p className="text-text-muted text-[10px] uppercase tracking-[0.2em] font-black mb-1">{t('dash_monthly_income')}</p>
               <h3 className="text-3xl font-black text-success">
                 {preferences.hideBalances ? '••••••' : `+$${Number(stats.income).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
               </h3>
@@ -338,12 +341,13 @@ const Dashboard = () => {
 
       {/* Shortcuts & Instant Move */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className={`card ${showInstantMove ? 'lg:col-span-2' : 'lg:col-span-3'} bg-card border-white/5`}>
-          <div className="flex items-center justify-between mb-8">
-             <div>
-                <h4 className="font-black text-lg">One-Tap Shortcuts</h4>
-                <p className="text-[10px] text-text-muted uppercase tracking-widest mt-1">Instant transaction logging</p>
-             </div>
+        <div className="card bg-card border-white/5 lg:col-span-2">
+          <div className="flex items-center justify-between mb-8 px-1">
+            <div className="flex items-center gap-3">
+              <Zap size={18} className="text-warning" />
+              <h3 className="text-xs font-black uppercase tracking-[0.2em]">{t('dash_quick_actions')}</h3>
+            </div>
+
              <div className="flex gap-2">
                 <button 
                   onClick={() => setIsShortcutsEditMode(!isShortcutsEditMode)}
