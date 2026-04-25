@@ -31,12 +31,18 @@ import ErrorBoundary from './components/ErrorBoundary';
 import Reports from './components/Reports';
 import LogEntryModal from './components/LogEntryModal';
 import { supabase } from './lib/supabase';
+import logoImg from './assets/logo.png';
+
 
 const Logo = ({ size = 24 }) => (
-  <div className="flex items-center justify-center rounded-xl bg-primary text-black shadow-lg shadow-primary/20" style={{ width: size * 1.5, height: size * 1.5 }}>
-    <Wallet size={size} strokeWidth={3} />
-  </div>
+  <img 
+    src={logoImg} 
+    alt="AK Financial" 
+    style={{ height: size * 1.2, width: 'auto' }} 
+    className="object-contain"
+  />
 );
+
 
 const AppContent = () => {
   const { 
