@@ -226,7 +226,14 @@ const Dashboard = () => {
   const handleAddShortcut = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const result = await addFrequentPayment(newShortcut);
+    
+    // Convert empty amount to 0 for database compatibility
+    const submissionData = {
+      ...newShortcut,
+      amount: newShortcut.amount === '' ? 0 : newShortcut.amount
+    };
+    
+    const result = await addFrequentPayment(submissionData);
     if (result.error) {
       alert(`Failed to add shortcut: ${result.error.message || 'Unknown error'}`);
     } else {
@@ -235,6 +242,7 @@ const Dashboard = () => {
     }
     setLoading(false);
   };
+
 
   return (
     <div className="space-y-8 animate-slide-up">
