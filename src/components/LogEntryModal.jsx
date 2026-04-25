@@ -18,8 +18,6 @@ const LogEntryModal = ({ isOpen, onClose }) => {
   } = useFinance();
 
 
-
-
   const [modalType, setModalType] = useState('expense'); 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -48,6 +46,26 @@ const LogEntryModal = ({ isOpen, onClose }) => {
       setFormData(prev => ({ ...prev, account_id: accounts[0].id }));
     }
   }, [accounts]);
+
+  const categories = {
+    income: [
+      { id: 'Salary', name: t('cat_salary') },
+      { id: 'Bonus', name: t('cat_bonus') },
+      { id: 'Investment', name: t('cat_investment') },
+      { id: 'Gift', name: t('cat_gift') },
+      { id: 'Other', name: t('cat_other') }
+    ],
+
+    expense: [
+      { id: 'Food', name: t('cat_food') },
+      { id: 'Rent', name: t('cat_rent') },
+      { id: 'Transport', name: t('cat_transport') },
+      { id: 'Entertainment', name: t('cat_entertainment') },
+      { id: 'Utilities', name: t('cat_utilities') },
+      { id: 'Shopping', name: t('cat_shopping') },
+      { id: 'Health', name: t('cat_health') },
+      { id: 'Other', name: t('cat_other') }
+    ],
 
     transfer: []
   };
@@ -203,8 +221,6 @@ const LogEntryModal = ({ isOpen, onClose }) => {
                   placeholder={t('tx_search_cat') || "Search Category..."} 
                 />
               </div>
-
-
             )}
             
             {modalType === 'transfer' && (
