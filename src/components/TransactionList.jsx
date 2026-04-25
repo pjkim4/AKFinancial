@@ -42,8 +42,6 @@ const TransactionList = () => {
     t
   } = useFinance();
 
-
-
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isWalletHubOpen, setIsWalletHubOpen] = useState(false);
@@ -89,6 +87,24 @@ const TransactionList = () => {
     member_id: ''
   });
 
+  const categories = {
+    income: [
+      { id: 'Salary', name: t('cat_salary') },
+      { id: 'Bonus', name: t('cat_bonus') },
+      { id: 'Investment', name: t('cat_investment') },
+      { id: 'Gift', name: t('cat_gift') },
+      { id: 'Other', name: t('cat_other') }
+    ],
+    expense: [
+      { id: 'Food', name: t('cat_food') },
+      { id: 'Rent', name: t('cat_rent') },
+      { id: 'Transport', name: t('cat_transport') },
+      { id: 'Entertainment', name: t('cat_entertainment') },
+      { id: 'Utilities', name: t('cat_utilities') },
+      { id: 'Shopping', name: t('cat_shopping') },
+      { id: 'Health', name: t('cat_health') },
+      { id: 'Other', name: t('cat_other') }
+    ],
     transfer: []
   };
 
@@ -106,7 +122,6 @@ const TransactionList = () => {
     }
     setFormData(prev => ({ ...prev, category: val }));
   };
-
 
   const getMemberId = (tx) => {
     if (tx.member_id) return tx.member_id;
@@ -155,7 +170,6 @@ const TransactionList = () => {
     setIsModalOpen(true);
   };
 
-
   const handleDelete = async () => {
     if (!deleteConfirmId) return;
     
@@ -178,7 +192,7 @@ const TransactionList = () => {
     console.log('[DEBUG] Executing bulk delete for:', selectedIds);
     const result = await deleteTransactions(selectedIds);
     setLoading(false);
-
+    
     if (result?.error) {
       alert('Bulk Action Failed: ' + result.error.message);
     } else {
