@@ -495,7 +495,9 @@ const Dashboard = () => {
           <div className="space-y-6">
 
             {accounts.map((acc) => {
-              const shortcuts = frequentPayments.filter(p => p.account_id && String(p.account_id) === String(acc.id));
+              const shortcuts = frequentPayments
+                .filter(p => p.account_id && String(p.account_id) === String(acc.id))
+                .sort((a, b) => a.name.localeCompare(b.name));
               if (shortcuts.length === 0) return null;
 
               
@@ -579,8 +581,10 @@ const Dashboard = () => {
                   <h5 className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted">Other / Unassigned</h5>
                 </div>
                 <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-9 gap-2">
-
-                  {frequentPayments.filter(p => !p.account_id || !accounts.some(acc => String(acc.id) === String(p.account_id))).map((item) => (
+                  {frequentPayments
+                    .filter(p => !p.account_id || !accounts.some(acc => String(acc.id) === String(p.account_id)))
+                    .sort((a, b) => a.name.localeCompare(b.name))
+                    .map((item) => (
   
                      <div 
                         key={item.id} 
@@ -893,8 +897,16 @@ const Dashboard = () => {
                   <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 20 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
                     <XAxis dataKey="name" stroke="#666" fontSize={11} fontWeight={900} />
-                    <YAxis stroke="#666" fontSize={11} fontWeight={900} />
-                    <Tooltip contentStyle={{ background: '#181818', border: '1px solid #333' }} />
+                    <YAxis 
+                      stroke="#666" 
+                      fontSize={11} 
+                      fontWeight={900} 
+                      tickFormatter={(value) => `$${value.toLocaleString()}`}
+                    />
+                    <Tooltip 
+                      contentStyle={{ background: '#181818', border: '1px solid #333' }} 
+                      formatter={(value) => [`$${Number(value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, '']}
+                    />
                     <Legend verticalAlign="bottom" height={36} wrapperStyle={{ paddingTop: '10px' }} />
                     <Bar name="Income" dataKey="income" fill="#10b981" radius={[4, 4, 0, 0]} />
                     <Bar name="Expense" dataKey="expense" fill="#ff4d4d" radius={[4, 4, 0, 0]} />
