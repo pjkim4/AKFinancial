@@ -112,7 +112,8 @@ const SearchableSelect = ({ options = [], value, onChange, onEdit, onDelete, pla
               {filteredOptions.map((opt) => (
                 <div
                   key={opt.id}
-                  className={`flex items-center justify-between p-3 rounded-xl transition-colors ${value === opt.id ? 'bg-primary/10 text-primary border border-primary/20' : 'hover:bg-gray-100'}`}
+                  className={`flex items-center justify-between p-4 px-6 rounded-xl transition-colors ${value === opt.id ? 'bg-primary/10 text-primary border border-primary/20' : 'hover:bg-gray-100'}`}
+
                 >
                   <div 
                     className="flex-1 flex items-center justify-between cursor-pointer"
