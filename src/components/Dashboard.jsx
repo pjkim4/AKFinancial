@@ -912,8 +912,11 @@ const Dashboard = () => {
               {accounts.map(acc => (
                 <button
                   key={acc.id}
-                  onClick={() => {
-                    updateFrequentPayment(linkingShortcut.id, { account_id: acc.id });
+                  onClick={async () => {
+                    const result = await updateFrequentPayment(linkingShortcut.id, { account_id: acc.id });
+                    if (result?.error) {
+                       console.error('Link failure:', result.error);
+                    }
                     setLinkingShortcut(null);
                   }}
                   className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl hover:bg-primary hover:text-black transition-all flex items-center gap-4 group"

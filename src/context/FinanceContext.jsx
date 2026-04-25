@@ -980,11 +980,39 @@ export const FinanceProvider = ({ children }) => {
 
   const updateFrequentPayment = async (id, updates) => {
     try {
+      // 1. Try normal update first
       const { error } = await supabase
         .from('frequent_payments')
         .update(updates)
         .eq('id', id);
-      if (error) throw error;
+      
+      if (error) {
+        // 2. If it fails due to missing column, use encoding fallback
+        if (error.code === '42703' || error.message?.includes('column')) {
+          console.warn('[DB] Missing shortcut columns on update, using category encoding fallback');
+          const item = frequentPayments.find(p => p.id === id);
+          if (!item) throw new Error('Shortcut not found for local update');
+          
+          const merged = { ...item, ...updates };
+          const { type, account_id, category, id: _, user_id: __, created_at: ___, ...rest } = merged;
+          
+          // Re-encode
+          const encodedCategory = `TYPE:${type || 'Expense'}|ACC:${account_id || ''}|CAT:${category}`;
+          
+          const { error: retryError } = await supabase
+            .from('frequent_payments')
+            .update({ category: encodedCategory })
+            .eq('id', id);
+            
+          if (retryError) throw retryError;
+          
+          // Update local state with merged values (so the UI sees account_id etc)
+          setFrequentPayments(prev => prev.map(p => p.id === id ? merged : p));
+          return { success: true };
+        }
+        throw error;
+      }
+      
       setFrequentPayments(prev => prev.map(p => p.id === id ? { ...p, ...updates } : p));
       return { success: true };
     } catch (error) {
