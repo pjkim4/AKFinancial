@@ -45,10 +45,14 @@ export const translations = {
     settings_cloud_share: 'Cloud Access Management',
     settings_revoke: 'Revoke Access',
     settings_invite: 'Send Cloud Invitation',
+    settings_send_invite: 'Send Invitation',
     settings_username: 'Display Name / Username',
     settings_password: 'New Password',
     settings_confirm: 'Confirm New Password',
+    settings_new_password: 'New Password',
+    settings_confirm_password: 'Confirm New Password',
     settings_sync: 'Sync with Supabase',
+
     
     // Reports
     report_liquidity: 'Total Liquidity In',
@@ -113,10 +117,14 @@ export const translations = {
     settings_cloud_share: '클라우드 액세스 관리',
     settings_revoke: '권한 회수',
     settings_invite: '클라우드 초대 보내기',
+    settings_send_invite: '초대장 발송',
     settings_username: '사용자 이름 / 닉네임',
     settings_password: '새 비밀번호',
     settings_confirm: '비밀번호 확인',
+    settings_new_password: '새 비밀번호',
+    settings_confirm_password: '비밀번호 확인',
     settings_sync: '저장 및 동기화',
+
     
     // Reports
     report_liquidity: '총 수입 (유입)',

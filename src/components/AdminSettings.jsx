@@ -8,8 +8,10 @@ const AdminSettings = () => {
     user, profile, updateProfile, updatePassword, 
     householdMembers, addHouseholdMember, updateHouseholdMember, deleteHouseholdMember,
     inviteMember, currentHouseholdId, pendingInvitations, sentInvitations, revokeInvitation, respondToInvitation, availableHouseholds,
-    setCurrentHouseholdId
+    setCurrentHouseholdId,
+    t
   } = useFinance();
+
   
   const [isAddingMember, setIsAddingMember] = useState(false);
   const [editingMemberId, setEditingMemberId] = useState(null);
@@ -98,9 +100,9 @@ const AdminSettings = () => {
       <header>
         <div className="flex items-center gap-3 mb-2">
           <Shield className="text-primary" size={32} />
-          <h2 className="text-3xl font-bold">Account Security</h2>
+          <h2 className="text-3xl font-black tracking-tight uppercase italic">{t('nav_setup')}</h2>
         </div>
-        <p className="text-text-muted">Managed via Supabase Cloud Auth.</p>
+        <p className="text-text-muted font-bold uppercase text-[10px] tracking-[0.2em]">{t('settings_security')} & Global Logic</p>
       </header>
 
       {/* EMERGENCY TROUBLESHOOTING BOX - MOVED TO TOP */}
@@ -187,7 +189,9 @@ const AdminSettings = () => {
 
             {/* Username */}
             <div>
-              <label className="text-[10px] text-text-muted uppercase tracking-widest block mb-1">Display Name / Username</label>
+            <label className="text-[10px] text-text-muted uppercase font-black tracking-widest mb-2 block">
+              {t('settings_username')}
+            </label>
               <div className="relative">
                 <User size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" />
                 <input 
@@ -205,7 +209,7 @@ const AdminSettings = () => {
             {/* Password Update */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="text-[10px] text-text-muted uppercase tracking-widest block mb-1">New Password</label>
+                <label className="text-[10px] text-text-muted uppercase tracking-widest block mb-1">{t('settings_new_password')}</label>
                 <div className="relative">
                   <Key size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" />
                   <input 
@@ -218,7 +222,7 @@ const AdminSettings = () => {
                 </div>
               </div>
               <div>
-                <label className="text-[10px] text-text-muted uppercase tracking-widest block mb-1">Confirm New Password</label>
+                <label className="text-[10px] text-text-muted uppercase tracking-widest block mb-1">{t('settings_confirm_password')}</label>
                 <input 
                   type="password" 
                   className="w-full bg-white/5 border-white/10"
@@ -239,13 +243,13 @@ const AdminSettings = () => {
 
           <div className="pt-4">
             <button 
-              type="submit" 
-              disabled={loading}
-              className="btn btn-primary w-full md:w-auto px-8 h-12 text-black font-black uppercase tracking-widest"
-            >
-              {loading ? <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin"></div> : <Save size={18} />}
-              {loading ? 'Saving...' : 'Sync with Supabase'}
-            </button>
+            type="submit"
+            disabled={loading}
+            className="btn btn-primary w-full h-14 text-black font-black uppercase tracking-widest shadow-xl shadow-primary/20"
+          >
+            {loading ? <Zap className="animate-spin" size={18} /> : <Save size={18} />}
+            {t('settings_sync')}
+          </button>
           </div>
         </form>
       </div>
@@ -261,15 +265,20 @@ const AdminSettings = () => {
       </div>
 
       {/* Household Management */}
-      <div className="card glass border-white/10 p-8">
+      <div className="card border-white/5 bg-card">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
-            <Users className="text-primary" size={24} />
-            <h3 className="text-xl font-bold">Household Members</h3>
+            <div className="p-3 bg-primary/10 rounded-xl">
+              <Users className="text-primary" size={24} />
+            </div>
+            <div>
+              <h3 className="font-black text-lg">{t('settings_household')}</h3>
+              <p className="text-[10px] text-text-muted uppercase tracking-widest">Shared Ledger Roles</p>
+            </div>
           </div>
           <button 
             onClick={() => setIsAddingMember(true)}
-            className="p-2 bg-primary/10 text-primary rounded-lg hover:bg-primary hover:text-black transition-all"
+            className="btn bg-white/5 border-white/10 p-3 hover:bg-primary hover:text-black transition-all"
           >
             <Plus size={18} />
           </button>
@@ -359,7 +368,7 @@ const AdminSettings = () => {
                   disabled={!inviteEmail || loading}
                   className="btn btn-primary w-full h-14 font-black uppercase text-black disabled:opacity-50"
                 >
-                  {loading ? 'Sending...' : 'Send Cloud Invitation'}
+                  {loading ? 'Sending...' : t('settings_send_invite')}
                 </button>
               </div>
             )}
@@ -487,10 +496,16 @@ const AdminSettings = () => {
 
       {/* Sent Invitations / Revoke Access */}
       <div className="card glass border-white/10 p-8">
-        <div className="flex items-center gap-3 mb-6">
-          <Key className="text-warning" size={24} />
-          <h3 className="text-xl font-bold">Cloud Access Management</h3>
+        <div className="flex items-center gap-3 mb-8">
+          <div className="p-3 bg-primary/10 rounded-xl">
+            <Zap className="text-primary" size={24} />
+          </div>
+          <div>
+            <h3 className="font-black text-lg">{t('settings_cloud_share')}</h3>
+            <p className="text-[10px] text-text-muted uppercase tracking-widest">Active Remote Connections</p>
+          </div>
         </div>
+
         <p className="text-[10px] text-text-muted uppercase tracking-widest mb-6 leading-relaxed">
           Authorized users who have access to your shared wallets. Revoke access here to remove their permission.
         </p>
