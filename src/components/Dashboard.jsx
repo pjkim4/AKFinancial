@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import SearchableSelect from './ui/SearchableSelect';
 
@@ -68,6 +68,20 @@ const Dashboard = () => {
   const [qtTarget, setQtTarget] = useState('');
   const [qtAmount, setQtAmount] = useState('');
   const [qtDate, setQtDate] = useState(new Date().toISOString().split('T')[0]);
+  
+  const logAmountRef = useRef(null);
+  const logDateRef = useRef(null);
+
+  useEffect(() => {
+    if (isLogConfirmationOpen) {
+      const amountVal = Number(logFormData.amount);
+      if (!amountVal || amountVal === 0) {
+        setTimeout(() => logAmountRef.current?.focus(), 100);
+      } else {
+        setTimeout(() => logDateRef.current?.focus(), 100);
+      }
+    }
+  }, [isLogConfirmationOpen]);
 
   const expenseCategories = [
     { id: 'Food', name: t('cat_food') },
@@ -832,6 +846,7 @@ const Dashboard = () => {
                 <div>
                    <label className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-2 block text-center">Amount</label>
                    <input 
+                    ref={logAmountRef}
                     type="number" 
                     step="0.01" 
                     className="text-3xl font-black text-center bg-transparent border-none focus:ring-0 text-primary"
@@ -843,8 +858,8 @@ const Dashboard = () => {
                 <div>
                    <label className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-2 block text-center">Date</label>
                    <input 
+                    ref={logDateRef}
                     type="date" 
-                    autoFocus
                     className="text-center bg-white/5 border-white/10 rounded-xl"
                     value={logFormData.date}
                     onChange={e => setLogFormData({...logFormData, date: e.target.value})}
