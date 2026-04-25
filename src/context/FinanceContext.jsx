@@ -429,7 +429,8 @@ export const FinanceProvider = ({ children }) => {
 
       if (error) {
         // Fallback: If member_id column is missing in DB
-        if (member_id && (error.code === '42703' || error.message?.includes('column "member_id"'))) {
+        if (member_id && (error.code === '42703' || error.message?.includes("'member_id' column") || error.message?.includes('column "member_id"'))) {
+
           const member = householdMembers.find(m => m.id === member_id);
           const memberPrefix = member ? `[${member.name}] ` : '';
           const fallbackTx = { 
@@ -517,7 +518,8 @@ export const FinanceProvider = ({ children }) => {
 
       if (error) {
         // Fallback for member_id column
-        if (member_id && (error.code === '42703' || error.message?.includes('column "member_id"'))) {
+        if (member_id && (error.code === '42703' || error.message?.includes("'member_id' column") || error.message?.includes('column "member_id"'))) {
+
           const member = householdMembers.find(m => m.id === member_id);
           const memberPrefix = member ? `[${member.name}] ` : '';
           
