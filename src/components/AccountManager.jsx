@@ -310,7 +310,6 @@ const AccountManager = () => {
                   </button>
                 </div>
 
-          
           <form onSubmit={handleCreateAccount} className="space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
@@ -369,7 +368,9 @@ const AccountManager = () => {
                   {loading ? <Loader2 className="animate-spin" /> : t('wallet_create')}
                 </button>
               </form>
-            )}
+            </div>
+          )}
+
 
 
             {modalType === 'settings' && (
