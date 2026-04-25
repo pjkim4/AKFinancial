@@ -496,35 +496,47 @@ export const FinanceProvider = ({ children }) => {
 
   const updateAccountBalancesAfterTx = async (transaction, mode = 'add', oldTx = null) => {
     try {
-      const account = accounts.find(acc => acc.id === transaction.account_id);
-      if (account) {
-        let amountChange = 0;
-        if (mode === 'add') {
-          const txAmount = Number(transaction.amount);
-          amountChange = transaction.type === 'Income' ? txAmount : -txAmount;
-        } else if (mode === 'update' && oldTx) {
-          // Reverse old amount
-          amountChange += oldTx.type === 'Income' ? -Number(oldTx.amount) : Number(oldTx.amount);
-          // Apply new amount
-          amountChange += transaction.type === 'Income' ? Number(transaction.amount) : -Number(transaction.amount);
-        } else if (mode === 'delete') {
-          const txAmount = Number(transaction.amount);
-          amountChange = transaction.type === 'Income' ? -txAmount : txAmount;
-        }
+      // 1. Fetch latest account data directly from DB to avoid stale state in loops
+      const { data: latestAccounts, error: fetchError } = await supabase
+        .from('accounts')
+        .select('*')
+        .eq('id', transaction.account_id);
+      
+      if (fetchError) throw fetchError;
+      if (!latestAccounts || latestAccounts.length === 0) return { error: 'Account not found' };
+      
+      const account = latestAccounts[0];
+      let amountChange = 0;
 
-        if (account.type === 'Debit Card' && account.parent_account_id) {
-          const parent = accounts.find(acc => acc.id === account.parent_account_id);
-          if (parent) {
-            const newParentBalance = Number((Number(parent.balance) + amountChange).toFixed(2));
-            await supabase.from('accounts').update({ balance: newParentBalance }).eq('id', parent.id);
-            setAccounts(prev => prev.map(acc => acc.id === parent.id ? { ...acc, balance: newParentBalance } : acc));
-          }
-        } else {
-          const newBalance = Number((Number(account.balance) + amountChange).toFixed(2));
-          await supabase.from('accounts').update({ balance: newBalance }).eq('id', account.id);
-          setAccounts(prev => prev.map(acc => acc.id === account.id ? { ...acc, balance: newBalance } : acc));
-        }
+      if (mode === 'add') {
+        const txAmount = Number(transaction.amount);
+        amountChange = transaction.type === 'Income' ? txAmount : -txAmount;
+      } else if (mode === 'update' && oldTx) {
+        amountChange += oldTx.type === 'Income' ? -Number(oldTx.amount) : Number(oldTx.amount);
+        amountChange += transaction.type === 'Income' ? Number(transaction.amount) : -Number(transaction.amount);
+      } else if (mode === 'delete') {
+        const txAmount = Number(transaction.amount);
+        amountChange = transaction.type === 'Income' ? -txAmount : txAmount;
       }
+
+      if (account.type === 'Debit Card' && account.parent_account_id) {
+        // Handle Debit Card linked to Parent Account
+        const { data: parents, error: pError } = await supabase.from('accounts').select('*').eq('id', account.parent_account_id);
+        if (pError) throw pError;
+        const parent = parents[0];
+        
+        if (parent) {
+          const newParentBalance = Number((Number(parent.balance) + amountChange).toFixed(2));
+          await supabase.from('accounts').update({ balance: newParentBalance }).eq('id', parent.id);
+          setAccounts(prev => prev.map(acc => acc.id === parent.id ? { ...acc, balance: newParentBalance } : acc));
+        }
+      } else {
+        // Normal account balance update
+        const newBalance = Number((Number(account.balance) + amountChange).toFixed(2));
+        await supabase.from('accounts').update({ balance: newBalance }).eq('id', account.id);
+        setAccounts(prev => prev.map(acc => acc.id === account.id ? { ...acc, balance: newBalance } : acc));
+      }
+
       return { success: true };
     } catch (err) {
       console.error('Error updating balances:', err.message);
