@@ -669,7 +669,8 @@ const Dashboard = () => {
                  <div>
                   <label className="text-xs text-text-muted uppercase font-black tracking-widest mb-2 block">Primary Wallet</label>
                   <select value={newShortcut.account_id} onChange={e => setNewShortcut({...newShortcut, account_id: e.target.value})}>
-                    <option value="">Ask when clicked (Unassigned)</option>
+                    <option value="" className="font-bold text-primary">✨ Ask When Clicked (Unassigned)</option>
+
                     {accounts.map(acc => (
                       <option key={acc.id} value={acc.id}>{acc.name}</option>
                     ))}
