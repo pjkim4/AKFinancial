@@ -16,7 +16,8 @@ import {
   Eye,
   EyeOff,
   ChevronDown,
-  FileText
+  FileText,
+  Shield
 } from 'lucide-react';
 
 
@@ -30,6 +31,8 @@ import RecurringManager from './components/RecurringManager';
 import ErrorBoundary from './components/ErrorBoundary';
 import Reports from './components/Reports';
 import LogEntryModal from './components/LogEntryModal';
+import PendingApproval from './components/PendingApproval';
+import AdminDashboard from './components/AdminDashboard';
 import { supabase } from './lib/supabase';
 import logoImg from './assets/logo.png';
 
@@ -292,6 +295,10 @@ const AppContent = () => {
     );
   }
 
+  if (profile && profile.is_approved === false) {
+    return <PendingApproval />;
+  }
+
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard': return <Dashboard />;
@@ -300,6 +307,7 @@ const AppContent = () => {
       case 'recurring': return <RecurringManager />;
       case 'ai': return <AIInsights />;
       case 'reports': return <Reports />;
+      case 'admin': return <AdminDashboard />;
       case 'settings': return <AdminSettings />;
       default: return <Dashboard />;
     }
@@ -428,6 +436,15 @@ const AppContent = () => {
 
 
         <div className="p-4 border-t border-white/5">
+          {profile?.is_admin && (
+            <button 
+              onClick={() => setActiveTab('admin')}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all mb-2 ${activeTab === 'admin' ? 'bg-info text-black shadow-lg shadow-info/20' : 'hover:bg-white/5 text-text-muted hover:text-white'}`}
+            >
+              <Shield size={20} />
+              Admin
+            </button>
+          )}
           <button 
             onClick={() => setActiveTab('settings')}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${activeTab === 'settings' ? 'bg-primary text-black shadow-lg shadow-primary/20' : 'hover:bg-white/5 text-text-muted hover:text-white'}`}
@@ -531,6 +548,16 @@ const AppContent = () => {
                 <span className="text-[8px] font-black uppercase tracking-tighter">{t('nav_reports')}</span>
 
               </button>
+
+              {profile?.is_admin && (
+                <button 
+                  onClick={() => setActiveTab('admin')}
+                  className={`flex-1 flex flex-col items-center gap-0.5 py-2 transition-all ${activeTab === 'admin' ? 'text-info' : 'text-text-muted hover:text-white'}`}
+                >
+                  <Shield size={20} />
+                  <span className="text-[8px] font-black uppercase tracking-tighter">Admin</span>
+                </button>
+              )}
 
               <button 
                 onClick={() => setActiveTab('settings')}
