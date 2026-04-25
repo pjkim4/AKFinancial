@@ -84,7 +84,8 @@ const SearchableSelect = ({ options = [], value, onChange, onEdit, onDelete, pla
               autoFocus
               type="text"
               placeholder="Type to search..."
-              className="w-full bg-transparent border-none p-0 focus:ring-0 text-sm font-bold text-black placeholder-gray-500"
+              className="w-full bg-transparent border-none p-0 focus:ring-0 text-sm font-black text-black placeholder-gray-500"
+
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               onClick={(e) => e.stopPropagation()}
@@ -131,7 +132,8 @@ const SearchableSelect = ({ options = [], value, onChange, onEdit, onDelete, pla
                   </div>
                   
                   {opt.isCustom && (
-                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity ml-2">
+                    <div className="flex items-center gap-1 md:opacity-0 md:group-hover:opacity-100 opacity-100 transition-opacity ml-2 shrink-0">
+
                        <button 
                         onClick={(e) => { e.stopPropagation(); onEdit?.(opt.id, opt.name); }} 
                         className="p-1.5 hover:bg-black/5 rounded text-gray-400 hover:text-primary transition-colors"
