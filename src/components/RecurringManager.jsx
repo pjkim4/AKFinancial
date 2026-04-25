@@ -23,8 +23,10 @@ const RecurringManager = () => {
     updateRecurringSchedule,
     deleteRecurringSchedule, 
     skipNextOccurrence,
-    calculateNextPaymentDate
+    calculateNextPaymentDate,
+    t
   } = useFinance();
+
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
