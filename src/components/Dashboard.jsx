@@ -25,7 +25,8 @@ import {
   Edit2,
   Check,
   Zap,
-  History
+  History,
+  ArrowUpDown
 } from 'lucide-react';
 
 
@@ -621,19 +622,34 @@ const Dashboard = () => {
               <h4 className="font-black text-lg mb-1">Instant Move</h4>
               <p className="text-[10px] text-text-muted uppercase tracking-widest mb-6">Internal Asset Transfers</p>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-2">
                <div>
-                  <label className="text-[10px] text-text-muted uppercase tracking-widest block mb-1">From Wallet</label>
+                  <label className="text-[10px] text-text-muted uppercase tracking-widest block mb-1">From Wallet (Source)</label>
                   <select 
                     className="font-bold border-white/10"
                     value={qtSource}
                     onChange={(e) => setQtSource(e.target.value)}
                   >
-                    {accounts.map(acc => <option key={acc.id} value={acc.id}>{acc.name} ({preferences.hideBalances ? '••••' : `$${acc.balance}`})</option>)}
+                    {accounts.map(acc => <option key={acc.id} value={acc.id}>{acc.name} — {preferences.hideBalances ? '••••' : `$${acc.balance}`}</option>)}
                   </select>
                </div>
+               
+               <div className="flex justify-center -my-1 relative z-10">
+                  <button 
+                   onClick={() => {
+                     const temp = qtSource;
+                     const newSource = qtTarget || accounts.find(a => a.id !== qtSource)?.id || '';
+                     setQtSource(newSource);
+                     setQtTarget(temp);
+                   }}
+                   className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary hover:text-black transition-all shadow-lg"
+                  >
+                    <ArrowUpDown size={14} />
+                  </button>
+               </div>
+
                <div>
-                  <label className="text-[10px] text-text-muted uppercase tracking-widest block mb-1">To Wallet</label>
+                  <label className="text-[10px] text-text-muted uppercase tracking-widest block mb-1">To Wallet (Destination)</label>
                   <select 
                     className="font-bold border-white/10"
                     value={qtTarget}
@@ -641,7 +657,7 @@ const Dashboard = () => {
                   >
                     <option value="">Select Destination</option>
                     {accounts.filter(acc => acc.id !== qtSource).map(acc => (
-                      <option key={acc.id} value={acc.id}>{acc.name} ({preferences.hideBalances ? '••••' : `$${acc.balance}`})</option>
+                      <option key={acc.id} value={acc.id}>{acc.name} — {preferences.hideBalances ? '••••' : `$${acc.balance}`}</option>
                     ))}
                   </select>
                </div>

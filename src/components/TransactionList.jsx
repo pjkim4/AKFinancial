@@ -255,16 +255,19 @@ const TransactionList = () => {
     const timeA = new Date(a.created_at || 0).getTime();
     const timeB = new Date(b.created_at || 0).getTime();
 
+    // Priority: Income (0), Transfer (1), Expense (2)
+    const typePriority = (t) => t.type === 'Income' ? 0 : (t.type === 'Transfer' ? 1 : 2);
+
     switch (sortBy) {
       case 'date-asc': 
-        return dateA - dateB || timeA - timeB;
+        return dateA - dateB || typePriority(a) - typePriority(b) || timeA - timeB;
       case 'amount-desc': return parseFloat(b.amount) - parseFloat(a.amount) || timeB - timeA;
       case 'amount-asc': return parseFloat(a.amount) - parseFloat(b.amount) || timeA - timeB;
       case 'category-asc': return (a.category || '').localeCompare(b.category || '') || timeA - timeB;
       case 'category-desc': return (b.category || '').localeCompare(a.category || '') || timeB - timeA;
       case 'date-desc':
       default:
-        return dateB - dateA || timeB - timeA;
+        return dateB - dateA || typePriority(a) - typePriority(b) || timeB - timeA;
     }
   });
 
@@ -277,6 +280,12 @@ const TransactionList = () => {
       accountTxs.sort((a, b) => {
         const dateDiff = new Date(b.date) - new Date(a.date);
         if (dateDiff !== 0) return dateDiff;
+        
+        // Same-day priority: Income (0), Transfer (1), Expense (2)
+        const typeA = a.type === 'Income' ? 0 : (a.type === 'Transfer' ? 1 : 2);
+        const typeB = b.type === 'Income' ? 0 : (b.type === 'Transfer' ? 1 : 2);
+        if (typeA !== typeB) return typeA - typeB;
+
         return new Date(b.created_at || 0) - new Date(a.created_at || 0);
       });
       
