@@ -85,10 +85,26 @@ const TransactionList = () => {
   });
 
   const categories = {
-    income: ['Salary', 'Bonus', 'Investment', 'Gift', 'Other'],
-    expense: ['Food', 'Rent', 'Transport', 'Entertainment', 'Utilities', 'Shopping', 'Health', 'Other'],
+    income: [
+      { id: 'Salary', name: t('cat_salary') },
+      { id: 'Bonus', name: t('cat_bonus') },
+      { id: 'Investment', name: t('cat_investment') },
+      { id: 'Gift', name: t('cat_gift') },
+      { id: 'Other', name: t('cat_other') }
+    ],
+    expense: [
+      { id: 'Food', name: t('cat_food') },
+      { id: 'Rent', name: t('cat_rent') },
+      { id: 'Transport', name: t('cat_transport') },
+      { id: 'Entertainment', name: t('cat_entertainment') },
+      { id: 'Utilities', name: t('cat_utilities') },
+      { id: 'Shopping', name: t('cat_shopping') },
+      { id: 'Health', name: t('cat_health') },
+      { id: 'Other', name: t('cat_other') }
+    ],
     transfer: []
   };
+
 
   const filteredTransactions = transactions.filter(t => {
     // 1. Text Search Filter
@@ -605,29 +621,34 @@ const TransactionList = () => {
               )}
               <div className="grid grid-cols-2 gap-6">
                 <div>
-                  <label className="text-xs text-text uppercase tracking-widest font-black block mb-3">Net Value</label>
+                  <label className="text-xs text-text uppercase tracking-widest font-black block mb-3">{t('amount')}</label>
                   <input type="number" step="0.01" required className="h-14 text-lg font-black" value={formData.amount} onChange={(e) => setFormData({...formData, amount: e.target.value})} />
                 </div>
+
                 <div>
-                  <label className="text-xs text-text uppercase tracking-widest font-black block mb-3">Timestamp</label>
+                  <label className="text-xs text-text uppercase tracking-widest font-black block mb-3">{t('date')}</label>
                   <input type="date" required className="h-14 font-bold" value={formData.date} onChange={(e) => setFormData({...formData, date: e.target.value})} />
                 </div>
+
               </div>
               <div>
-                <label className="text-xs text-text uppercase tracking-widest font-black block mb-3">Description / Memo</label>
+                <label className="text-xs text-text uppercase tracking-widest font-black block mb-3">{t('description')}</label>
                 <input type="text" required className="h-14 font-black" value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} />
               </div>
+
               <div className="space-y-6">
                 <div>
-                  <label className="text-[10px] text-text-muted uppercase tracking-[0.2em] font-black block mb-2">Wallet</label>
-                  <SearchableSelect options={accounts?.map(acc => ({ id: acc.id, name: acc.name }))} value={formData.account_id} onChange={(val) => setFormData({...formData, account_id: val})} placeholder="Search Wallet..." />
+                  <label className="text-[10px] text-text-muted uppercase tracking-[0.2em] font-black block mb-2">{t('wallet')}</label>
+                  <SearchableSelect options={accounts?.map(acc => ({ id: acc.id, name: acc.name }))} value={formData.account_id} onChange={(val) => setFormData({...formData, account_id: val})} placeholder={t('tx_wallet') + '...'} />
                 </div>
+
                 {modalType !== 'transfer' && (
                   <div>
-                    <label className="text-[10px] text-text-muted uppercase tracking-[0.2em] font-black block mb-2">Classification</label>
-                    <SearchableSelect options={(categories[modalType] || []).map(cat => ({ id: cat, name: cat }))} value={formData.category} onChange={(val) => setFormData({...formData, category: val})} placeholder="Search Category..." />
+                    <label className="text-[10px] text-text-muted uppercase tracking-[0.2em] font-black block mb-2">{t('category')}</label>
+                    <SearchableSelect options={categories[modalType] || []} value={formData.category} onChange={(val) => setFormData({...formData, category: val})} placeholder={t('category') + '...'} />
                   </div>
                 )}
+
                 {modalType === 'transfer' && !editingId && (
                   <div>
                     <label className="text-[10px] text-text-muted uppercase tracking-[0.2em] font-black block mb-2">To Wallet</label>
@@ -635,16 +656,29 @@ const TransactionList = () => {
                   </div>
                 )}
                 {householdMembers.length > 0 && (
-                  <div>
-                    <label className="text-[10px] text-text-muted uppercase tracking-[0.2em] font-black block mb-2">Member Tag (Optional)</label>
-                    <SearchableSelect 
-                      options={householdMembers.map(m => ({ id: m.id, name: m.name }))} 
-                      value={formData.member_id} 
-                      onChange={(val) => setFormData({...formData, member_id: val})} 
-                      placeholder="Tag family member..." 
-                    />
+                  <div className="relative group/member">
+                    <label className="text-[10px] text-text-muted uppercase tracking-[0.2em] font-black block mb-2">{t('member')}</label>
+                    <div className="flex items-center gap-3">
+                      {formData.member_id && (
+                        <div 
+                          className="w-10 h-10 rounded-xl flex items-center justify-center text-xs font-black text-black shrink-0 animate-scale-in"
+                          style={{ backgroundColor: householdMembers.find(m => m.id === formData.member_id)?.color || '#fff' }}
+                        >
+                          {householdMembers.find(m => m.id === formData.member_id)?.name.charAt(0)}
+                        </div>
+                      )}
+                      <div className="flex-1">
+                        <SearchableSelect 
+                          options={householdMembers.map(m => ({ id: m.id, name: m.name }))} 
+                          value={formData.member_id} 
+                          onChange={(val) => setFormData({...formData, member_id: val})} 
+                          placeholder={t('member') + '...'} 
+                        />
+                      </div>
+                    </div>
                   </div>
                 )}
+
               </div>
               <div className="pt-6">
                 <button type="submit" disabled={loading} className="btn btn-primary w-full h-16 font-black uppercase text-black">

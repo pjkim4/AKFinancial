@@ -31,6 +31,8 @@ export const translations = {
     tx_action: 'Action',
     tx_export: 'Export',
     tx_clear: 'Clear/Show All',
+    tx_search_cat: 'Search Category',
+
     tx_transfer: 'Transfer',
     tx_delete_confirm: 'Delete transactions?',
     
@@ -155,7 +157,22 @@ export const translations = {
     transfer: 'Transfer',
     from_wallet: 'From Wallet',
     to_wallet: 'To Wallet',
-    wallet: 'Wallet'
+    wallet: 'Wallet',
+    
+    // Categories
+    cat_salary: 'Salary',
+    cat_bonus: 'Bonus',
+    cat_investment: 'Investment',
+    cat_gift: 'Gift',
+    cat_food: 'Food',
+    cat_rent: 'Rent',
+    cat_transport: 'Transport',
+    cat_entertainment: 'Entertainment',
+    cat_utilities: 'Utilities',
+    cat_shopping: 'Shopping',
+    cat_health: 'Health',
+    cat_other: 'Other'
+
   },
   ko: {
 
@@ -190,6 +207,8 @@ export const translations = {
     tx_action: '관리',
     tx_export: '내보내기',
     tx_clear: '필터 초기화',
+    tx_search_cat: '카테고리 검색',
+
     tx_transfer: '이체/송금',
     tx_delete_confirm: '내역을 삭제하시겠습니까?',
     
@@ -328,7 +347,22 @@ export const translations = {
     transfer: '이체',
     from_wallet: '출금 지갑',
     to_wallet: '입금 지갑',
-    wallet: '지갑'
+    wallet: '지갑',
+    
+    // Categories
+    cat_salary: '급여',
+    cat_bonus: '보너스',
+    cat_investment: '투자',
+    cat_gift: '선물',
+    cat_food: '식비',
+    cat_rent: '주거비',
+    cat_transport: '교통비',
+    cat_entertainment: '문화/생활',
+    cat_utilities: '공과금',
+    cat_shopping: '쇼핑',
+    cat_health: '의료/건강',
+    cat_other: '기타'
+
   }
 };
 

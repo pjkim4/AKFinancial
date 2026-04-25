@@ -44,8 +44,25 @@ const LogEntryModal = ({ isOpen, onClose }) => {
   }, [accounts]);
 
   const categories = {
-    income: ['Salary', 'Bonus', 'Investment', 'Gift', 'Other'],
-    expense: ['Food', 'Rent', 'Transport', 'Entertainment', 'Utilities', 'Shopping', 'Health', 'Other'],
+    income: [
+      { id: 'Salary', name: t('cat_salary') },
+      { id: 'Bonus', name: t('cat_bonus') },
+      { id: 'Investment', name: t('cat_investment') },
+      { id: 'Gift', name: t('cat_gift') },
+      { id: 'Other', name: t('cat_other') }
+    ],
+
+    expense: [
+      { id: 'Food', name: t('cat_food') },
+      { id: 'Rent', name: t('cat_rent') },
+      { id: 'Transport', name: t('cat_transport') },
+      { id: 'Entertainment', name: t('cat_entertainment') },
+      { id: 'Utilities', name: t('cat_utilities') },
+      { id: 'Shopping', name: t('cat_shopping') },
+      { id: 'Health', name: t('cat_health') },
+      { id: 'Other', name: t('cat_other') }
+    ],
+
     transfer: []
   };
 
@@ -158,7 +175,7 @@ const LogEntryModal = ({ isOpen, onClose }) => {
                 options={accounts?.map(acc => ({ id: acc.id, name: acc.name }))} 
                 value={formData.account_id} 
                 onChange={(val) => setFormData({...formData, account_id: val})} 
-                placeholder="Search Wallet..." 
+                placeholder={t('tx_wallet') + '...'} 
               />
             </div>
             
@@ -166,10 +183,10 @@ const LogEntryModal = ({ isOpen, onClose }) => {
               <div>
                 <label className="text-xs text-text-muted uppercase tracking-[0.2em] font-black block mb-2">{t('category')}</label>
                 <SearchableSelect 
-                  options={(categories[modalType] || []).map(cat => ({ id: cat, name: cat }))} 
+                  options={categories[modalType] || []} 
                   value={formData.category} 
                   onChange={(val) => setFormData({...formData, category: val})} 
-                  placeholder="Search Category..." 
+                  placeholder={t('tx_search_cat') || "Search Category..."} 
                 />
               </div>
             )}
@@ -187,14 +204,26 @@ const LogEntryModal = ({ isOpen, onClose }) => {
             )}
 
             {householdMembers.length > 0 && (
-              <div>
+              <div className="relative group/member">
                 <label className="text-xs text-text-muted uppercase tracking-[0.2em] font-black block mb-2">{t('member')}</label>
-                <SearchableSelect 
-                  options={householdMembers.map(m => ({ id: m.id, name: m.name }))} 
-                  value={formData.member_id} 
-                  onChange={(val) => setFormData({...formData, member_id: val})} 
-                  placeholder="Tag family member..." 
-                />
+                <div className="flex items-center gap-3">
+                  {formData.member_id && (
+                    <div 
+                      className="w-10 h-10 rounded-xl flex items-center justify-center text-xs font-black text-black shrink-0 animate-scale-in"
+                      style={{ backgroundColor: householdMembers.find(m => m.id === formData.member_id)?.color || '#fff' }}
+                    >
+                      {householdMembers.find(m => m.id === formData.member_id)?.name.charAt(0)}
+                    </div>
+                  )}
+                  <div className="flex-1">
+                    <SearchableSelect 
+                      options={householdMembers.map(m => ({ id: m.id, name: m.name }))} 
+                      value={formData.member_id} 
+                      onChange={(val) => setFormData({...formData, member_id: val})} 
+                      placeholder={t('member') + '...'} 
+                    />
+                  </div>
+                </div>
               </div>
             )}
           </div>
