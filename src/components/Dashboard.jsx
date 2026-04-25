@@ -481,7 +481,8 @@ const Dashboard = () => {
 
               
               return (
-                <div key={acc.id} className="p-4 border border-white/10 rounded-2xl bg-white/[0.04] space-y-4">
+                <div key={acc.id} className="p-5 border border-white/20 rounded-3xl bg-white/5 shadow-inner space-y-5">
+
 
 
                   <div className="flex items-center gap-3 px-2">
@@ -525,7 +526,8 @@ const Dashboard = () => {
 
             {/* Handle unassigned shortcuts or catch-all if no accounts matched */}
             {frequentPayments.filter(p => !p.account_id || !accounts.some(acc => String(acc.id) === String(p.account_id))).length > 0 && (
-              <div className="p-4 border border-white/10 rounded-2xl bg-white/[0.04] space-y-4">
+              <div className="p-5 border border-white/20 rounded-3xl bg-white/5 shadow-inner space-y-5">
+
 
 
                 <div className="flex items-center gap-3 px-2">
