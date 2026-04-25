@@ -63,6 +63,7 @@ const Dashboard = () => {
   const [filterAccount, setFilterAccount] = useState('all');
   const [chartPeriod, setChartPeriod] = useState('1M'); // 1M, 3M, 6M, YTD, All
   const [statsPeriod, setStatsPeriod] = useState('1M'); // 1M, 3M, YTD, All
+  const [trendPeriod, setTrendPeriod] = useState('6M'); // 6M, 1Y, All
   const [pendingShortcut, setPendingShortcut] = useState(null);
   const [isAccountPickerOpen, setIsAccountPickerOpen] = useState(false);
   const [isLogConfirmationOpen, setIsLogConfirmationOpen] = useState(false);
@@ -188,25 +189,37 @@ const Dashboard = () => {
 
   const chartData = useMemo(() => {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const currentYear = new Date().getFullYear();
+    const now = new Date();
     
-    const grouped = transactions.reduce((acc, t) => {
-      // Use string split to avoid timezone-associated date shifting
-      const [y, m] = t.date.split('-').map(Number);
-      
-      if (y === currentYear && t.category !== 'Transfer') {
-        const monthName = months[m - 1];
-        if (!acc[monthName]) acc[monthName] = { name: monthName, income: 0, expense: 0 };
-        if (t.type === 'Income') acc[monthName].income += Number(t.amount);
-        else acc[monthName].expense += Number(t.amount);
-      }
-      return acc;
-    }, {});
+    // Generate last N months based on trendPeriod
+    let monthsToFetch = 6;
+    if (trendPeriod === '1Y') monthsToFetch = 12;
+    if (trendPeriod === 'All') monthsToFetch = 36; // Cap at 3 years for performance
 
-    return months.slice(0, new Date().getMonth() + 1)
-      .map(m => grouped[m] || { name: m, income: 0, expense: 0 })
-      .slice(-6);
-  }, [transactions]);
+    const result = [];
+    for (let i = monthsToFetch - 1; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const mName = months[d.getMonth()];
+      const year = d.getFullYear();
+      const monthNum = d.getMonth() + 1;
+      
+      const monthTxs = transactions.filter(t => {
+        const [ty, tm] = t.date.split('-').map(Number);
+        return ty === year && tm === monthNum && t.category !== 'Transfer';
+      });
+
+      const income = monthTxs.filter(t => t.type === 'Income').reduce((s, t) => s + Number(t.amount), 0);
+      const expense = monthTxs.filter(t => t.type === 'Expense').reduce((s, t) => s + Number(t.amount), 0);
+      
+      result.push({ 
+        name: monthsToFetch > 12 ? `${mName} ${String(year).slice(-2)}` : mName, 
+        income, 
+        expense 
+      });
+    }
+
+    return result;
+  }, [transactions, trendPeriod]);
 
   const COLORS = ['#10b981', '#3b82f6', '#ef4444', '#f59e0b', '#8b5cf6', '#06b6d4'];
   const pieData = useMemo(() => {
@@ -928,9 +941,22 @@ const Dashboard = () => {
       {(showMonthlyTrend || showExpenseDistribution) && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pb-10">
           {showMonthlyTrend && (
-            <div className={`card bg-card border-white/5 h-[500px] flex flex-col ${!showExpenseDistribution ? 'lg:col-span-2' : ''}`}>
-              <h4 className="text-sm font-black uppercase tracking-widest mb-6 text-primary">Monthly Trend</h4>
-              <div className="flex-1 min-h-[350px]">
+            <div className={`card bg-card border-white/5 min-h-[450px] flex flex-col ${!showExpenseDistribution ? 'lg:col-span-2' : ''}`}>
+              <div className="flex items-center justify-between mb-6">
+                <h4 className="text-sm font-black uppercase tracking-widest text-primary">Monthly Trend</h4>
+                <div className="flex bg-white/5 p-1 rounded-lg border border-white/5">
+                  {['6M', '1Y', 'All'].map(p => (
+                    <button 
+                      key={p}
+                      onClick={() => setTrendPeriod(p)}
+                      className={`px-3 py-1 text-[9px] font-black uppercase rounded-md transition-all ${trendPeriod === p ? 'bg-primary text-black' : 'text-text-muted hover:text-white'}`}
+                    >
+                      {p}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="flex-1 w-full" style={{ minHeight: '300px' }}>
                 <ResponsiveContainer width="100%" height={350}>
                   <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 20 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
@@ -955,7 +981,7 @@ const Dashboard = () => {
           )}
 
           {showExpenseDistribution && (
-            <div className={`card bg-card border-white/5 h-[500px] flex flex-col ${!showMonthlyTrend ? 'lg:col-span-2' : ''}`}>
+            <div className={`card bg-card border-white/5 min-h-[450px] flex flex-col ${!showMonthlyTrend ? 'lg:col-span-2' : ''}`}>
               <div className="flex items-center justify-between mb-6">
                 <h4 className="text-sm font-black uppercase tracking-widest text-primary">Expense Distribution</h4>
                 <div className="flex bg-white/5 p-1 rounded-lg border border-white/5">
@@ -963,14 +989,14 @@ const Dashboard = () => {
                     <button 
                       key={p}
                       onClick={() => setChartPeriod(p)}
-                      className={`px-3 py-1 text-[9px] font-black uppercase rounded-md transition-all ${chartPeriod === p ? 'bg-primary text-black' : 'text-text-muted hover:text-white'}`}
+                      className={`px-2 sm:px-3 py-1 text-[9px] font-black uppercase rounded-md transition-all ${chartPeriod === p ? 'bg-primary text-black' : 'text-text-muted hover:text-white'}`}
                     >
                       {p}
                     </button>
                   ))}
                 </div>
               </div>
-              <div className="flex-1 min-h-[350px]">
+              <div className="flex-1 w-full" style={{ minHeight: '300px' }}>
                 <ResponsiveContainer width="100%" height={350}>
                   <PieChart margin={{ bottom: 30 }}>
                     <Pie 
