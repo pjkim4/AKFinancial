@@ -661,33 +661,7 @@ const TransactionList = () => {
               </div>
            )}
         </div>
-
-                 
-                 <div className="flex items-center justify-between pt-4 border-t border-white/5">
-                    <span className="text-[9px] font-black uppercase text-text-muted tracking-widest">
-                      {accounts.find(a => a.id === t.account_id)?.name || 'Wallet'} • {t.category}
-                    </span>
-                    <div className="flex gap-2">
-                       <button 
-                        onClick={(e) => { e.stopPropagation(); handleEditClick(t); }}
-                        className="p-2 rounded-lg bg-white/5 text-text-muted"
-                       >
-                         <Edit2 size={14} />
-                       </button>
-                       <button 
-                        onClick={(e) => { e.stopPropagation(); setDeleteConfirmId(t.id); }}
-                        className="p-2 rounded-lg bg-danger/10 text-danger"
-                       >
-                         <Trash2 size={14} />
-                       </button>
-                    </div>
-                 </div>
-               </div>
-             ))}
-          </div>
         </div>
-      </div>
-
       {/* Portals */}
       {deleteConfirmId && createPortal(
         <div className="fixed inset-0 z-max flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl">
@@ -844,7 +818,7 @@ const TransactionList = () => {
                 </button>
               </div>
             </form>
-
+          </div>
         </div>,
         document.body
       )}
