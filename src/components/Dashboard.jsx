@@ -49,8 +49,10 @@ const Dashboard = () => {
     t,
     addCustomCategory,
     updateCustomCategory,
-    deleteCustomCategory
+    deleteCustomCategory,
+    user
   } = useFinance();
+
 
 
 
@@ -237,21 +239,32 @@ const Dashboard = () => {
       return;
     }
 
-    setLoading(true);
-    await addTransaction({
-      amount: finalAmount,
-      type: pendingShortcut.type || 'Expense',
-      description: `${pendingShortcut.name}`,
-      account_id: pendingShortcut.account_id || accounts[0].id,
-      category: pendingShortcut.category,
-      date: finalDate,
-      member_id: user?.id
-    });
+    try {
+      setLoading(true);
+      const result = await addTransaction({
+        amount: finalAmount,
+        type: pendingShortcut.type || 'Expense',
+        description: `${pendingShortcut.name}`,
+        account_id: pendingShortcut.account_id || accounts[0].id,
+        category: pendingShortcut.category,
+        date: finalDate,
+        member_id: user?.id
+      });
 
-    setLoading(false);
-    setIsLogConfirmationOpen(false);
-    setPendingShortcut(null);
+      if (result?.error) {
+        alert('Failed to log: ' + result.error.message);
+      } else {
+        setIsLogConfirmationOpen(false);
+        setPendingShortcut(null);
+      }
+    } catch (err) {
+      console.error('Log failed:', err);
+      alert('An unexpected error occurred.');
+    } finally {
+      setLoading(false);
+    }
   };
+
 
 
   const handlePickAccount = (accId) => {
