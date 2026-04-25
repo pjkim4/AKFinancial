@@ -16,6 +16,7 @@ export const translations = {
     dash_monthly_expense: 'Monthly Expense',
     dash_active_workspace: 'Active Workspace',
     dash_personal_account: 'Personal Account',
+    dash_total_portfolio: 'Total Portfolio',
     dash_cloud_sync: 'Cloud Sync',
     dash_wallets_active: 'Wallets Active',
     dash_quick_actions: 'Quick Actions',
@@ -45,7 +46,9 @@ export const translations = {
     
     // Schedules
     schedule_create: 'New Schedule',
-
+    schedule_edit: 'Edit Schedule',
+    schedule_modify_desc: 'Modify your existing automated schedule',
+    schedule_create_desc: 'Set up an automated transaction schedule',
 
     
     // Settings
@@ -71,6 +74,18 @@ export const translations = {
     report_momentum: 'Monthly Momentum',
     report_print: 'Print / PDF',
     report_master: 'Master Ledger',
+
+    // AI
+    ai_header: 'AK Finance Planning',
+    ai_subtitle: 'Personalized insights and strategies for your portfolio.',
+    ai_summary_title: 'Portfolio Summary',
+    ai_savings_rate: 'Savings Rate',
+    ai_safe_zone: 'Safe zone is 20%+',
+    ai_top_expense: 'Top Expense',
+    ai_budget_label: 'OF BUDGET',
+    ai_recommendations: 'Recommended Actions',
+    ai_health_title: 'Account Health Check',
+    ai_health_desc: 'Your liquidity position is strong. All balances are covered by reserves.',
     
     // General
     save: 'Save',
@@ -111,6 +126,7 @@ export const translations = {
     dash_monthly_expense: '이번 달 지출',
     dash_active_workspace: '활성 워크스페이스',
     dash_personal_account: '개인 계정',
+    dash_total_portfolio: '전체 포트폴리오',
     dash_cloud_sync: '클라우드 동기화',
     dash_wallets_active: '개의 지갑 연결됨',
     dash_quick_actions: '빠른 실행',
@@ -140,6 +156,9 @@ export const translations = {
     
     // Schedules
     schedule_create: '정기 결제 예약',
+    schedule_edit: '예약 수정',
+    schedule_modify_desc: '기존에 설정된 자동 거래 일정을 수정합니다',
+    schedule_create_desc: '자동으로 기록될 거래 일정을 설정합니다',
 
 
     
@@ -161,11 +180,23 @@ export const translations = {
     // Reports
     report_liquidity: '총 수입 (유입)',
     report_capital: '총 지출 (유출)',
-    report_retention: '순수익 (잔존)',
-    report_distribution: '지출 분포',
-    report_momentum: '월별 흐름',
+    report_retention: '순이익 (잔여 자산)',
+    report_distribution: '지출 분포도',
+    report_momentum: '월별 자금 흐름',
     report_print: '인쇄 / PDF 저장',
     report_master: '전체 장부 추출',
+
+    // AI
+    ai_header: 'AI 지능형 자산 분석',
+    ai_subtitle: '포트폴리오를 기반으로 한 맞춤형 재무 인사이트와 전략입니다.',
+    ai_summary_title: '포트폴리오 요약',
+    ai_savings_rate: '저축률',
+    ai_safe_zone: '안정권은 20% 이상입니다',
+    ai_top_expense: '최대 지출 항목',
+    ai_budget_label: '지출 비중',
+    ai_recommendations: '추천 실행 조치',
+    ai_health_title: '계좌 건강 상태 체크',
+    ai_health_desc: '유동성 상태가 매우 양호합니다. 모든 지출이 예비비로 충당 가능한 수준입니다.',
     
     // General
     save: '저장',

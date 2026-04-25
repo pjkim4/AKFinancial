@@ -12,7 +12,8 @@ import {
 } from 'lucide-react';
 
 const AIInsights = () => {
-  const { transactions, accounts } = useFinance();
+  const { transactions, accounts, t } = useFinance();
+
 
   const insights = useMemo(() => {
     const totalIncome = transactions.filter(t => t.type === 'Income').reduce((s, t) => s + t.amount, 0);
@@ -77,10 +78,11 @@ const AIInsights = () => {
       <header>
         <div className="flex items-center gap-3 mb-2">
           <BrainCircuit className="text-primary" size={32} />
-          <h2 className="text-3xl font-bold">AK Finance Planning</h2>
+          <h2 className="text-3xl font-bold">{t('ai_header')}</h2>
         </div>
-        <p className="text-text-muted">Personalized insights and strategies for May 2026.</p>
+        <p className="text-text-muted">{t('ai_subtitle')}</p>
       </header>
+
 
       {/* Overview Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -89,26 +91,28 @@ const AIInsights = () => {
             <div className="p-3 bg-primary/20 rounded-xl">
               <Sparkles className="text-primary" />
             </div>
-            <h3 className="font-bold text-lg">Portfolio Summary</h3>
+            <h3 className="font-bold text-lg">{t('ai_summary_title')}</h3>
           </div>
           <div className="space-y-4">
             <div className="flex justify-between items-center bg-white/5 p-4 rounded-xl">
-              <span className="text-text-muted">Total Monthly Income</span>
+              <span className="text-text-muted">{t('report_liquidity')}</span>
               <span className="font-bold text-success">${insights.totalIncome.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
             </div>
             <div className="flex justify-between items-center bg-white/5 p-4 rounded-xl">
-              <span className="text-text-muted">Total Monthly Expenses</span>
-              <span className="font-bold text-danger">${insights.totalExpense.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+              <span className="text-text-muted">{t('report_capital')}</span>
+              <span className="font-bold text-danger">-${insights.totalExpense.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
             </div>
-            <div className="border-t border-white/10 pt-4 flex justify-between items-center">
-              <span className="font-bold">Net Savings</span>
-              <span className="font-bold text-xl">${insights.savings.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+            <div className="flex justify-between items-center bg-white/5 p-4 rounded-xl border-t border-white/10 pt-6">
+              <span className="text-white font-bold">{t('report_retention')}</span>
+              <span className={`text-xl font-black ${insights.savings >= 0 ? 'text-primary' : 'text-danger'}`}>
+                ${insights.savings.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+              </span>
             </div>
           </div>
         </div>
 
         <div className="card glass flex flex-col items-center justify-center text-center">
-          <p className="text-text-muted text-sm mb-2">Savings Rate</p>
+          <p className="text-text-muted text-sm mb-2">{t('ai_savings_rate')}</p>
           <div className="relative w-32 h-32 flex items-center justify-center">
             <svg className="w-full h-full transform -rotate-90">
               <circle cx="64" cy="64" r="58" stroke="rgba(255,255,255,0.05)" strokeWidth="8" fill="transparent" />
@@ -117,11 +121,11 @@ const AIInsights = () => {
             </svg>
             <span className="absolute text-2xl font-black">{isNaN(insights.savingsRate) ? 0 : Math.round(insights.savingsRate)}%</span>
           </div>
-          <p className="text-xs text-text-muted mt-4">Safe zone is 20%+</p>
+          <p className="text-xs text-text-muted mt-4">{t('ai_safe_zone')}</p>
         </div>
 
         <div className="card glass flex flex-col justify-between">
-          <h4 className="text-sm font-bold text-text-muted uppercase tracking-widest">Top Expense</h4>
+          <h4 className="text-sm font-bold text-text-muted uppercase tracking-widest">{t('ai_top_expense')}</h4>
           <div className="mt-4">
              <h3 className="text-2xl font-bold truncate">
                {Object.entries(insights.categories).sort((a,b) => b[1] - a[1])[0]?.[0] || 'N/A'}
@@ -132,8 +136,8 @@ const AIInsights = () => {
           </div>
           <div className="bg-danger/10 text-danger text-[10px] py-1 px-2 rounded-md font-bold mt-4 inline-block w-fit">
             {insights.totalExpense > 0 
-              ? `${Math.round(((Object.entries(insights.categories).sort((a,b) => b[1] - a[1])[0]?.[1] || 0) / insights.totalExpense) * 100)}% OF BUDGET` 
-              : '0% OF BUDGET'}
+              ? `${Math.round(((Object.entries(insights.categories).sort((a,b) => b[1] - a[1])[0]?.[1] || 0) / insights.totalExpense) * 100)}% ${t('ai_budget_label')}` 
+              : `0% ${t('ai_budget_label')}`}
           </div>
         </div>
       </div>
@@ -143,7 +147,7 @@ const AIInsights = () => {
       <div className="space-y-4">
         <h3 className="text-xl font-bold flex items-center gap-2">
           <Lightbulb className="text-warning" size={20} />
-          Recommended Actions
+          {t('ai_recommendations')}
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {insights.strategies.map((s, i) => (
@@ -169,8 +173,8 @@ const AIInsights = () => {
          <div className="flex gap-4">
             <CheckCircle2 className="text-success" />
             <div>
-              <p className="font-bold text-success">Account Health Check</p>
-              <p className="text-sm text-text-muted">All active credit card balances are covered by 3x cash reserves. You are in a strong liquidity position.</p>
+              <p className="font-bold text-success">{t('ai_health_title')}</p>
+              <p className="text-sm text-text-muted">{t('ai_health_desc')}</p>
             </div>
          </div>
       </div>
