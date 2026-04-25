@@ -6,6 +6,8 @@ import SearchableSelect from './ui/SearchableSelect';
 
 const LogEntryModal = ({ isOpen, onClose }) => {
   const { 
+    accounts,
+    addTransaction,
     transferFunds,
     householdMembers,
     t

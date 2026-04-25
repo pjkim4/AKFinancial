@@ -39,8 +39,13 @@ export const translations = {
     wallet_balance: 'Current Balance',
     wallet_initial: 'Initial Balance',
     wallet_create: 'Create Account',
+    wallet_subtitle: 'Liquid Asset Management & Verification',
     show_wallets: 'Show Wallets',
     hide_wallets: 'Hide Wallets',
+    
+    // Schedules
+    schedule_create: 'New Schedule',
+
 
     
     // Settings
@@ -129,8 +134,13 @@ export const translations = {
     wallet_balance: '현재 잔액',
     wallet_initial: '초기 잔고',
     wallet_create: '계좌 생성',
+    wallet_subtitle: '유동 자산 관리 및 데이터 동기화',
     show_wallets: '지갑 보기',
     hide_wallets: '지갑 숨기기',
+    
+    // Schedules
+    schedule_create: '정기 결제 예약',
+
 
     
     // Settings

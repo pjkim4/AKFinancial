@@ -16,7 +16,8 @@ import {
 import SearchableSelect from './ui/SearchableSelect';
 
 const AccountManager = () => {
-  const { transactions, accounts, createAccount, updateAccount, deleteAccount, adjustBalance, transferFunds } = useFinance();
+  const { transactions, accounts, createAccount, updateAccount, deleteAccount, adjustBalance, transferFunds, t } = useFinance();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState('add'); 
   const [selectedAccount, setSelectedAccount] = useState(null);
@@ -186,19 +187,20 @@ const AccountManager = () => {
 
   return (
     <div className="space-y-8 animate-slide-up">
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-3xl font-bold">My Accounts</h2>
-          <p className="text-text-muted">Cloud-synced financial hubs.</p>
-        </div>
-        <button 
-          onClick={() => { setModalType('add'); setError(''); setIsModalOpen(true); }}
-          className="btn btn-primary text-black font-bold"
-        >
-          <Plus size={18} />
-          Create New Account
-        </button>
-      </header>
+        <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div>
+            <h2 className="text-4xl font-black tracking-tight">{t('nav_wallets')}</h2>
+            <p className="text-text-muted font-bold mt-1 uppercase text-[10px] tracking-widest">{t('wallet_subtitle')}</p>
+          </div>
+          <button 
+            onClick={() => { setModalType('add'); setIsModalOpen(true); }}
+            className="btn btn-primary h-14 px-8 text-black font-black uppercase text-xs tracking-widest shadow-xl shadow-primary/20"
+          >
+            <Plus size={20} strokeWidth={3} />
+            {t('wallet_create')}
+          </button>
+        </header>
+
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {accounts.map(acc => (
@@ -230,10 +232,13 @@ const AccountManager = () => {
 
               <div>
                 <p className="text-text-muted text-[10px] uppercase tracking-[0.2em] font-black mb-1">{acc.type}</p>
-                <h3 className="text-lg font-bold mb-2">{acc.name}</h3>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-2xl font-black">${Number(acc.balance).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                </div>
+                  <div className="text-right">
+                    <p className="text-[10px] text-text-muted uppercase font-black tracking-widest mb-1">{t('wallet_balance')}</p>
+                    <p className="text-2xl font-black tracking-tighter">
+                      ${Number(acc.balance).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    </p>
+                  </div>
+
                 {acc.type === 'Debit Card' && acc.parent_account_id && (
                   <p className="text-[9px] text-primary font-black uppercase tracking-widest mt-1">
                     Linked to: {accounts.find(a => a.id === acc.parent_account_id)?.name || 'Source'}
@@ -297,25 +302,58 @@ const AccountManager = () => {
             )}
 
             {modalType === 'add' && (
-              <form onSubmit={handleCreateAccount} className="space-y-6">
-                <div>
-                  <label className="text-[10px] text-text-muted uppercase tracking-widest block mb-2 font-black">Account Name</label>
-                  <input required placeholder="e.g. Chase Checking" value={newAcc.name} onChange={e => setNewAcc({...newAcc, name: e.target.value})} />
+              <div className="flex flex-col h-full">
+                <div className="flex justify-between items-center mb-10">
+                  <h3 className="text-2xl font-black tracking-tight uppercase italic">{t('wallet_create')}</h3>
+                  <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-white/10 rounded-xl transition-all">
+                    <X size={24} />
+                  </button>
                 </div>
-                <div>
-                  <label className="text-[10px] text-text-muted uppercase tracking-widest block mb-2 font-black">Account Type</label>
-                  <select value={newAcc.type} onChange={e => setNewAcc({...newAcc, type: e.target.value})}>
-                    <option value="Checking">Checking</option>
-                    <option value="Savings">Savings</option>
-                    <option value="Investment">Investment</option>
-                    <option value="Credit Card">Credit Card</option>
-                    <option value="Debit Card">Debit Card</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="text-[10px] text-text-muted uppercase tracking-widest block mb-2 font-black">Initial Balance</label>
-                  <input type="number" step="0.01" required value={newAcc.balance} onChange={e => setNewAcc({...newAcc, balance: e.target.value})} />
-                </div>
+
+          
+          <form onSubmit={handleCreateAccount} className="space-y-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="text-[10px] text-text-muted uppercase font-black tracking-widest mb-2 block">{t('wallet_name')}</label>
+                <input 
+                  type="text" 
+                  required 
+                  className="h-14 font-black" 
+                  placeholder="e.g. Bank of America"
+                  value={newAcc.name}
+                  onChange={(e) => setNewAcc({...newAcc, name: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="text-[10px] text-text-muted uppercase font-black tracking-widest mb-2 block">{t('wallet_type')}</label>
+                <select 
+                  className="h-14 font-bold border-white/10"
+                  value={newAcc.type}
+                  onChange={(e) => setNewAcc({...newAcc, type: e.target.value})}
+                >
+                  <option value="Checking">Checking</option>
+                  <option value="Savings">Savings</option>
+                  <option value="Credit Card">Credit Card</option>
+                  <option value="Investment">Investment</option>
+                  <option value="Debit Card">Debit Card (Link to Checking)</option>
+                  <option value="Cash">Cash</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label className="text-[10px] text-text-muted uppercase font-black tracking-widest mb-2 block">{t('wallet_initial')}</label>
+              <input 
+                type="number" 
+                step="0.01" 
+                required 
+                className="h-16 text-2xl font-black" 
+                placeholder="0.00"
+                value={newAcc.balance}
+                onChange={(e) => setNewAcc({...newAcc, balance: e.target.value})}
+              />
+            </div>
+
                 {newAcc.type === 'Debit Card' && (
                   <div className="animate-slide-up">
                     <label className="text-[10px] text-text-muted uppercase tracking-widest block mb-2 font-black text-primary">Connected Account (Funding Source)</label>
@@ -328,10 +366,11 @@ const AccountManager = () => {
                   </div>
                 )}
                 <button type="submit" disabled={loading} className="btn btn-primary w-full h-14 font-black uppercase text-black disabled:opacity-50">
-                  {loading ? <Loader2 className="animate-spin" /> : 'Create Account'}
+                  {loading ? <Loader2 className="animate-spin" /> : t('wallet_create')}
                 </button>
               </form>
             )}
+
 
             {modalType === 'settings' && (
               <div className="space-y-6">
