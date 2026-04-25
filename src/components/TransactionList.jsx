@@ -832,7 +832,9 @@ const TransactionList = () => {
 
               <div className="space-y-6">
                 <div>
-                  <label className="text-[10px] text-text-muted uppercase tracking-[0.2em] font-black block mb-2">{t('wallet')}</label>
+                  <label className="text-[10px] text-text-muted uppercase tracking-[0.2em] font-black block mb-2">
+                    {modalType === 'transfer' ? (editingId ? 'Wallet' : 'From Wallet (Source)') : t('wallet')}
+                  </label>
                   <SearchableSelect options={accounts?.map(acc => ({ id: acc.id, name: acc.name }))} value={formData.account_id} onChange={(val) => setFormData({...formData, account_id: val})} placeholder={t('tx_wallet') + '...'} />
                 </div>
 
@@ -864,7 +866,7 @@ const TransactionList = () => {
 
                 {modalType === 'transfer' && !editingId && (
                   <div>
-                    <label className="text-[10px] text-text-muted uppercase tracking-[0.2em] font-black block mb-2">To Wallet</label>
+                    <label className="text-[10px] text-text-muted uppercase tracking-[0.2em] font-black block mb-2">To Wallet (Destination)</label>
                     <SearchableSelect options={accounts?.map(acc => ({ id: acc.id, name: acc.name }))} value={formData.to_account_id} onChange={(val) => setFormData({...formData, to_account_id: val})} placeholder="Search Target Wallet..." />
                   </div>
                 )}

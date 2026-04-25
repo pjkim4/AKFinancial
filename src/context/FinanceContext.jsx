@@ -701,14 +701,16 @@ export const FinanceProvider = ({ children }) => {
     }
   };
 
-  const transferFunds = async (fromId, toId, amount) => {
-    console.log('[DEBUG] Starting transferFunds:', { fromId, toId, amount });
+  const transferFunds = async (fromId, toId, amount, date = null) => {
+    console.log('[DEBUG] Starting transferFunds:', { fromId, toId, amount, date });
     try {
       const parsedAmount = Number(amount);
       const fromAcc = accounts.find(a => a.id === fromId);
       const toAcc = accounts.find(a => a.id === toId);
 
       if (!fromAcc || !toAcc) throw new Error('Source or destination account not found');
+
+      const transferDate = date || new Date().toISOString().split('T')[0];
 
       console.log('[DEBUG] Recording source deduction...');
       const result1 = await addTransaction({
@@ -717,7 +719,7 @@ export const FinanceProvider = ({ children }) => {
         description: `Transfer to ${toAcc.name}`,
         account_id: fromId,
         category: 'Transfer',
-        date: new Date().toISOString().split('T')[0]
+        date: transferDate
       });
       if (result1.error) throw result1.error;
 
@@ -727,8 +729,8 @@ export const FinanceProvider = ({ children }) => {
         type: 'Income',
         description: `Transfer from ${fromAcc.name}`,
         account_id: toId,
-        category: 'Income',
-        date: new Date().toISOString().split('T')[0]
+        category: 'Transfer',
+        date: transferDate
       });
       if (result2.error) throw result2.error;
 

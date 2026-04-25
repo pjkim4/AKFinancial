@@ -67,6 +67,7 @@ const Dashboard = () => {
   const [qtSource, setQtSource] = useState(accounts[0]?.id || '');
   const [qtTarget, setQtTarget] = useState('');
   const [qtAmount, setQtAmount] = useState('');
+  const [qtDate, setQtDate] = useState(new Date().toISOString().split('T')[0]);
 
   const expenseCategories = [
     { id: 'Food', name: t('cat_food') },
@@ -285,7 +286,7 @@ const Dashboard = () => {
     if (!qtSource || !qtTarget || !qtAmount || loading) return;
     if (qtSource === qtTarget) return;
     setLoading(true);
-    await transferFunds(qtSource, qtTarget, qtAmount);
+    await transferFunds(qtSource, qtTarget, qtAmount, qtDate);
     setQtAmount('');
     setLoading(false);
   };
@@ -672,6 +673,15 @@ const Dashboard = () => {
                       onChange={(e) => setQtAmount(e.target.value)}
                     />
                   </div>
+                  <div className="w-32">
+                     <label className="text-[10px] text-text-muted uppercase tracking-widest block mb-1">Date</label>
+                     <input 
+                      type="date" 
+                      className="font-bold text-xs"
+                      value={qtDate}
+                      onChange={(e) => setQtDate(e.target.value)}
+                    />
+                  </div>
                   <button 
                     onClick={handleQuickTransfer}
                     disabled={loading || !qtTarget || !qtAmount}
@@ -824,7 +834,6 @@ const Dashboard = () => {
                    <input 
                     type="number" 
                     step="0.01" 
-                    autoFocus
                     className="text-3xl font-black text-center bg-transparent border-none focus:ring-0 text-primary"
                     placeholder="0.00"
                     value={logFormData.amount}
@@ -835,6 +844,7 @@ const Dashboard = () => {
                    <label className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-2 block text-center">Date</label>
                    <input 
                     type="date" 
+                    autoFocus
                     className="text-center bg-white/5 border-white/10 rounded-xl"
                     value={logFormData.date}
                     onChange={e => setLogFormData({...logFormData, date: e.target.value})}
