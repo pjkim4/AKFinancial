@@ -425,8 +425,9 @@ const Dashboard = () => {
           </div>
           <div className="space-y-10">
             {accounts.map((acc) => {
-              const shortcuts = frequentPayments.filter(p => p.account_id === acc.id);
+              const shortcuts = frequentPayments.filter(p => p.account_id && String(p.account_id) === String(acc.id));
               if (shortcuts.length === 0) return null;
+
               
               return (
                 <div key={acc.id} className="space-y-4">
@@ -466,14 +467,15 @@ const Dashboard = () => {
             })}
 
             {/* Handle unassigned shortcuts or catch-all if no accounts matched */}
-            {frequentPayments.filter(p => !accounts.some(acc => acc.id === p.account_id)).length > 0 && (
+            {frequentPayments.filter(p => !p.account_id || !accounts.some(acc => String(acc.id) === String(p.account_id))).length > 0 && (
               <div className="space-y-4">
                 <div className="flex items-center gap-3 px-2">
                   <div className="w-1.5 h-4 bg-gray-500 rounded-full"></div>
                   <h5 className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted">Other / Unassigned</h5>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {frequentPayments.filter(p => !accounts.some(acc => acc.id === p.account_id)).map((item) => (
+                  {frequentPayments.filter(p => !p.account_id || !accounts.some(acc => String(acc.id) === String(p.account_id))).map((item) => (
+
                      <div 
                         key={item.id} 
                         className="relative group p-4 bg-white/5 rounded-2xl hover:bg-primary transition-all cursor-pointer border border-white/5 hover:border-transparent flex flex-col items-center text-center overflow-visible"
