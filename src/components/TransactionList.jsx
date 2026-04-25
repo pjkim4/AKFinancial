@@ -105,6 +105,20 @@ const TransactionList = () => {
     transfer: []
   };
 
+  const getMemberId = (tx) => {
+    if (tx.member_id) return tx.member_id;
+    const match = (tx.description || '').match(/^\[(.*?)\]/);
+    if (match) {
+      const name = match[1];
+      return householdMembers.find(m => m.name === name)?.id;
+    }
+    return null;
+  };
+
+  const getCleanDescription = (desc) => {
+    return (desc || '').replace(/^\[.*?\]\s*/, '');
+  };
+
 
   const filteredTransactions = transactions.filter(t => {
     // 1. Text Search Filter
@@ -425,18 +439,19 @@ const TransactionList = () => {
                     <tr 
                       key={t.id} 
                       className={`hover:bg-white/[0.04] transition-colors group cursor-pointer ${selectedIds.includes(t.id) ? 'bg-primary/[0.05]' : ''}`}
-                      style={t.member_id ? { backgroundColor: `${householdMembers.find(m => m.id === t.member_id)?.color}0D` } : {}}
+                      style={getMemberId(t) ? { backgroundColor: `${householdMembers.find(m => m.id === getMemberId(t))?.color}0D` } : {}}
                       onClick={() => toggleSelect(t.id)}
                     >
+
 
                       <td 
                         className="pl-8 py-5 w-10 relative overflow-hidden" 
                         onClick={(e) => e.stopPropagation()}
                       >
-                         {t.member_id && (
+                         {getMemberId(t) && (
                            <div 
                              className="absolute left-0 top-0 bottom-0 w-1.5 opacity-60"
-                             style={{ backgroundColor: householdMembers.find(m => m.id === t.member_id)?.color || '#fff' }}
+                             style={{ backgroundColor: householdMembers.find(m => m.id === getMemberId(t))?.color || '#fff' }}
                            />
                          )}
                          <button 
@@ -447,6 +462,7 @@ const TransactionList = () => {
                          </button>
                       </td>
 
+
                       <td className="px-8 py-5 text-xs font-black text-text-muted">{t.date}</td>
                       <td className="px-8 py-5">
                         <div className="flex items-center gap-4">
@@ -455,15 +471,16 @@ const TransactionList = () => {
                           </div>
                           <div>
                             <div className="flex items-center gap-2 mb-1">
-                              <p className="font-black text-[15px] tracking-tight text-white leading-none">{t.description}</p>
-                              {t.member_id && (
+                              <p className="font-black text-[15px] tracking-tight text-white leading-none">{getCleanDescription(t.description)}</p>
+                              {getMemberId(t) && (
                                 <div 
                                   className="px-2 py-0.5 rounded-md text-[9px] font-black text-black shrink-0 animate-scale-in"
-                                  style={{ backgroundColor: householdMembers.find(m => m.id === t.member_id)?.color || '#fff' }}
+                                  style={{ backgroundColor: householdMembers.find(m => m.id === getMemberId(t))?.color || '#fff' }}
                                 >
-                                  {householdMembers.find(m => m.id === t.member_id)?.name.toUpperCase()}
+                                  {householdMembers.find(m => m.id === getMemberId(t))?.name.toUpperCase()}
                                 </div>
                               )}
+
 
                             </div>
                             <p className="text-[10px] text-primary uppercase font-black tracking-widest">{t.category}</p>
@@ -509,16 +526,16 @@ const TransactionList = () => {
                 <div 
                  key={t.id} 
                  className={`card p-5 border-white/5 bg-card active:scale-[0.98] transition-transform relative overflow-hidden ${selectedIds.includes(t.id) ? 'border-primary/50' : ''}`}
-                 style={t.member_id ? { backgroundColor: `${householdMembers.find(m => m.id === t.member_id)?.color}0D` } : {}}
+                 style={getMemberId(t) ? { backgroundColor: `${householdMembers.find(m => m.id === getMemberId(t))?.color}0D` } : {}}
                  onClick={() => toggleSelect(t.id)}
                 >
-
-                  {t.member_id && (
+                  {getMemberId(t) && (
                     <div 
                       className="absolute left-0 top-0 bottom-0 w-1.5 opacity-60"
-                      style={{ backgroundColor: householdMembers.find(m => m.id === t.member_id)?.color || '#fff' }}
+                      style={{ backgroundColor: householdMembers.find(m => m.id === getMemberId(t))?.color || '#fff' }}
                     />
                   )}
+
 
                  <div className="flex justify-between items-start mb-4">
                     <div className="flex gap-3">
@@ -527,17 +544,17 @@ const TransactionList = () => {
                       </div>
                       <div>
                         <div className="flex items-center gap-2 mb-1">
-                          <p className="font-black text-sm text-white">{t.description}</p>
-                          {t.member_id && (
+                          <p className="font-black text-sm text-white">{getCleanDescription(t.description)}</p>
+                          {getMemberId(t) && (
                             <div 
                               className="px-1.5 py-0.5 rounded-md text-[8px] font-black text-black shrink-0 animate-scale-in"
-                              style={{ backgroundColor: householdMembers.find(m => m.id === t.member_id)?.color || '#fff' }}
+                              style={{ backgroundColor: householdMembers.find(m => m.id === getMemberId(t))?.color || '#fff' }}
                             >
-                              {householdMembers.find(m => m.id === t.member_id)?.name.toUpperCase()}
+                              {householdMembers.find(m => m.id === getMemberId(t))?.name.toUpperCase()}
                             </div>
                           )}
-
                         </div>
+
                         <p className="text-[10px] text-text-muted font-bold uppercase tracking-widest">{t.date}</p>
                       </div>
                     </div>
