@@ -96,6 +96,38 @@ const TransactionRow = ({ transaction, accounts, householdMembers, preferences, 
 
 
 const TransactionList = () => {
+  // Utility Functions (Hoisted)
+  function getToday() {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  function getLastMonthDate() {
+    const d = new Date();
+    d.setMonth(d.getMonth() - 1);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  function getMemberId(tx) {
+    if (tx.member_id) return tx.member_id;
+    const match = (tx.description || '').match(/^\[(.*?)\]/);
+    if (match) {
+      const name = match[1];
+      return householdMembers.find(m => m.name === name)?.id;
+    }
+    return null;
+  }
+
+  function getCleanDescription(desc) {
+    return (desc || '').replace(/^\[.*?\]\s*/, '');
+  }
+
   const { 
     transactions, 
     accounts, 
@@ -126,24 +158,6 @@ const TransactionList = () => {
   
   // Bulk Selection State
   const [selectedIds, setSelectedIds] = useState([]);
-  
-  // Date Filtering State Helpers
-  const getToday = () => {
-    const d = new Date();
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
-
-  const getLastMonthDate = () => {
-    const d = new Date();
-    d.setMonth(d.getMonth() - 1);
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
 
   const [startDate, setStartDate] = useState(getLastMonthDate());
   const [endDate, setEndDate] = useState(getToday());
@@ -210,19 +224,7 @@ const TransactionList = () => {
     setFormData(prev => ({ ...prev, category: val }));
   };
 
-  const getMemberId = (tx) => {
-    if (tx.member_id) return tx.member_id;
-    const match = (tx.description || '').match(/^\[(.*?)\]/);
-    if (match) {
-      const name = match[1];
-      return householdMembers.find(m => m.name === name)?.id;
-    }
-    return null;
-  };
 
-  const getCleanDescription = (desc) => {
-    return (desc || '').replace(/^\[.*?\]\s*/, '');
-  };
 
 
   const filteredTransactions = transactions.filter(t => {

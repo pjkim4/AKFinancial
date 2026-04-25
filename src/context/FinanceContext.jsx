@@ -1122,7 +1122,7 @@ export const FinanceProvider = ({ children }) => {
   };
 
 
-  const getNextOccurrence = (date, frequency) => {
+  function getNextOccurrence(date, frequency) {
     const next = new Date(date);
     const dayOfMonth = date.getDate();
     
@@ -1162,7 +1162,7 @@ export const FinanceProvider = ({ children }) => {
         if (next.getDate() < dayOfMonth) next.setDate(0);
     }
     return next;
-  };
+  }
 
   const calculateNextPaymentDate = (schedule) => {
     if (!schedule || schedule.status !== 'Active') return null;
