@@ -139,8 +139,8 @@ const AIInsights = () => {
       {/* Overview Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div className="card glass col-span-1 lg:col-span-2 p-8 border-white/5 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 p-8 opacity-5">
-             <Sparkles size={120} />
+          <div className="absolute -top-6 -left-6 pointer-events-none opacity-[0.03] transform -rotate-12">
+             <Sparkles size={160} />
           </div>
           <div className="flex items-center gap-4 mb-8">
             <div className="p-3 bg-primary/20 rounded-xl">
