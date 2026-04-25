@@ -407,7 +407,7 @@ const TransactionList = () => {
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
-              <div className="lg:col-span-3">
+              <div className="lg:col-span-6 grid grid-cols-2 gap-3">
                 <div className="flex items-center gap-2 bg-white/5 border border-white/20 p-2 rounded-xl h-14 hover:border-primary/50 transition-all">
                   <span className="text-[10px] font-black uppercase text-white px-2">From</span>
                   <input 
@@ -417,8 +417,6 @@ const TransactionList = () => {
                     onChange={(e) => setStartDate(e.target.value)}
                   />
                 </div>
-              </div>
-              <div className="lg:col-span-3">
                 <div className="flex items-center gap-2 bg-white/5 border border-white/20 p-2 rounded-xl h-14 hover:border-primary/50 transition-all">
                   <span className="text-[10px] font-black uppercase text-white px-2">To</span>
                   <input 
@@ -429,6 +427,7 @@ const TransactionList = () => {
                   />
                 </div>
               </div>
+
            </div>
 
            {/* Row 2: Select Filters */}
