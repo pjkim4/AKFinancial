@@ -411,20 +411,27 @@ const Dashboard = () => {
               ))}
             </div>
 
-            <div className="flex items-center gap-2">
-              <Filter size={16} className="text-primary hidden sm:block" />
-              <select 
-                value={filterAccount} 
-                onChange={(e) => setFilterAccount(e.target.value)}
-                className="w-40 md:w-64 h-12 text-sm font-bold"
-              >
-                <option value="all">Total Portfolio</option>
-                {accounts.map(acc => (
-                  <option key={acc.id} value={acc.id}>{acc.name}</option>
-                ))}
-              </select>
-            </div>
           </div>
+        </div>
+      </div>
+
+      {/* Account Switcher Row */}
+      <div className="mb-8 animate-slide-up" style={{ animationDelay: '100ms' }}>
+        <div className="flex items-center gap-3 bg-white/5 p-2 rounded-2xl border border-white/10 w-fit max-w-full group hover:border-primary/30 transition-all">
+          <div className="flex items-center gap-2 pl-3 pr-2 border-r border-white/10">
+            <Filter size={16} className="text-primary" />
+            <span className="text-[10px] font-black uppercase tracking-widest text-text-muted hidden sm:block">Portfolio filter</span>
+          </div>
+          <select 
+            value={filterAccount} 
+            onChange={(e) => setFilterAccount(e.target.value)}
+            className="bg-transparent border-none focus:ring-0 text-white font-black uppercase italic tracking-tight text-sm h-10 px-4 cursor-pointer hover:text-primary transition-colors min-w-[200px]"
+          >
+            <option value="all" className="bg-[#181818] text-white">Total Portfolio</option>
+            {accounts.map(acc => (
+              <option key={acc.id} value={acc.id} className="bg-[#181818] text-white">{acc.name}</option>
+            ))}
+          </select>
         </div>
       </div>
 
