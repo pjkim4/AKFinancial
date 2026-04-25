@@ -315,7 +315,7 @@ const AppContent = () => {
         <div className="flex items-center gap-2">
           <button 
             onClick={() => setLanguage(language === 'en' ? 'ko' : 'en')}
-            className="w-10 h-10 flex items-center justify-center bg-white/10 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-white/20 transition-all border border-white/10"
+            className="w-12 h-12 flex items-center justify-center bg-white/10 rounded-xl text-[12px] font-black uppercase tracking-widest hover:bg-white/20 transition-all border border-white/10"
           >
             {language === 'en' ? 'KO' : 'EN'}
           </button>
@@ -328,25 +328,28 @@ const AppContent = () => {
 
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex w-64 glass border-r border-white/10 h-screen sticky top-0 z-20 flex-col">
-        <div className="p-6 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Logo size={24} />
-            <div className="flex flex-col">
-              <span className="font-bold text-xl tracking-tight leading-none italic">AK Finance <span className="text-primary">Master</span></span>
-
-              <span className="text-[10px] text-primary uppercase tracking-[0.2em] font-black mt-1">
-                {profile?.username || user?.email?.split('@')[0]}
-              </span>
+        <div className="p-6 flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Logo size={32} />
+              <div className="flex flex-col">
+                <span className="font-bold text-2xl tracking-tight leading-none italic">AK Finance <span className="text-primary">Master</span></span>
+                <span className="text-[10px] text-primary uppercase tracking-[0.2em] font-black mt-1">
+                  {profile?.username || user?.email?.split('@')[0]}
+                </span>
+              </div>
             </div>
           </div>
+          
           <button 
             onClick={() => setLanguage(language === 'en' ? 'ko' : 'en')}
-            className="w-10 h-10 flex items-center justify-center bg-white/5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all border border-white/5"
+            className="w-full h-16 flex items-center justify-center bg-primary text-black rounded-xl text-sm font-black uppercase tracking-widest hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all"
             title={language === 'en' ? 'Switch to Korean' : 'Switch to English'}
           >
-            {language === 'en' ? 'KO' : 'EN'}
+            {language === 'en' ? 'Switch to Korean (한국어)' : 'English (EN) 로 전환'}
           </button>
         </div>
+
 
 
         {availableHouseholds.length > 1 && (
@@ -424,7 +427,7 @@ const AppContent = () => {
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${activeTab === 'settings' ? 'bg-primary text-black shadow-lg shadow-primary/20' : 'hover:bg-white/5 text-text-muted hover:text-white'}`}
           >
             <Settings size={20} />
-            Settings
+            {t('nav_setup')}
           </button>
           <button 
             onClick={logout}

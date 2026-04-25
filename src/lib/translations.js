@@ -49,6 +49,14 @@ export const translations = {
     schedule_edit: 'Edit Schedule',
     schedule_modify_desc: 'Modify your existing automated schedule',
     schedule_create_desc: 'Set up an automated transaction schedule',
+    schedule_subtitle: 'Manage your automated schedules and subscriptions',
+    
+    // Roles
+    role_parent: 'Parent',
+    role_spouse: 'Spouse',
+    role_child: 'Child',
+    role_roommate: 'Roommate',
+
 
     
     // Settings
@@ -190,6 +198,14 @@ export const translations = {
     schedule_edit: '예약 수정',
     schedule_modify_desc: '기존에 설정된 자동 거래 일정을 수정합니다',
     schedule_create_desc: '자동으로 기록될 거래 일정을 설정합니다',
+    schedule_subtitle: '자동 거래 일정 및 정기 구독을 관리합니다',
+    
+    // Roles
+    role_parent: '부모',
+    role_spouse: '배우자',
+    role_child: '자녀',
+    role_roommate: '동거인',
+
 
 
     
