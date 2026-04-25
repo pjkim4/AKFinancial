@@ -212,7 +212,9 @@ const Dashboard = () => {
     if (accounts.length === 0 || loading) return;
     
     let finalAccountId = item.account_id;
-    if (!finalAccountId) {
+    const accountExists = accounts.some(a => String(a.id) === String(finalAccountId));
+
+    if (!finalAccountId || !accountExists) {
       setPendingShortcut(item);
       setIsAccountPickerOpen(true);
       return;
@@ -272,7 +274,6 @@ const Dashboard = () => {
     setIsAccountPickerOpen(false);
     if (pendingShortcut) {
       handleFrequentPayment({ ...pendingShortcut, account_id: accId });
-      setPendingShortcut(null);
     }
   };
 
