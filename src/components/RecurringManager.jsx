@@ -367,14 +367,16 @@ const RecurringManager = () => {
 
               <div className="space-y-2">
                 <label className="text-xs font-black uppercase tracking-widest text-text-muted">Wallet / Account</label>
-                <select
-                  className="w-full h-12 px-4 bg-white/5 border border-white/10 rounded-xl focus:outline-none focus:border-primary transition-all text-white appearance-none cursor-pointer"
+                <SearchableSelect 
+                  options={accounts.map(acc => ({ 
+                    id: acc.id, 
+                    name: `${acc.name} ${preferences.hideBalances ? '(••••)' : `($${acc.balance})`}` 
+                  }))}
                   value={newSchedule.account_id}
-                  onChange={(e) => setNewSchedule({...newSchedule, account_id: e.target.value})}
-                  required
-                >
-                  {accounts.map(acc => <option key={acc.id} value={acc.id} className="bg-[#181818]">{acc.name} (${acc.balance})</option>)}
-                </select>
+                  onChange={(val) => setNewSchedule({...newSchedule, account_id: val})}
+                  placeholder="Select Wallet"
+                />
+
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -761,7 +761,10 @@ const Dashboard = () => {
                       </div>
                       <span className="font-black">{acc.name}</span>
                    </div>
-                   <span className="font-bold opacity-60">${acc.balance}</span>
+                    <span className="font-bold opacity-60">
+                      {preferences.hideBalances ? '••••' : `$${acc.balance}`}
+                    </span>
+
                  </button>
                ))}
              </div>
