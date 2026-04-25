@@ -481,14 +481,16 @@ const Dashboard = () => {
 
               
               return (
-                <div key={acc.id} className="p-6 border-2 border-white/30 rounded-[2rem] bg-black/40 shadow-2xl space-y-5">
+                <div key={acc.id} className="p-6 border-2 border-primary/40 rounded-[2rem] bg-black/40 shadow-2xl space-y-5">
+
 
 
 
 
                   <div className="flex items-center gap-3 px-2">
                     <div className="w-1.5 h-4 bg-primary rounded-full"></div>
-                    <h5 className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted">{acc.name}</h5>
+                    <h5 className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">{acc.name} (GROUP)</h5>
+
                   </div>
                   <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-9 gap-2">
 
@@ -527,7 +529,8 @@ const Dashboard = () => {
 
             {/* Handle unassigned shortcuts or catch-all if no accounts matched */}
             {frequentPayments.filter(p => !p.account_id || !accounts.some(acc => String(acc.id) === String(p.account_id))).length > 0 && (
-              <div className="p-6 border-2 border-white/30 rounded-[2rem] bg-black/40 shadow-2xl space-y-5">
+              <div className="p-6 border-2 border-primary/40 rounded-[2rem] bg-black/40 shadow-2xl space-y-5">
+
 
 
 
