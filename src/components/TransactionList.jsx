@@ -424,9 +424,11 @@ const TransactionList = () => {
                   {filteredTransactions.map(t => (
                     <tr 
                       key={t.id} 
-                      className={`hover:bg-white/[0.02] transition-colors group cursor-pointer ${selectedIds.includes(t.id) ? 'bg-primary/[0.05]' : ''}`}
+                      className={`hover:bg-white/[0.04] transition-colors group cursor-pointer ${selectedIds.includes(t.id) ? 'bg-primary/[0.05]' : ''}`}
+                      style={t.member_id ? { backgroundColor: `${householdMembers.find(m => m.id === t.member_id)?.color}0D` } : {}}
                       onClick={() => toggleSelect(t.id)}
                     >
+
                       <td 
                         className="pl-8 py-5 w-10 relative overflow-hidden" 
                         onClick={(e) => e.stopPropagation()}
@@ -507,8 +509,10 @@ const TransactionList = () => {
                 <div 
                  key={t.id} 
                  className={`card p-5 border-white/5 bg-card active:scale-[0.98] transition-transform relative overflow-hidden ${selectedIds.includes(t.id) ? 'border-primary/50' : ''}`}
+                 style={t.member_id ? { backgroundColor: `${householdMembers.find(m => m.id === t.member_id)?.color}0D` } : {}}
                  onClick={() => toggleSelect(t.id)}
                 >
+
                   {t.member_id && (
                     <div 
                       className="absolute left-0 top-0 bottom-0 w-1.5 opacity-60"
