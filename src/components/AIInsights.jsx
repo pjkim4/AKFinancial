@@ -19,36 +19,59 @@ import {
 const AIInsights = () => {
   const { transactions, accounts, t } = useFinance();
   const [showDetailed, setShowDetailed] = useState(false);
+  const [period, setPeriod] = useState('All');
 
   const insights = useMemo(() => {
-    const totalIncome = transactions.filter(tx => tx.type === 'Income').reduce((s, tx) => s + Number(tx.amount), 0);
-    const totalExpense = transactions.filter(tx => tx.type === 'Expense' && tx.category !== 'Transfer').reduce((s, tx) => s + Number(tx.amount), 0);
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    const filteredTxs = transactions.filter(tx => {
+      const txDate = new Date(tx.date);
+      if (period === '1M') {
+        return txDate.getMonth() === currentMonth && txDate.getFullYear() === currentYear;
+      }
+      if (period === '3M') {
+        const ninetyDaysAgo = new Date();
+        ninetyDaysAgo.setDate(now.getDate() - 90);
+        return txDate >= ninetyDaysAgo;
+      }
+      if (period === 'YTD') {
+        return txDate.getFullYear() === currentYear;
+      }
+      return true; // 'All'
+    });
+
+    const totalIncome = filteredTxs.filter(tx => tx.type === 'Income').reduce((s, tx) => s + Number(tx.amount), 0);
+    const totalExpense = filteredTxs.filter(tx => tx.type === 'Expense' && tx.category !== 'Transfer').reduce((s, tx) => s + Number(tx.amount), 0);
     const totalBalance = accounts.reduce((s, acc) => s + Number(acc.balance), 0);
     
     const savings = totalIncome - totalExpense;
     const savingsRate = totalIncome > 0 ? (savings / totalIncome) * 100 : 0;
 
     const categories = {};
-    transactions.filter(tx => tx.type === 'Expense' && tx.category !== 'Transfer').forEach(tx => {
+    filteredTxs.filter(tx => tx.type === 'Expense' && tx.category !== 'Transfer').forEach(tx => {
       categories[tx.category] = (categories[tx.category] || 0) + Number(tx.amount);
     });
 
     // Detailed Metrics Logic
-    const now = new Date();
-    const currentMonth = now.getMonth();
-    const currentYear = now.getFullYear();
-    
-    const monthTransactions = transactions.filter(tx => {
-      const d = new Date(tx.date);
-      return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
-    });
-
-    const monthExpenses = monthTransactions
+    const monthExpenses = filteredTxs
       .filter(tx => tx.type === 'Expense' && tx.category !== 'Transfer')
       .reduce((s, tx) => s + Number(tx.amount), 0);
 
-    const daysPassed = now.getDate();
-    const dailyVelocity = monthExpenses / daysPassed;
+    // Calculate effective days for velocity
+    let effectiveDays = now.getDate();
+    if (period === '3M') effectiveDays = 90;
+    if (period === 'YTD') {
+      const startOfYear = new Date(currentYear, 0, 1);
+      effectiveDays = Math.ceil((now - startOfYear) / (1000 * 60 * 60 * 24));
+    }
+    if (period === 'All' && transactions.length > 0) {
+      const oldest = new Date(Math.min(...transactions.map(t => new Date(t.date))));
+      effectiveDays = Math.max(1, Math.ceil((now - oldest) / (1000 * 60 * 60 * 24)));
+    }
+
+    const dailyVelocity = monthExpenses / Math.max(1, effectiveDays);
     
     // Runway (Days until $0 at current rate)
     const runwayDays = dailyVelocity > 0 ? Math.round(totalBalance / dailyVelocity) : 999;
@@ -110,7 +133,7 @@ const AIInsights = () => {
       runwayDays,
       healthScore: score
     };
-  }, [transactions, accounts, t]);
+  }, [transactions, accounts, t, period]);
 
   const topCategory = useMemo(() => {
     return Object.entries(insights.categories).sort((a,b) => b[1] - a[1])[0] || ['N/A', 0];
@@ -126,13 +149,26 @@ const AIInsights = () => {
           </div>
           <p className="text-text-muted text-sm font-bold uppercase tracking-widest">{t('ai_subtitle')}</p>
         </div>
-        <button 
-          onClick={() => setShowDetailed(!showDetailed)}
-          className={`btn flex items-center gap-2 h-12 px-6 rounded-2xl font-black uppercase text-[10px] tracking-widest transition-all ${showDetailed ? 'bg-primary text-black shadow-xl shadow-primary/20' : 'bg-white/5 text-text-muted hover:bg-white/10'}`}
-        >
-          {showDetailed ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-          {showDetailed ? 'Close Detailed Audit' : 'Deep Dive Analysis'}
-        </button>
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="flex bg-white/5 p-1 rounded-xl border border-white/10">
+            {['1M', '3M', 'YTD', 'All'].map(p => (
+              <button 
+                key={p}
+                onClick={() => setPeriod(p)}
+                className={`px-4 py-2 text-[10px] font-black uppercase rounded-lg transition-all ${period === p ? 'bg-primary text-black shadow-lg shadow-primary/20' : 'text-text-muted hover:text-white'}`}
+              >
+                {p}
+              </button>
+            ))}
+          </div>
+          <button 
+            onClick={() => setShowDetailed(!showDetailed)}
+            className={`btn flex items-center gap-2 h-12 px-6 rounded-2xl font-black uppercase text-[10px] tracking-widest transition-all ${showDetailed ? 'bg-primary text-black shadow-xl shadow-primary/20' : 'bg-white/5 text-text-muted hover:bg-white/10'}`}
+          >
+            {showDetailed ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+            {showDetailed ? 'Close Detailed Audit' : 'Deep Dive Analysis'}
+          </button>
+        </div>
       </header>
 
 
@@ -143,7 +179,7 @@ const AIInsights = () => {
             <div className="p-3 bg-primary/20 rounded-xl">
               <Sparkles className="text-primary" size={24} />
             </div>
-            <h3 className="font-black text-xl uppercase italic tracking-tight">{t('ai_summary_title')}</h3>
+            <h3 className="font-black text-xl uppercase italic tracking-tight">{t('ai_summary_title')} ({period})</h3>
           </div>
           <div className="space-y-4">
             <div className="flex justify-between items-center bg-white/5 p-5 rounded-2xl border border-white/5">
