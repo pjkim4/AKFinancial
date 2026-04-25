@@ -314,28 +314,26 @@ export const FinanceProvider = ({ children }) => {
       
       if (error) throw error;
       
-      // Parse fallbacks (TYPE:Income|CAT:Salary or ACC:id|CAT:Food)
+      // Parse fallbacks (TYPE:Income|ACC:id|CAT:Salary or ACC:id|CAT:Food)
       const parsedData = (data || []).map(item => {
         let { category, type, account_id } = item;
         
-        // If type is missing in DB but encoded in category
-        if (!type && category?.startsWith('TYPE:')) {
+        // If the category contains encoded metadata
+        if (category?.includes('|') && (category.startsWith('TYPE:') || category.includes('ACC:'))) {
           const parts = category.split('|');
-          type = parts[0].replace('TYPE:', '');
-          category = parts[1]?.replace('CAT:', '') || category;
-        }
-        
-        // If account_id is missing in DB but encoded in category
-        if (!account_id && category?.includes('ACC:')) {
-          const parts = category.split('|');
+          
+          const typePart = parts.find(p => p.startsWith('TYPE:'));
           const accPart = parts.find(p => p.startsWith('ACC:'));
           const catPart = parts.find(p => p.startsWith('CAT:'));
-          if (accPart) account_id = accPart.replace('ACC:', '');
+
+          if (typePart && !type) type = typePart.replace('TYPE:', '');
+          if (accPart && !account_id) account_id = accPart.replace('ACC:', '');
           if (catPart) category = catPart.replace('CAT:', '');
         }
 
         return { ...item, type: type || 'Expense', account_id, category };
       });
+
 
       setFrequentPayments(parsedData);
     } catch (err) {
