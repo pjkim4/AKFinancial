@@ -333,7 +333,7 @@ const Dashboard = () => {
               <ArrowDownRight className="text-danger" size={28} />
             </div>
             <div>
-              <p className="text-text-muted text-[10px] uppercase tracking-[0.2em] font-black mb-1">Total Expenses</p>
+              <p className="text-text-muted text-[10px] uppercase tracking-[0.2em] font-black mb-1">{t('dash_monthly_expense')}</p>
               <h3 className="text-3xl font-black text-white">
                 {preferences.hideBalances ? '••••••' : `-$${Number(stats.expenses).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
               </h3>
