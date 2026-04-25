@@ -71,10 +71,17 @@ const LogEntryModal = ({ isOpen, onClose }) => {
   };
 
   const allCategories = {
-    income: [...categories.income, ...(preferences.customCategories?.income || [])],
-    expense: [...categories.expense, ...(preferences.customCategories?.expense || [])],
+    income: [
+      ...categories.income, 
+      ...(preferences.customCategories?.income || []).map(c => ({ ...c, isCustom: true }))
+    ],
+    expense: [
+      ...categories.expense, 
+      ...(preferences.customCategories?.expense || []).map(c => ({ ...c, isCustom: true }))
+    ],
     transfer: []
   };
+
 
   const handleCategoryChange = (val) => {
     // Check if this is a NEW category (not in allCategories)
