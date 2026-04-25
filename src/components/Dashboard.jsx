@@ -488,7 +488,24 @@ const Dashboard = () => {
                           <p className="text-[10px] font-bold text-text-muted group-hover:text-black/60 mt-1">
                             {item.type === 'Income' ? '+' : ''}${item.amount || '???'}
                           </p>
+                          {isShortcutsEditMode && (
+                             <button 
+                               onClick={(e) => { 
+                                 e.stopPropagation(); 
+                                 if (accounts[0]) {
+                                   const { id, created_at, ...cleanItem } = item;
+                                   deleteFrequentPayment(item.id);
+                                   addFrequentPayment({ ...cleanItem, account_id: accounts[0].id });
+                                 }
+                               }}
+
+                               className="mt-2 text-[8px] font-black uppercase tracking-widest text-primary hover:underline"
+                             >
+                               Link to {accounts[0]?.name || 'Wallet'}
+                             </button>
+                          )}
                         </div>
+
                         {isShortcutsEditMode && (
                           <button 
                             onClick={(e) => { e.stopPropagation(); deleteFrequentPayment(item.id); }}
