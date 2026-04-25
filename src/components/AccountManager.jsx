@@ -2,21 +2,28 @@ import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useFinance } from '../context/FinanceContext';
 import { 
-  Plus, 
-  CreditCard, 
-  Wallet, 
-  Settings2, 
-  X,
-  ShieldCheck,
-  ArrowRightLeft,
-  AlertCircle,
   Loader2,
-  ChevronDown
+  ChevronDown,
+  Eye,
+  EyeOff
 } from 'lucide-react';
+
 import SearchableSelect from './ui/SearchableSelect';
 
 const AccountManager = () => {
-  const { transactions, accounts, createAccount, updateAccount, deleteAccount, adjustBalance, transferFunds, t } = useFinance();
+  const { 
+    transactions, 
+    accounts, 
+    createAccount, 
+    updateAccount, 
+    deleteAccount, 
+    adjustBalance, 
+    transferFunds, 
+    preferences,
+    toggleBalances,
+    t 
+  } = useFinance();
+
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState('add'); 
@@ -192,13 +199,23 @@ const AccountManager = () => {
             <h2 className="text-4xl font-black tracking-tight">{t('nav_wallets')}</h2>
             <p className="text-text-muted font-bold mt-1 uppercase text-[10px] tracking-widest">{t('wallet_subtitle')}</p>
           </div>
-          <button 
-            onClick={() => { setModalType('add'); setIsModalOpen(true); }}
-            className="btn btn-primary h-14 px-8 text-black font-black uppercase text-xs tracking-widest shadow-xl shadow-primary/20"
-          >
-            <Plus size={20} strokeWidth={3} />
-            {t('wallet_create')}
-          </button>
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={toggleBalances}
+              className="btn btn-secondary w-14 h-14 flex items-center justify-center border-white/10"
+              title={preferences.hideBalances ? t('show_wallets') : t('hide_wallets')}
+            >
+              {preferences.hideBalances ? <Eye size={20} /> : <EyeOff size={20} />}
+            </button>
+            <button 
+              onClick={() => { setModalType('add'); setIsModalOpen(true); }}
+              className="btn btn-primary h-14 px-8 text-black font-black uppercase text-xs tracking-widest shadow-xl shadow-primary/20"
+            >
+              <Plus size={20} strokeWidth={3} />
+              {t('wallet_create')}
+            </button>
+          </div>
+
         </header>
 
 
@@ -235,8 +252,9 @@ const AccountManager = () => {
                   <div className="text-right">
                     <p className="text-[10px] text-text-muted uppercase font-black tracking-widest mb-1">{t('wallet_balance')}</p>
                     <p className="text-2xl font-black tracking-tighter">
-                      ${Number(acc.balance).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                      {preferences.hideBalances ? '••••' : `$${Number(acc.balance).toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
                     </p>
+
                   </div>
 
                 {acc.type === 'Debit Card' && acc.parent_account_id && (
@@ -359,8 +377,11 @@ const AccountManager = () => {
                     <select required value={newAcc.parent_account_id} onChange={e => setNewAcc({...newAcc, parent_account_id: e.target.value})}>
                       <option value="">Select Account</option>
                       {accounts.filter(a => a.type !== 'Credit Card' && a.type !== 'Debit Card').map(acc => (
-                        <option key={acc.id} value={acc.id}>{acc.name} (${Number(acc.balance).toLocaleString()})</option>
+                        <option key={acc.id} value={acc.id}>
+                          {acc.name} ({preferences.hideBalances ? '••••' : `$${Number(acc.balance).toLocaleString()}`})
+                        </option>
                       ))}
+
                     </select>
                   </div>
                 )}
@@ -469,9 +490,10 @@ const AccountManager = () => {
                         </div>
                         <div className="text-[10px] text-text font-mono whitespace-pre opacity-80 overflow-x-auto max-h-32">
                           {transactions.filter(t => t.account_id === selectedAccount.id).length > 0 
-                            ? `Date,Description,Amount\n` + transactions.filter(t => t.account_id === selectedAccount.id).slice(0, 5).map(t => `${t.date},${t.description.substring(0,15)},${t.amount}`).join('\n') + '\n...'
+                            ? `Date,Description,Amount\n` + transactions.filter(t => t.account_id === selectedAccount.id).slice(0, 5).map(t => `${t.date},${t.description.substring(0,15)},${preferences.hideBalances ? '••••' : t.amount}`).join('\n') + '\n...'
                             : 'No transaction history found.'}
                         </div>
+
                       </div>
 
                       <label className="flex items-center gap-3 p-4 bg-white/5 rounded-xl cursor-pointer hover:bg-white/10 transition-all border border-white/5">
@@ -494,10 +516,12 @@ const AccountManager = () => {
                         {Number(selectedAccount.balance) !== 0 && (
                           <div className="space-y-4 animate-scale-in">
                             <p className="text-xs font-bold text-center text-warning p-4 bg-warning/10 rounded-xl border border-warning/20">
-                              Step 2: Account has a balance of ${selectedAccount.balance}. Select where to move the funds:
+                              Step 2: Account has a balance of {preferences.hideBalances ? '••••' : `$${selectedAccount.balance}`}. Select where to move the funds:
                             </p>
+
                             <SearchableSelect 
-                              options={accounts.filter(a => a.id !== selectedAccount.id).map(a => ({ id: a.id, name: `${a.name} ($${Number(a.balance).toLocaleString()})` }))}
+                              options={accounts.filter(a => a.id !== selectedAccount.id).map(a => ({ id: a.id, name: `${a.name} (${preferences.hideBalances ? '••••' : `$${Number(a.balance).toLocaleString()}`})` }))}
+
                               value={settlementTargetId}
                               onChange={(val) => setSettlementTargetId(val)}
                               placeholder="Search Destination Wallet..."
