@@ -149,13 +149,13 @@ const AIInsights = () => {
           </div>
           <p className="text-text-muted text-sm font-bold uppercase tracking-widest">{t('ai_subtitle')}</p>
         </div>
-        <div className="flex flex-wrap items-center gap-4">
-          <div className="flex bg-white/5 p-1 rounded-xl border border-white/10">
+        <div className="flex flex-wrap items-center gap-3 md:gap-4 w-full md:w-auto justify-start md:justify-end">
+          <div className="flex bg-white/5 p-1 rounded-xl border border-white/10 shrink-0">
             {['1M', '3M', 'YTD', 'All'].map(p => (
               <button 
                 key={p}
                 onClick={() => setPeriod(p)}
-                className={`px-4 py-2 text-[10px] font-black uppercase rounded-lg transition-all ${period === p ? 'bg-primary text-black shadow-lg shadow-primary/20' : 'text-text-muted hover:text-white'}`}
+                className={`px-2 sm:px-4 py-2 text-[10px] font-black uppercase rounded-lg transition-all ${period === p ? 'bg-primary text-black shadow-lg shadow-primary/20' : 'text-text-muted hover:text-white'}`}
               >
                 {p}
               </button>
@@ -163,7 +163,7 @@ const AIInsights = () => {
           </div>
           <button 
             onClick={() => setShowDetailed(!showDetailed)}
-            className={`btn flex items-center gap-2 h-12 px-6 rounded-2xl font-black uppercase text-[10px] tracking-widest transition-all ${showDetailed ? 'bg-primary text-black shadow-xl shadow-primary/20' : 'bg-white/5 text-text-muted hover:bg-white/10'}`}
+            className={`btn flex items-center gap-2 h-12 px-6 rounded-2xl font-black uppercase text-[10px] tracking-widest transition-all ${showDetailed ? 'bg-primary text-black shadow-xl shadow-primary/20' : 'bg-white/5 text-text-muted hover:bg-white/10'} w-full sm:w-auto justify-center`}
           >
             {showDetailed ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
             {showDetailed ? 'Close Detailed Audit' : 'Deep Dive Analysis'}
