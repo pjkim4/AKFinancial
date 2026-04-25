@@ -96,8 +96,9 @@ const Dashboard = () => {
     category: 'Entertainment', 
     type: 'Expense',
     color: '#10b981',
-    account_id: accounts[0]?.id || ''
+    account_id: ''
   });
+
 
   
   const [loading, setLoading] = useState(false);
@@ -125,7 +126,11 @@ const Dashboard = () => {
     return transactions.filter(t => t.account_id === filterAccount);
   }, [transactions, filterAccount]);
 
+  const [pendingShortcut, setPendingShortcut] = useState(null);
+  const [isAccountPickerOpen, setIsAccountPickerOpen] = useState(false);
+
   const stats = useMemo(() => {
+
     const income = filteredTransactions
       .filter(t => t.type === 'Income' && t.category !== 'Transfer')
       .reduce((sum, t) => sum + Number(t.amount), 0);
@@ -200,7 +205,14 @@ const Dashboard = () => {
   const handleFrequentPayment = async (item) => {
     if (accounts.length === 0 || loading) return;
     
-    const account = accounts.find(a => a.id === item.account_id) || accounts[0];
+    let finalAccountId = item.account_id;
+    if (!finalAccountId) {
+      setPendingShortcut(item);
+      setIsAccountPickerOpen(true);
+      return;
+    }
+
+    const account = accounts.find(a => String(a.id) === String(finalAccountId)) || accounts[0];
     let finalAmount = item.amount;
     
     // If no amount is set, or it's 0, ask for it
@@ -211,6 +223,7 @@ const Dashboard = () => {
     } else {
       if (!window.confirm(`Log ${item.name} for $${item.amount}\nFrom Wallet: [${account.name}]?`)) return;
     }
+
 
     setLoading(true);
     await addTransaction({
@@ -225,6 +238,15 @@ const Dashboard = () => {
     setLoading(false);
     alert(`Successfully logged ${item.name} ($${finalAmount}) to [${account.name}]`);
   };
+
+  const handlePickAccount = (accId) => {
+    setIsAccountPickerOpen(false);
+    if (pendingShortcut) {
+      handleFrequentPayment({ ...pendingShortcut, account_id: accId });
+      setPendingShortcut(null);
+    }
+  };
+
 
 
 
@@ -644,14 +666,16 @@ const Dashboard = () => {
                     />
                   </div>
                 </div>
-                <div>
+                 <div>
                   <label className="text-xs text-text-muted uppercase font-black tracking-widest mb-2 block">Primary Wallet</label>
-                  <select required value={newShortcut.account_id} onChange={e => setNewShortcut({...newShortcut, account_id: e.target.value})}>
+                  <select value={newShortcut.account_id} onChange={e => setNewShortcut({...newShortcut, account_id: e.target.value})}>
+                    <option value="">Ask when clicked (Unassigned)</option>
                     {accounts.map(acc => (
                       <option key={acc.id} value={acc.id}>{acc.name}</option>
                     ))}
                   </select>
                 </div>
+
                 <button type="submit" className="btn btn-primary w-full h-14 uppercase font-black text-black">Add Shortcut</button>
              </form>
           </div>
@@ -659,7 +683,39 @@ const Dashboard = () => {
         document.body
       )}
 
+      {/* Account Picker Modal for Unassigned Shortcuts */}
+      {isAccountPickerOpen && createPortal(
+        <div className="fixed inset-0 z-max flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+          <div className="card w-full max-w-md shadow-2xl bg-card border-white/10">
+             <div className="flex justify-between items-center mb-8">
+               <h3 className="text-xl font-bold italic tracking-tight">Select Wallet</h3>
+               <button onClick={() => setIsAccountPickerOpen(false)}><X size={24} /></button>
+             </div>
+             <p className="text-sm text-text-muted mb-6">Select a wallet to log <b>{pendingShortcut?.name}</b></p>
+             <div className="grid grid-cols-1 gap-3">
+               {accounts.map(acc => (
+                 <button 
+                   key={acc.id}
+                   onClick={() => handlePickAccount(acc.id)}
+                   className="flex items-center justify-between p-4 bg-white/5 rounded-2xl hover:bg-primary hover:text-black transition-all border border-white/5 group"
+                 >
+                   <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center group-hover:bg-black/20">
+                        <Wallet size={20} />
+                      </div>
+                      <span className="font-black">{acc.name}</span>
+                   </div>
+                   <span className="font-bold opacity-60">${acc.balance}</span>
+                 </button>
+               ))}
+             </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
       {/* Charts */}
+
       {(showMonthlyTrend || showExpenseDistribution) && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pb-10">
           {showMonthlyTrend && (
