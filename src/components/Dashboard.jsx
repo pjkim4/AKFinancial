@@ -485,22 +485,24 @@ const Dashboard = () => {
                     <div className="w-1.5 h-4 bg-primary rounded-full"></div>
                     <h5 className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted">{acc.name}</h5>
                   </div>
-                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3">
+                  <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-9 gap-2">
+
 
                     {shortcuts.map((item) => (
                         <div 
                           key={item.id} 
-                          className="relative group p-3 bg-white/5 rounded-2xl hover:bg-primary transition-all cursor-pointer border border-white/5 hover:border-transparent flex flex-col items-center text-center overflow-visible"
+                          className="relative group p-2 bg-white/5 rounded-xl hover:bg-primary transition-all cursor-pointer border border-white/5 hover:border-transparent flex flex-col items-center text-center overflow-visible"
                         >
                           <div onClick={() => !isShortcutsEditMode && handleFrequentPayment(item)} className="w-full h-full flex flex-col items-center">
-                            <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-2 font-black text-lg bg-white/10 group-hover:bg-black/20" style={{ color: item.color }}>
-                              {item.type === 'Income' ? <ArrowUpRight size={18} /> : item.name.charAt(0)}
+                            <div className="w-9 h-9 rounded-lg flex items-center justify-center mb-1.5 font-black text-base bg-white/10 group-hover:bg-black/20" style={{ color: item.color }}>
+                              {item.type === 'Income' ? <ArrowUpRight size={16} /> : item.name.charAt(0)}
                             </div>
-                            <p className="text-[11px] font-black group-hover:text-black transition-colors line-clamp-1">{item.name}</p>
-                            <p className="text-[9px] font-bold text-text-muted group-hover:text-black/60 mt-0.5">
+                            <p className="text-[10px] font-black group-hover:text-black transition-colors line-clamp-1 leading-tight">{item.name}</p>
+                            <p className="text-[8px] font-bold text-text-muted group-hover:text-black/60 mt-0.5">
                               {item.type === 'Income' ? '+' : ''}${item.amount || '???'}
                             </p>
                           </div>
+
 
                         
                         {isShortcutsEditMode && (
@@ -525,21 +527,23 @@ const Dashboard = () => {
                   <div className="w-1.5 h-4 bg-gray-500 rounded-full"></div>
                   <h5 className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted">Other / Unassigned</h5>
                 </div>
-                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3">
+                <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-9 gap-2">
+
                   {frequentPayments.filter(p => !p.account_id || !accounts.some(acc => String(acc.id) === String(p.account_id))).map((item) => (
   
                      <div 
                         key={item.id} 
-                        className="relative group p-3 bg-white/5 rounded-2xl hover:bg-primary transition-all cursor-pointer border border-white/5 hover:border-transparent flex flex-col items-center text-center overflow-visible"
+                        className="relative group p-2 bg-white/5 rounded-xl hover:bg-primary transition-all cursor-pointer border border-white/5 hover:border-transparent flex flex-col items-center text-center overflow-visible"
                       >
                         <div onClick={() => !isShortcutsEditMode && handleFrequentPayment(item)} className="w-full h-full flex flex-col items-center">
-                          <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-2 font-black text-lg bg-white/10 group-hover:bg-black/20" style={{ color: item.color }}>
-                            {item.type === 'Income' ? <ArrowUpRight size={18} /> : item.name.charAt(0)}
+                          <div className="w-9 h-9 rounded-lg flex items-center justify-center mb-1.5 font-black text-base bg-white/10 group-hover:bg-black/20" style={{ color: item.color }}>
+                            {item.type === 'Income' ? <ArrowUpRight size={16} /> : item.name.charAt(0)}
                           </div>
-                          <p className="text-[11px] font-black group-hover:text-black transition-colors line-clamp-1">{item.name}</p>
-                          <p className="text-[9px] font-bold text-text-muted group-hover:text-black/60 mt-0.5">
+                          <p className="text-[10px] font-black group-hover:text-black transition-colors line-clamp-1 leading-tight">{item.name}</p>
+                          <p className="text-[8px] font-bold text-text-muted group-hover:text-black/60 mt-0.5">
                             {item.type === 'Income' ? '+' : ''}${item.amount || '???'}
                           </p>
+
                           {isShortcutsEditMode && (
                              <button 
                                onClick={(e) => { 
