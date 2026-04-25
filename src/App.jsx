@@ -478,7 +478,8 @@ const AppContent = () => {
               </p>
             </div>
             </div>
-            <nav className="glass border border-white/10 rounded-2xl flex items-center justify-between p-1">
+            <nav className="glass border border-white/10 rounded-2xl grid grid-cols-7 p-1 overflow-hidden">
+
               <button 
                 onClick={() => setActiveTab('dashboard')}
                 className={`flex-1 flex flex-col items-center gap-0.5 py-2 transition-all ${activeTab === 'dashboard' ? 'text-primary' : 'text-text-muted hover:text-white'}`}

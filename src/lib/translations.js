@@ -6,7 +6,7 @@ export const translations = {
     nav_wallets: 'Wallets',
     nav_auto: 'Auto',
     nav_insights: 'Insights',
-    nav_intel: 'Financial Intel',
+    nav_intel: 'Intel',
     nav_setup: 'Setup',
     nav_logout: 'Logout',
     
