@@ -14,6 +14,8 @@ import {
   Clock,
   Pencil
 } from 'lucide-react';
+import SearchableSelect from './ui/SearchableSelect';
+
 
 const RecurringManager = () => {
   const { 
@@ -24,8 +26,13 @@ const RecurringManager = () => {
     deleteRecurringSchedule, 
     skipNextOccurrence,
     calculateNextPaymentDate,
+    preferences,
+    addCustomCategory,
+    updateCustomCategory,
+    deleteCustomCategory,
     t
   } = useFinance();
+
 
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -48,10 +55,29 @@ const RecurringManager = () => {
     'Quarterly', 'Semi-Yearly', 'Yearly'
   ];
 
-  const categories = [
-    'Subscription', 'Rent', 'Insurance', 'Utilities', 
-    'Salary', 'Savings', 'Debt', 'Other'
+  const expenseCategories = [
+    { id: 'Food', name: t('cat_food') },
+    { id: 'Rent', name: t('cat_rent') },
+    { id: 'Transport', name: t('cat_transport') },
+    { id: 'Entertainment', name: t('cat_entertainment') },
+    { id: 'Utilities', name: t('cat_utilities') },
+    { id: 'Shopping', name: t('cat_shopping') },
+    { id: 'Health', name: t('cat_health') },
+    { id: 'Subscription', name: 'Subscription' },
+    { id: 'Insurance', name: 'Insurance' },
+    { id: 'Other', name: t('cat_other') },
+    ...(preferences.customCategories?.expense || []).map(c => ({ ...c, isCustom: true }))
   ];
+
+  const incomeCategories = [
+    { id: 'Salary', name: t('cat_salary') || 'Salary' },
+    { id: 'Investment', name: t('cat_investment') || 'Investment' },
+    { id: 'Gift', name: t('cat_gift') || 'Gift' },
+    { id: 'Savings', name: 'Savings' },
+    { id: 'Other', name: t('cat_other') },
+    ...(preferences.customCategories?.income || []).map(c => ({ ...c, isCustom: true }))
+  ];
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -313,14 +339,29 @@ const RecurringManager = () => {
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-black uppercase tracking-widest text-text-muted">Category</label>
-                  <select
-                    className="w-full h-12 px-4 bg-white/5 border border-white/10 rounded-xl focus:outline-none focus:border-primary transition-all text-white appearance-none cursor-pointer"
+                  <SearchableSelect 
+                    options={newSchedule.type === 'Expense' ? expenseCategories : incomeCategories}
                     value={newSchedule.category}
-                    onChange={(e) => setNewSchedule({...newSchedule, category: e.target.value})}
-                  >
-                    {categories.map(c => <option key={c} value={c} className="bg-[#181818]">{c}</option>)}
-                  </select>
+                    onChange={(val) => {
+                      const cats = newSchedule.type === 'Expense' ? expenseCategories : incomeCategories;
+                      const exists = cats.some(c => c.id === val);
+                      if (!exists && val) {
+                        addCustomCategory(newSchedule.type === 'Expense' ? 'expense' : 'income', val);
+                      }
+                      setNewSchedule(prev => ({ ...prev, category: val }));
+                    }}
+                    onEdit={(id, name) => {
+                      const newName = prompt('New category name:', name);
+                      if (newName) updateCustomCategory(newSchedule.type === 'Expense' ? 'expense' : 'income', id, newName);
+                    }}
+                    onDelete={(id) => {
+                      if (confirm('Delete category?')) deleteCustomCategory(newSchedule.type === 'Expense' ? 'expense' : 'income', id);
+                    }}
+
+                    placeholder="Select Category"
+                  />
                 </div>
+
               </div>
 
               <div className="space-y-2">
