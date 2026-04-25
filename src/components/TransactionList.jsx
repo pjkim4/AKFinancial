@@ -114,7 +114,7 @@ const TransactionList = () => {
   } = useFinance();
 
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState('date-desc');
+  const [sortBy, setSortBy] = useState('date-asc');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isWalletHubOpen, setIsWalletHubOpen] = useState(false);
   const [modalType, setModalType] = useState('expense'); 

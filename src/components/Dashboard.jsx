@@ -506,21 +506,23 @@ const Dashboard = () => {
                           key={item.id} 
                           className="relative group p-2 bg-white/5 rounded-xl hover:bg-primary transition-all cursor-pointer border border-white/5 hover:border-transparent flex flex-col items-center text-center overflow-visible"
                         >
-                          <div onClick={() => !isShortcutsEditMode && handleFrequentPayment(item)} className="w-full h-full flex flex-col items-center overflow-hidden">
-                            <div className="w-9 h-9 rounded-lg flex items-center justify-center mb-1.5 font-black text-base bg-white/10 group-hover:bg-black/20 shrink-0" style={{ color: item.color }}>
-                              {item.type === 'Income' ? <ArrowUpRight size={16} /> : item.name.charAt(0)}
-                            </div>
-                            <p className="w-full text-[10px] font-black group-hover:text-black transition-colors truncate leading-tight text-center">{item.name}</p>
-                            <p className="text-[8px] font-bold text-text-muted group-hover:text-black/60 mt-0.5 shrink-0">
-                              {item.type === 'Income' ? '+' : ''}${item.amount || '???'}
-                            </p>
+                        <div onClick={() => !isShortcutsEditMode && handleFrequentPayment(item)} className="w-full h-full flex flex-col items-center">
+                          <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-2 font-black text-base bg-white/10 group-hover:bg-black/20 shrink-0 shadow-sm" style={{ color: item.color }}>
+                            {item.type === 'Income' ? <ArrowUpRight size={18} /> : item.name.charAt(0)}
+                          </div>
+                          <div className="flex-1 flex flex-col items-center justify-center min-h-[36px] w-full px-1">
+                             <p className="w-full text-[10px] font-black group-hover:text-black transition-colors truncate leading-tight text-center mb-0.5">{item.name}</p>
+                             <p className="text-[9px] font-black text-text-muted group-hover:text-black/60 shrink-0">
+                               {item.type === 'Income' ? '+' : ''}${item.amount || '???'}
+                             </p>
+                          </div>
                           {isShortcutsEditMode && (
                              <button 
                                onClick={(e) => { 
                                  e.stopPropagation(); 
                                  setLinkingShortcut(item);
                                }}
-                               className="mt-2 text-[7px] font-black uppercase tracking-widest text-primary hover:underline"
+                               className="mt-2 py-1 px-3 bg-primary/20 rounded-full text-[7px] font-black uppercase tracking-widest text-primary hover:bg-primary hover:text-black transition-all"
                              >
                                Link
                              </button>
@@ -566,22 +568,23 @@ const Dashboard = () => {
                         key={item.id} 
                         className="relative group p-2 bg-white/5 rounded-xl hover:bg-primary transition-all cursor-pointer border border-white/5 hover:border-transparent flex flex-col items-center text-center overflow-visible"
                       >
-                        <div onClick={() => !isShortcutsEditMode && handleFrequentPayment(item)} className="w-full h-full flex flex-col items-center overflow-hidden">
-                          <div className="w-9 h-9 rounded-lg flex items-center justify-center mb-1.5 font-black text-base bg-white/10 group-hover:bg-black/20 shrink-0" style={{ color: item.color }}>
-                            {item.type === 'Income' ? <ArrowUpRight size={16} /> : item.name.charAt(0)}
+                        <div onClick={() => !isShortcutsEditMode && handleFrequentPayment(item)} className="w-full h-full flex flex-col items-center">
+                          <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-2 font-black text-base bg-white/10 group-hover:bg-black/20 shrink-0 shadow-sm" style={{ color: item.color }}>
+                            {item.type === 'Income' ? <ArrowUpRight size={18} /> : item.name.charAt(0)}
                           </div>
-                          <p className="w-full text-[10px] font-black group-hover:text-black transition-colors truncate leading-tight text-center">{item.name}</p>
-                          <p className="text-[8px] font-bold text-text-muted group-hover:text-black/60 mt-0.5 shrink-0">
-                            {item.type === 'Income' ? '+' : ''}${item.amount || '???'}
-                          </p>
-
+                          <div className="flex-1 flex flex-col items-center justify-center min-h-[36px] w-full px-1">
+                             <p className="w-full text-[10px] font-black group-hover:text-black transition-colors truncate leading-tight text-center mb-0.5">{item.name}</p>
+                             <p className="text-[9px] font-black text-text-muted group-hover:text-black/60 shrink-0">
+                               {item.type === 'Income' ? '+' : ''}${item.amount || '???'}
+                             </p>
+                          </div>
                           {isShortcutsEditMode && (
                              <button 
                                onClick={(e) => { 
                                  e.stopPropagation(); 
                                  setLinkingShortcut(item);
                                }}
-                               className="mt-2 text-[7px] font-black uppercase tracking-widest text-primary hover:underline"
+                               className="mt-2 py-1 px-3 bg-primary/20 rounded-full text-[7px] font-black uppercase tracking-widest text-primary hover:bg-primary hover:text-black transition-all"
                              >
                                Link
                              </button>
