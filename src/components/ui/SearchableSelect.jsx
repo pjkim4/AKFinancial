@@ -194,11 +194,14 @@ const SearchableSelect = ({ options = [], value, onChange, onEdit, onDelete, pla
               <button 
                 onClick={(e) => {
                   e.stopPropagation();
-                  const name = prompt('Enter new category name:');
-                  if (name) {
-                    if (typeof onChange === 'function') onChange(name);
-                    setIsOpen(false);
-                  }
+                  // Use setTimeout so the browser can paint the button click before blocking the thread with a native prompt
+                  setTimeout(() => {
+                    const name = prompt('Enter new category name:');
+                    if (name) {
+                      if (typeof onChange === 'function') onChange(name);
+                      setIsOpen(false);
+                    }
+                  }, 10);
                 }}
                 className="w-full p-4 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-primary hover:bg-primary/10 rounded-xl transition-all border-2 border-dashed border-primary/20"
               >
