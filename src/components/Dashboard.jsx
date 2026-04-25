@@ -62,6 +62,10 @@ const Dashboard = () => {
   
   const [filterAccount, setFilterAccount] = useState('all');
   const [chartPeriod, setChartPeriod] = useState('1M'); // 1M, 3M, 6M, YTD, All
+  const [pendingShortcut, setPendingShortcut] = useState(null);
+  const [isAccountPickerOpen, setIsAccountPickerOpen] = useState(false);
+  const [isLogConfirmationOpen, setIsLogConfirmationOpen] = useState(false);
+  const [logFormData, setLogFormData] = useState({ amount: '', date: '' });
   
   // Instant Move State
   const [qtSource, setQtSource] = useState(accounts[0]?.id || '');
@@ -145,10 +149,7 @@ const Dashboard = () => {
     return transactions.filter(t => t.account_id === filterAccount);
   }, [transactions, filterAccount]);
 
-  const [pendingShortcut, setPendingShortcut] = useState(null);
-  const [isAccountPickerOpen, setIsAccountPickerOpen] = useState(false);
-  const [isLogConfirmationOpen, setIsLogConfirmationOpen] = useState(false);
-  const [logFormData, setLogFormData] = useState({ amount: '', date: '' });
+
 
   const stats = useMemo(() => {
 

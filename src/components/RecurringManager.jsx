@@ -129,14 +129,14 @@ const RecurringManager = () => {
     setIsModalOpen(true);
   };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'Active': return 'text-success';
-      case 'Completed': return 'text-text-muted opacity-50';
-      case 'Paused': return 'text-warning';
-      default: return 'text-text';
-    }
-  };
+function getStatusColor(status) {
+  switch (status) {
+    case 'Active': return 'text-success';
+    case 'Completed': return 'text-text-muted opacity-50';
+    case 'Paused': return 'text-warning';
+    default: return 'text-text';
+  }
+}
 
   return (
     <div className="space-y-8 animate-fade-in">

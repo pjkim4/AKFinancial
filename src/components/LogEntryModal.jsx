@@ -4,6 +4,14 @@ import { X, Loader2, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { useFinance } from '../context/FinanceContext';
 import SearchableSelect from './ui/SearchableSelect';
 
+function getToday() {
+  const d = new Date();
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 const LogEntryModal = ({ isOpen, onClose }) => {
   const { 
     accounts,
@@ -22,13 +30,7 @@ const LogEntryModal = ({ isOpen, onClose }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const getToday = () => {
-    const d = new Date();
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
+
 
   const [formData, setFormData] = useState({
     amount: '',
