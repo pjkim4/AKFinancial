@@ -250,15 +250,21 @@ const TransactionList = () => {
     
     return matchesSearch && matchesStartDate && matchesEndDate && matchesAccount && matchesCategory && matchesType && matchesMember;
   }).sort((a, b) => {
+    const dateA = new Date(a.date);
+    const dateB = new Date(b.date);
+    const timeA = new Date(a.created_at || 0).getTime();
+    const timeB = new Date(b.created_at || 0).getTime();
+
     switch (sortBy) {
-      case 'date-asc': return new Date(a.date) - new Date(b.date);
-      case 'amount-desc': return parseFloat(b.amount) - parseFloat(a.amount);
-      case 'amount-asc': return parseFloat(a.amount) - parseFloat(b.amount);
-      case 'category-asc': return (a.category || '').localeCompare(b.category || '');
-      case 'category-desc': return (b.category || '').localeCompare(a.category || '');
+      case 'date-asc': 
+        return dateA - dateB || timeA - timeB;
+      case 'amount-desc': return parseFloat(b.amount) - parseFloat(a.amount) || timeB - timeA;
+      case 'amount-asc': return parseFloat(a.amount) - parseFloat(b.amount) || timeA - timeB;
+      case 'category-asc': return (a.category || '').localeCompare(b.category || '') || timeA - timeB;
+      case 'category-desc': return (b.category || '').localeCompare(a.category || '') || timeB - timeA;
       case 'date-desc':
       default:
-        return new Date(b.date) - new Date(a.date);
+        return dateB - dateA || timeB - timeA;
     }
   });
 
@@ -268,7 +274,11 @@ const TransactionList = () => {
     const selectedAccount = accounts.find(a => String(a.id) === String(filterAccount));
     if (selectedAccount) {
       const accountTxs = transactions.filter(t => String(t.account_id) === String(filterAccount));
-      accountTxs.sort((a, b) => new Date(b.date) - new Date(a.date));
+      accountTxs.sort((a, b) => {
+        const dateDiff = new Date(b.date) - new Date(a.date);
+        if (dateDiff !== 0) return dateDiff;
+        return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+      });
       
       let currentBal = parseFloat(selectedAccount.balance) || 0;
       
