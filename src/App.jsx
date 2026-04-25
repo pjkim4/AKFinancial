@@ -415,7 +415,7 @@ const AppContent = () => {
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${activeTab === 'reports' ? 'bg-primary text-black shadow-lg shadow-primary/20' : 'hover:bg-white/5 text-text-muted hover:text-white'}`}
           >
             <FileText size={20} />
-            {t('nav_intel')}
+            {t('nav_reports')}
           </button>
         </nav>
 
@@ -478,7 +478,8 @@ const AppContent = () => {
               </p>
             </div>
             </div>
-            <nav className="glass border border-white/10 rounded-2xl grid grid-cols-7 p-1 overflow-hidden">
+            <nav className="glass border border-white/10 rounded-2xl grid grid-cols-4 p-1 overflow-hidden">
+
 
               <button 
                 onClick={() => setActiveTab('dashboard')}
@@ -521,7 +522,8 @@ const AppContent = () => {
                 className={`flex-1 flex flex-col items-center gap-0.5 py-2 transition-all ${activeTab === 'reports' ? 'text-primary' : 'text-text-muted hover:text-white'}`}
               >
                 <FileText size={20} />
-                <span className="text-[8px] font-black uppercase tracking-tighter">{t('nav_intel')}</span>
+                <span className="text-[8px] font-black uppercase tracking-tighter">{t('nav_reports')}</span>
+
               </button>
 
               <button 

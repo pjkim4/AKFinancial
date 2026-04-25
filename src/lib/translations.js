@@ -6,9 +6,10 @@ export const translations = {
     nav_wallets: 'Wallets',
     nav_auto: 'Auto',
     nav_insights: 'Insights',
-    nav_intel: 'Intel',
+    nav_reports: 'Reports',
     nav_setup: 'Setup',
     nav_logout: 'Logout',
+
     
     // Dashboard
     dash_total_assets: 'Total Assets',
@@ -182,7 +183,7 @@ export const translations = {
     nav_wallets: '자산/지갑',
     nav_auto: '자동 이체',
     nav_insights: 'AI 분석',
-    nav_intel: '금융 리포트',
+    nav_reports: '리포트',
     nav_setup: '설정',
     nav_logout: '로그아웃',
     
