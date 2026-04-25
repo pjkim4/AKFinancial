@@ -24,7 +24,7 @@ import {
 } from 'lucide-react';
 import SearchableSelect from './ui/SearchableSelect';
 
-const TransactionRow = ({ transaction, accounts, householdMembers, preferences, getMemberId, getCleanDescription, toggleSelect, selectedIds, handleEditClick, setDeleteConfirmId, t }) => {
+const TransactionRow = ({ transaction, accounts, householdMembers, preferences, getMemberId, getCleanDescription, toggleSelect, selectedIds, handleEditClick, setDeleteConfirmId, t, runningBalance }) => {
   const memberId = getMemberId(transaction);
   const member = householdMembers.find(m => String(m.id) === String(memberId));
   const isSelected = selectedIds.includes(transaction.id);
@@ -68,6 +68,11 @@ const TransactionRow = ({ transaction, accounts, householdMembers, preferences, 
               <p className="text-2xl font-black text-white">
                 {transaction.type === 'Income' ? '+' : '-'}{preferences.hideBalances ? '••••' : `$${Number(transaction.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
               </p>
+              {runningBalance !== undefined && (
+                <p className="text-[10px] text-text-muted font-bold tracking-widest mt-1">
+                  BAL: {preferences.hideBalances ? '••••' : `$${Number(runningBalance).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                </p>
+              )}
             </div>
             <div className="flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-all">
               <button 
@@ -256,6 +261,26 @@ const TransactionList = () => {
         return new Date(b.date) - new Date(a.date);
     }
   });
+
+  // Pre-calculate running balances for all transactions if a single wallet is selected
+  const runningBalances = {};
+  if (filterAccount !== 'all' && (sortBy === 'date-desc' || sortBy === 'date-asc') && !isGroupedByType) {
+    const selectedAccount = accounts.find(a => String(a.id) === String(filterAccount));
+    if (selectedAccount) {
+      const accountTxs = transactions.filter(t => String(t.account_id) === String(filterAccount));
+      accountTxs.sort((a, b) => new Date(b.date) - new Date(a.date));
+      
+      let currentBal = parseFloat(selectedAccount.balance) || 0;
+      
+      accountTxs.forEach(t => {
+        runningBalances[t.id] = currentBal;
+        const amt = parseFloat(t.amount) || 0;
+        if (t.type === 'Income') currentBal -= amt;
+        else if (t.type === 'Expense') currentBal += amt;
+        else if (t.type === 'Transfer') currentBal += amt; 
+      });
+    }
+  }
 
 
   const handleEditClick = (transaction) => {
@@ -656,6 +681,7 @@ const TransactionList = () => {
                             handleEditClick={handleEditClick}
                             setDeleteConfirmId={setDeleteConfirmId}
                             t={t}
+                            runningBalance={runningBalances[t.id]}
                           />
                         ))}
                       </div>
@@ -682,6 +708,7 @@ const TransactionList = () => {
                       handleEditClick={handleEditClick}
                       setDeleteConfirmId={setDeleteConfirmId}
                       t={t}
+                      runningBalance={runningBalances[t.id]}
                     />
                   ))
                 )}
