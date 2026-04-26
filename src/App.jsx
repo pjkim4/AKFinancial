@@ -467,7 +467,7 @@ const AppContent = () => {
       <main className="flex-1 p-4 md:p-8 overflow-y-auto bg-bg">
         <div className="max-w-7xl mx-auto">
           {/* Mobile Integrated Navigation */}
-          <div className="flex md:hidden flex-col gap-6 mb-8">
+          <div className="flex md:hidden flex-col gap-6 mb-8 no-print">
             <div className="flex items-center gap-4">
               <Logo size={32} />
             <div className="flex flex-col">
@@ -501,7 +501,7 @@ const AppContent = () => {
               </p>
             </div>
             </div>
-            <nav className="glass border border-white/10 rounded-2xl grid grid-cols-4 p-1 overflow-hidden">
+            <nav className="glass border border-white/10 rounded-2xl grid grid-cols-4 p-1 overflow-hidden no-print">
 
 
               <button 
