@@ -194,7 +194,7 @@ const Reports = () => {
             <FileText className="text-primary" size={32} />
             <h2 className="text-3xl font-black tracking-tight uppercase italic">{t('nav_intel')}</h2>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 no-print">
             <p className="text-text-muted font-bold uppercase text-[10px] tracking-[0.2em]">
               {t('report_analysis_for')} <span className="text-primary">{currentWorkspaceName}</span>
             </p>
@@ -209,7 +209,7 @@ const Reports = () => {
         </div>
 
         {/* Date Range Picker */}
-        <div className="flex flex-wrap items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/10">
+        <div className="flex flex-wrap items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/10 no-print">
            <div className="flex items-center gap-3">
               <Calendar size={16} className="text-primary" />
               <div className="flex flex-col">
@@ -244,7 +244,7 @@ const Reports = () => {
            </button>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex gap-2 no-print">
           <button onClick={printReport} className="btn bg-white/5 border-white/10 h-14 px-6 hover:bg-white/10">
             <Printer size={18} />
             <span className="font-black text-[10px] uppercase tracking-widest">{t('report_print')}</span>

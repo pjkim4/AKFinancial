@@ -316,7 +316,7 @@ const AppContent = () => {
   return (
     <div className="min-h-screen bg-bg flex flex-col md:flex-row pb-20 md:pb-0">
       {/* Mobile Top Bar */}
-      <header className="flex md:hidden items-center justify-between p-4 glass border-b border-white/5 sticky top-0 z-30">
+      <header className="flex md:hidden items-center justify-between p-4 glass border-b border-white/5 sticky top-0 z-30 no-print">
         <div className="flex items-center gap-3">
           <Logo size={20} />
           <div className="flex flex-col">
@@ -341,7 +341,7 @@ const AppContent = () => {
       </header>
 
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex w-64 glass border-r border-white/10 h-screen sticky top-0 z-20 flex-col">
+      <aside className="hidden md:flex w-64 glass border-r border-white/10 h-screen sticky top-0 z-20 flex-col no-print">
         <div className="p-6 flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
