@@ -203,11 +203,11 @@ const Reports = () => {
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-2">
             <FileText className="text-primary" size={32} />
-            <h2 className="text-3xl font-black tracking-tight uppercase italic">{t('nav_intel')}</h2>
+            <h2 className="text-3xl font-black tracking-tight uppercase italic">REPORTS</h2>
           </div>
           <div className="flex items-center gap-4 no-print">
             <p className="text-text-muted font-bold uppercase text-[10px] tracking-[0.2em]">
-              {t('report_analysis_for')} <span className="text-primary">{currentWorkspaceName}</span>
+              ANALYSIS FOR <span className="text-primary">{currentWorkspaceName}</span>
             </p>
             <button 
               onClick={toggleBalances}
@@ -289,7 +289,7 @@ const Reports = () => {
 
       {/* Print-only Header */}
       <div className="hidden print:block mb-10 border-b-2 border-black pb-8">
-        <h1 className="text-4xl font-black uppercase italic mb-2">Financial Intel Report</h1>
+        <h1 className="text-4xl font-black uppercase italic mb-2">Financial Report</h1>
         <div className="flex justify-between items-start text-sm font-bold uppercase tracking-widest">
            <div className="space-y-1">
              <p className="text-primary">{currentWorkspaceName}</p>
@@ -306,7 +306,7 @@ const Reports = () => {
           <p className="text-4xl font-black tracking-tighter">
             {preferences.hideBalances ? '••••' : `$${reportData.totalIncome.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
           </p>
-          <div className="flex items-center gap-2 mt-4 text-success/60">
+          <div className="flex items-center gap-2 mt-4 text-success/60 no-print">
             <ArrowUpRight size={14} />
             <span className="text-[10px] font-bold uppercase">{t('report_synced')}</span>
           </div>
@@ -316,7 +316,7 @@ const Reports = () => {
           <p className="text-4xl font-black tracking-tighter">
             {preferences.hideBalances ? '••••' : `$${reportData.totalExpense.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
           </p>
-          <div className="flex items-center gap-2 mt-4 text-danger/60">
+          <div className="flex items-center gap-2 mt-4 text-danger/60 no-print">
             <ArrowDownRight size={14} />
             <span className="text-[10px] font-bold uppercase">{t('report_verified')}</span>
           </div>
@@ -326,7 +326,7 @@ const Reports = () => {
           <p className="text-4xl font-black tracking-tighter">
             {preferences.hideBalances ? '••••' : `$${(reportData.totalIncome - reportData.totalExpense).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
           </p>
-          <div className="flex items-center gap-2 mt-4 text-primary/60">
+          <div className="flex items-center gap-2 mt-4 text-primary/60 no-print">
             <Target size={14} />
             <span className="text-[10px] font-bold uppercase">Saving Capacity</span>
           </div>
@@ -335,7 +335,7 @@ const Reports = () => {
 
 
       {/* Visual Analytics */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 no-print">
         <div className="card bg-white/5 border-white/10 p-8 print:border-black/10 print:shadow-none">
           <div className="flex items-center justify-between mb-8">
             <h3 className="font-black uppercase tracking-widest text-xs flex items-center gap-2">
@@ -414,113 +414,6 @@ const Reports = () => {
             ) : (
               <p className="text-text-muted text-xs uppercase font-black opacity-30">No Sequential Data</p>
             )}
-          </div>
-        </div>
-      </div>
-
-      {/* Strategy Report (Print Only) */}
-      <div className="hidden print:block page-break-before mt-20">
-         <div className="border-b-4 border-primary pb-6 mb-10">
-            <h2 className="text-5xl font-black uppercase italic tracking-tighter">AI Strategic Assessment</h2>
-            <p className="text-sm font-bold uppercase tracking-[0.3em] mt-2 opacity-60">Prepared for {currentWorkspaceName}</p>
-         </div>
-
-         <div className="grid grid-cols-2 gap-10 mb-16">
-            <div className="space-y-6">
-               <h4 className="text-xs font-black uppercase tracking-widest text-primary">Financial Health Score</h4>
-               <div className="flex items-baseline gap-4">
-                  <span className="text-8xl font-black tracking-tighter">{aiStrategy.healthScore}</span>
-                  <span className="text-2xl font-bold uppercase opacity-40">/ 100</span>
-               </div>
-               <p className="text-sm leading-relaxed font-medium italic opacity-80 border-l-4 border-primary/20 pl-6 py-2">
-                 "{aiStrategy.assessment}"
-               </p>
-            </div>
-            <div className="bg-black/5 p-8 rounded-3xl border border-black/10">
-               <h4 className="text-[10px] font-black uppercase tracking-widest mb-6 opacity-40">Capital Retention Index</h4>
-               <div className="space-y-8">
-                  <div>
-                    <p className="text-[10px] font-black uppercase text-text-muted mb-2">Savings Velocity</p>
-                    <p className="text-3xl font-black">{aiStrategy.savingsRate}%</p>
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-black uppercase text-text-muted mb-2">12-Month Expansion Forecast</p>
-                    <p className="text-3xl font-black text-primary">${aiStrategy.annualProjection.toLocaleString()}</p>
-                  </div>
-               </div>
-            </div>
-         </div>
-
-         <div className="space-y-10">
-            <div>
-               <h4 className="text-sm font-black uppercase tracking-widest mb-6 border-b border-black/10 pb-4">Budget Efficiency Audit</h4>
-               <div className="grid grid-cols-1 gap-4">
-                  {aiStrategy.leaks.length > 0 ? aiStrategy.leaks.map((leak, i) => (
-                    <div key={i} className="flex items-center justify-between p-6 bg-black/5 rounded-2xl">
-                       <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 rounded-xl bg-danger/20 flex items-center justify-center">
-                             <ArrowDownRight className="text-danger" size={20} />
-                          </div>
-                          <div>
-                             <p className="font-black uppercase text-sm tracking-tight">{leak.name}</p>
-                             <p className="text-[10px] font-bold uppercase opacity-40">Exceeds recommended 20% threshold</p>
-                          </div>
-                       </div>
-                       <p className="text-xl font-black">${leak.value.toLocaleString()}</p>
-                    </div>
-                  )) : (
-                    <p className="text-sm font-medium italic opacity-60 text-center py-10 bg-black/5 rounded-3xl">No major operational inefficiencies detected in current period.</p>
-                  )}
-               </div>
-            </div>
-
-            <div className="pt-10">
-               <h4 className="text-sm font-black uppercase tracking-widest mb-6 border-b border-black/10 pb-4">Strategic Directives</h4>
-               <ul className="space-y-4">
-                  <li className="flex gap-4">
-                     <span className="text-primary font-black">01</span>
-                     <p className="text-sm font-medium">Reallocate surplus from {aiStrategy.leaks[0]?.name || 'low-yield accounts'} into tax-advantaged growth vehicles.</p>
-                  </li>
-                  <li className="flex gap-4">
-                     <span className="text-primary font-black">02</span>
-                     <p className="text-sm font-medium">Implement a 10% operational cost reduction target for the next fiscal quarter to boost savings velocity.</p>
-                  </li>
-                  <li className="flex gap-4">
-                     <span className="text-primary font-black">03</span>
-                     <p className="text-sm font-medium">Schedule a capital allocation review for Year-End expansion based on current ${aiStrategy.annualProjection.toLocaleString()} growth trajectory.</p>
-                  </li>
-               </ul>
-            </div>
-         </div>
-      </div>
-
-      {/* AI Strategy Export Section */}
-      <div className="card bg-primary/5 border-primary/10 p-10 relative overflow-hidden group no-print">
-        <BrainCircuit className="absolute -right-10 -bottom-10 text-primary opacity-5 w-64 h-64 group-hover:scale-110 transition-all duration-700" />
-        <div className="relative z-10">
-          <h3 className="text-xl font-black uppercase italic tracking-tight mb-4 flex items-center gap-3">
-            <Sparkles className={`text-primary ${isGenerating ? 'animate-spin' : ''}`} />
-            {t('report_ai_strat')}
-          </h3>
-          <p className="text-sm text-text-muted mb-8 max-w-xl leading-relaxed">
-            {t('report_ai_desc')}
-          </p>
-          <div className="flex flex-wrap gap-4">
-            <button 
-              onClick={handleGenerateStrategy}
-              disabled={isGenerating}
-              className="btn btn-primary h-14 px-10 text-black font-black uppercase tracking-widest shadow-xl shadow-primary/20 relative disabled:opacity-50"
-            >
-              {isGenerating ? (
-                <>
-                  <RefreshCw size={18} className="animate-spin mr-3" />
-                  Analyzing Data...
-                </>
-              ) : t('report_gen_pdf')}
-            </button>
-            <button className="btn bg-white/5 border-white/10 h-14 px-8 text-text-muted hover:text-white uppercase font-black text-[10px] tracking-widest">
-              {t('report_email_acc')}
-            </button>
           </div>
         </div>
       </div>
