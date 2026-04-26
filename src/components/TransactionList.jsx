@@ -32,33 +32,45 @@ const TransactionRow = ({ transaction, accounts, householdMembers, preferences, 
   return (
     <div 
       className={`card glass group relative overflow-visible transition-all hover:bg-white/5 border border-white/5 hover:border-white/10 ${isSelected ? 'border-primary ring-1 ring-primary bg-primary/5' : ''}`}
-      onClick={() => toggleSelect(transaction.id)}
     >
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 p-2">
          <div className="flex items-center gap-5">
-            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 ${transaction.type === 'Income' ? 'bg-primary/20 text-primary' : transaction.type === 'Transfer' ? 'bg-secondary/20 text-secondary' : 'bg-danger/20 text-danger'}`}>
-              {transaction.type === 'Income' ? <ArrowUpRight size={28} /> : transaction.type === 'Transfer' ? <Repeat size={28} /> : <ArrowDownRight size={28} />}
-            </div>
-            <div>
-              <div className="flex items-center gap-3">
-                <h4 className="font-black text-lg">{getCleanDescription(transaction.description)}</h4>
-                <span className="text-[10px] uppercase font-black tracking-widest px-2 py-0.5 rounded bg-white/5 text-text-muted">
-                  {transaction.category}
-                </span>
+            {/* Individual Select Box */}
+            <button 
+              onClick={(e) => { e.stopPropagation(); toggleSelect(transaction.id); }}
+              className={`w-10 h-10 rounded-xl flex items-center justify-center border transition-all ${isSelected ? 'bg-primary border-primary text-black' : 'bg-white/5 border-white/10 text-text-muted hover:text-white'}`}
+            >
+              {isSelected ? <CheckSquare size={18} /> : <Square size={18} />}
+            </button>
+
+            <div 
+              className="flex items-center gap-5 cursor-pointer flex-1"
+              onClick={() => toggleSelect(transaction.id)}
+            >
+              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 ${transaction.type === 'Income' ? 'bg-primary/20 text-primary' : transaction.type === 'Transfer' ? 'bg-secondary/20 text-secondary' : 'bg-danger/20 text-danger'}`}>
+                {transaction.type === 'Income' ? <ArrowUpRight size={28} /> : transaction.type === 'Transfer' ? <Repeat size={28} /> : <ArrowDownRight size={28} />}
               </div>
-              <div className="flex items-center gap-3 mt-1.5">
-                <div className="flex items-center gap-1.5">
-                  <Wallet size={12} className="text-text-muted" />
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-text-muted">
-                    {accounts.find(a => String(a.id) === String(transaction.account_id))?.name || 'Unknown'}
+              <div>
+                <div className="flex items-center gap-3">
+                  <h4 className="font-black text-lg">{getCleanDescription(transaction.description)}</h4>
+                  <span className="text-[10px] uppercase font-black tracking-widest px-2 py-0.5 rounded bg-white/5 text-text-muted">
+                    {transaction.category}
                   </span>
                 </div>
-                {member && (
-                  <div className="flex items-center gap-1.5 px-2 py-0.5 bg-primary/10 rounded text-primary border border-primary/20">
-                    <span className="text-[9px] font-black uppercase tracking-tighter">{member.name}</span>
+                <div className="flex items-center gap-3 mt-1.5">
+                  <div className="flex items-center gap-1.5">
+                    <Wallet size={12} className="text-text-muted" />
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-text-muted">
+                      {accounts.find(a => String(a.id) === String(transaction.account_id))?.name || 'Unknown'}
+                    </span>
                   </div>
-                )}
-                <p className="text-[10px] text-text-muted font-bold uppercase tracking-widest">{transaction.date}</p>
+                  {member && (
+                    <div className="flex items-center gap-1.5 px-2 py-0.5 bg-primary/10 rounded text-primary border border-primary/20">
+                      <span className="text-[9px] font-black uppercase tracking-tighter">{member.name}</span>
+                    </div>
+                  )}
+                  <p className="text-[10px] text-text-muted font-bold uppercase tracking-widest">{transaction.date}</p>
+                </div>
               </div>
             </div>
          </div>
