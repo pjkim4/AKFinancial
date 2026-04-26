@@ -15,7 +15,8 @@ import {
   Calendar,
   RefreshCw,
   Eye,
-  EyeOff
+  EyeOff,
+  Filter
 } from 'lucide-react';
 
 import { 
@@ -35,23 +36,31 @@ import {
 const Reports = () => {
   const { transactions, accounts, availableHouseholds, currentHouseholdId, t, preferences, toggleBalances } = useFinance();
 
-  // Date Range State
+  // Filter States
   const now = new Date();
   const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
   const today = now.toISOString().split('T')[0];
 
   const [startDate, setStartDate] = useState(firstDayOfMonth);
   const [endDate, setEndDate] = useState(today);
+  const [filterAccount, setFilterAccount] = useState('all');
 
   const currentWorkspaceName = useMemo(() => {
     return availableHouseholds.find(h => h.id === currentHouseholdId)?.name || t('dash_personal_account');
   }, [availableHouseholds, currentHouseholdId]);
 
+  const selectedAccountName = useMemo(() => {
+    if (filterAccount === 'all') return 'Total Portfolio';
+    return accounts.find(a => a.id === filterAccount)?.name || 'Unknown Account';
+  }, [filterAccount, accounts]);
+
 
   const reportData = useMemo(() => {
-    // Filter transactions by date range
+    // Filter transactions by date range AND account
     const filteredTxs = transactions.filter(tx => {
-      return tx.date >= startDate && tx.date <= endDate;
+      const matchesDate = tx.date >= startDate && tx.date <= endDate;
+      const matchesAccount = filterAccount === 'all' || tx.account_id === filterAccount;
+      return matchesDate && matchesAccount;
     });
 
     const incomes = filteredTxs.filter(t => t.type === 'Income');
@@ -104,7 +113,7 @@ const Reports = () => {
       pieData,
       barData: monthLabels.map(m => months[m])
     };
-  }, [transactions, startDate, endDate]);
+  }, [transactions, startDate, endDate, filterAccount]);
 
   const COLORS = ['#c1ff72', '#ffffff', '#3d3d3d', '#1a1a1a', '#4ade80', '#fbbf24', '#f87171'];
 
@@ -114,7 +123,11 @@ const Reports = () => {
 
   const exportFullLedger = () => {
     const headers = ['Date', 'Description', 'Category', 'Type', 'Amount', 'Wallet'];
-    const filteredTxs = transactions.filter(tx => tx.date >= startDate && tx.date <= endDate);
+    const filteredTxs = transactions.filter(tx => {
+      const matchesDate = tx.date >= startDate && tx.date <= endDate;
+      const matchesAccount = filterAccount === 'all' || tx.account_id === filterAccount;
+      return matchesDate && matchesAccount;
+    });
     
     const rows = filteredTxs.map(t => [
       t.date,
@@ -128,7 +141,7 @@ const Reports = () => {
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.setAttribute("download", `Ledger_${startDate}_to_${endDate}.csv`);
+    link.setAttribute("download", `Ledger_${selectedAccountName.replace(/\s+/g, '_')}_${startDate}_to_${endDate}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -137,6 +150,7 @@ const Reports = () => {
   const resetDates = () => {
     setStartDate(firstDayOfMonth);
     setEndDate(today);
+    setFilterAccount('all');
   };
 
   return (
@@ -191,7 +205,7 @@ const Reports = () => {
            <button 
             onClick={resetDates}
             className="p-3 hover:bg-white/10 rounded-xl transition-all text-text-muted hover:text-white"
-            title="Reset to current month"
+            title="Reset Filters"
            >
              <RefreshCw size={14} />
            </button>
@@ -209,12 +223,35 @@ const Reports = () => {
         </div>
       </header>
 
+      {/* Account Switcher Row */}
+      <div className="animate-slide-up no-print" style={{ animationDelay: '100ms' }}>
+        <div className="flex items-center gap-3 bg-white/5 p-2 rounded-2xl border border-white/10 w-fit max-w-full group hover:border-primary/30 transition-all">
+          <div className="flex items-center gap-2 pl-3 pr-2 border-r border-white/10">
+            <Filter size={16} className="text-primary" />
+            <span className="text-[10px] font-black uppercase tracking-widest text-text-muted hidden sm:block">Filter By Account</span>
+          </div>
+          <select 
+            value={filterAccount} 
+            onChange={(e) => setFilterAccount(e.target.value)}
+            className="bg-transparent border-none focus:ring-0 text-white font-black uppercase italic tracking-tight text-sm h-10 px-4 cursor-pointer hover:text-primary transition-colors min-w-[200px]"
+          >
+            <option value="all" className="bg-[#181818] text-white">Total Portfolio</option>
+            {accounts.map(acc => (
+              <option key={acc.id} value={acc.id} className="bg-[#181818] text-white">{acc.name}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
       {/* Print-only Header */}
       <div className="hidden print:block mb-10 border-b-2 border-black pb-8">
         <h1 className="text-4xl font-black uppercase italic mb-2">Financial Intel Report</h1>
-        <div className="flex justify-between items-center text-sm font-bold uppercase tracking-widest">
-           <p>{currentWorkspaceName}</p>
-           <p className="text-primary">{startDate} — {endDate}</p>
+        <div className="flex justify-between items-start text-sm font-bold uppercase tracking-widest">
+           <div className="space-y-1">
+             <p className="text-primary">{currentWorkspaceName}</p>
+             <p className="text-xs text-black/60">{selectedAccountName}</p>
+           </div>
+           <p className="text-primary pt-1">{startDate} — {endDate}</p>
         </div>
       </div>
 
