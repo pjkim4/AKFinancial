@@ -344,7 +344,7 @@ const Reports = () => {
             </h3>
           </div>
 
-          <div className="min-h-[300px] h-64">
+          <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <RePieChart>
                 <Pie
@@ -355,6 +355,7 @@ const Reports = () => {
                   outerRadius={80}
                   paddingAngle={5}
                   dataKey="value"
+                  isAnimationActive={false}
                 >
                   {reportData.pieData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -389,7 +390,7 @@ const Reports = () => {
             </h3>
           </div>
 
-          <div className="min-h-[300px] h-80">
+          <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={reportData.barData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
@@ -400,8 +401,8 @@ const Reports = () => {
                   contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
                   formatter={(value) => [preferences.hideBalances ? '••••' : `$${Number(value).toLocaleString()}`, '']}
                 />
-                <Bar dataKey="income" fill="#c1ff72" radius={[4, 4, 0, 0]} name={t('income')} />
-                <Bar dataKey="expense" fill="rgba(255,255,255,0.1)" radius={[4, 4, 0, 0]} name={t('expense')} />
+                <Bar dataKey="income" fill="#c1ff72" radius={[4, 4, 0, 0]} name={t('income')} isAnimationActive={false} />
+                <Bar dataKey="expense" fill="rgba(255,255,255,0.1)" radius={[4, 4, 0, 0]} name={t('expense')} isAnimationActive={false} />
 
               </BarChart>
             </ResponsiveContainer>
