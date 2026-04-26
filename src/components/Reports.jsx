@@ -292,8 +292,8 @@ const Reports = () => {
         <h1 className="text-4xl font-black uppercase italic mb-2 text-black">Financial Report</h1>
         <div className="flex justify-between items-start text-sm font-bold uppercase tracking-widest text-black">
            <div className="space-y-1">
-             <p className="text-black">{currentWorkspaceName}</p>
-             <p className="text-xs text-black/60">{selectedAccountName}</p>
+             {currentWorkspaceName !== 'Personal Account' && <p className="text-black">{currentWorkspaceName}</p>}
+             {selectedAccountName !== 'Personal Account' && <p className="text-xs text-black/60">{selectedAccountName}</p>}
            </div>
            <p className="text-black pt-1">{startDate} — {endDate}</p>
         </div>
