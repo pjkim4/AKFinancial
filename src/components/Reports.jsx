@@ -83,25 +83,36 @@ const Reports = () => {
     // Monthly data logic adjusted for range
     const months = {};
     const monthLabels = [];
+    const monthsNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     
     const start = new Date(startDate);
     const end = new Date(endDate);
-    const current = new Date(start.getFullYear(), start.getMonth(), 1);
+    
+    // Normalize current to start of month
+    let current = new Date(start.getFullYear(), start.getMonth(), 1);
 
     while (current <= end) {
-      const label = current.toLocaleString('default', { month: 'short' });
+      const mIdx = current.getMonth();
+      const mLabel = monthsNames[mIdx];
       const year = current.getFullYear();
-      const uniqueLabel = `${label} ${year}`;
-      months[uniqueLabel] = { name: label, year, income: 0, expense: 0 };
+      const uniqueLabel = `${mLabel} ${year}`;
+      
+      months[uniqueLabel] = { 
+        name: mLabel, 
+        year, 
+        income: 0, 
+        expense: 0 
+      };
       monthLabels.push(uniqueLabel);
       current.setMonth(current.getMonth() + 1);
     }
 
     filteredTxs.forEach(t => {
-      const d = new Date(t.date);
-      const label = d.toLocaleString('default', { month: 'short' });
-      const year = d.getFullYear();
-      const uniqueLabel = `${label} ${year}`;
+      // Use split to avoid timezone shifts
+      const [y, m] = t.date.split('-').map(Number);
+      const mLabel = monthsNames[m - 1];
+      const uniqueLabel = `${mLabel} ${y}`;
+      
       if (months[uniqueLabel]) {
         if (t.type === 'Income') months[uniqueLabel].income += Number(t.amount);
         if (t.type === 'Expense') months[uniqueLabel].expense += Number(t.amount);
@@ -333,7 +344,7 @@ const Reports = () => {
             </h3>
           </div>
 
-          <div className="h-64">
+          <div className="min-h-[300px] h-64">
             <ResponsiveContainer width="100%" height="100%">
               <RePieChart>
                 <Pie
@@ -378,7 +389,7 @@ const Reports = () => {
             </h3>
           </div>
 
-          <div className="h-80">
+          <div className="min-h-[300px] h-80">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={reportData.barData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
