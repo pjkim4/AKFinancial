@@ -6,9 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AK Financial</title>
     <style>
+      @media screen {
+        .print-only { display: none !important; }
+      }
       @media print {
         .no-print { display: none !important; }
-        .print-hidden { display: none !important; }
+        .print-only { display: block !important; }
+        body { background: white !important; color: black !important; }
       }
     </style>
   </head>

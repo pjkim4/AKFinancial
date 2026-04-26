@@ -288,14 +288,14 @@ const Reports = () => {
       </div>
 
       {/* Print-only Header */}
-      <div className="hidden print:block mb-10 border-b-2 border-black pb-8">
-        <h1 className="text-4xl font-black uppercase italic mb-2">Financial Report</h1>
-        <div className="flex justify-between items-start text-sm font-bold uppercase tracking-widest">
+      <div className="print-only mb-10 border-b-2 border-black pb-8">
+        <h1 className="text-4xl font-black uppercase italic mb-2 text-black">Financial Report</h1>
+        <div className="flex justify-between items-start text-sm font-bold uppercase tracking-widest text-black">
            <div className="space-y-1">
-             <p className="text-primary">{currentWorkspaceName}</p>
+             <p className="text-black">{currentWorkspaceName}</p>
              <p className="text-xs text-black/60">{selectedAccountName}</p>
            </div>
-           <p className="text-primary pt-1">{startDate} — {endDate}</p>
+           <p className="text-black pt-1">{startDate} — {endDate}</p>
         </div>
       </div>
 
