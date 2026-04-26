@@ -365,7 +365,10 @@ const Reports = () => {
                   <Tooltip 
                     contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
                     itemStyle={{ color: '#fff', fontSize: '10px', fontWeight: '900', textTransform: 'uppercase' }}
-                    formatter={(value) => [preferences.hideBalances ? '••••' : `$${Number(value).toLocaleString()}`, 'Amount']}
+                    formatter={(value, name, props) => [
+                      preferences.hideBalances ? '••••' : `$${Number(value).toLocaleString()}`, 
+                      props.payload.name
+                    ]}
                   />
                 </RePieChart>
               </ResponsiveContainer>
@@ -397,17 +400,25 @@ const Reports = () => {
           <div className="flex justify-center items-center" style={{ minHeight: '300px', width: '100%' }}>
             {reportData.barData.length > 0 ? (
               <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={reportData.barData}>
+                <BarChart data={reportData.barData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-                  <XAxis dataKey="name" stroke="rgba(255,255,255,0.3)" fontSize={10} axisLine={false} tickLine={false} />
-                  <YAxis stroke="rgba(255,255,255,0.3)" fontSize={10} axisLine={false} tickLine={false} />
+                  <XAxis dataKey="name" stroke="#666" fontSize={10} fontWeight={900} axisLine={false} tickLine={false} />
+                  <YAxis 
+                    stroke="#666" 
+                    fontSize={10} 
+                    fontWeight={900} 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tickFormatter={(val) => `$${val.toLocaleString()}`}
+                  />
                   <Tooltip 
                     cursor={{ fill: 'rgba(255,255,255,0.05)' }}
                     contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
                     formatter={(value) => [preferences.hideBalances ? '••••' : `$${Number(value).toLocaleString()}`, '']}
                   />
-                  <Bar dataKey="income" fill="#c1ff72" radius={[4, 4, 0, 0]} name={t('income')} isAnimationActive={false} />
-                  <Bar dataKey="expense" fill="rgba(255,255,255,0.1)" radius={[4, 4, 0, 0]} name={t('expense')} isAnimationActive={false} />
+                  <Legend verticalAlign="bottom" height={36} wrapperStyle={{ paddingTop: '20px', fontSize: '10px', fontWeight: '900', textTransform: 'uppercase' }} />
+                  <Bar dataKey="income" fill="#10b981" radius={[4, 4, 0, 0]} name={t('income')} isAnimationActive={false} />
+                  <Bar dataKey="expense" fill="#ff4d4d" radius={[4, 4, 0, 0]} name={t('expense')} isAnimationActive={false} />
 
                 </BarChart>
               </ResponsiveContainer>
