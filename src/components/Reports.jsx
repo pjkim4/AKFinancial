@@ -13,7 +13,9 @@ import {
   Target,
   Sparkles,
   Calendar,
-  RefreshCw
+  RefreshCw,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 
 import { 
@@ -31,7 +33,7 @@ import {
 } from 'recharts';
 
 const Reports = () => {
-  const { transactions, accounts, availableHouseholds, currentHouseholdId, t } = useFinance();
+  const { transactions, accounts, availableHouseholds, currentHouseholdId, t, preferences, toggleBalances } = useFinance();
 
   // Date Range State
   const now = new Date();
@@ -145,9 +147,18 @@ const Reports = () => {
             <FileText className="text-primary" size={32} />
             <h2 className="text-3xl font-black tracking-tight uppercase italic">{t('nav_intel')}</h2>
           </div>
-          <p className="text-text-muted font-bold uppercase text-[10px] tracking-[0.2em]">
-            {t('report_analysis_for')} <span className="text-primary">{currentWorkspaceName}</span>
-          </p>
+          <div className="flex items-center gap-4">
+            <p className="text-text-muted font-bold uppercase text-[10px] tracking-[0.2em]">
+              {t('report_analysis_for')} <span className="text-primary">{currentWorkspaceName}</span>
+            </p>
+            <button 
+              onClick={toggleBalances}
+              className={`p-2 rounded-lg transition-all ${preferences.hideBalances ? 'bg-primary/20 text-primary' : 'text-text-muted hover:text-white bg-white/5'}`}
+              title={preferences.hideBalances ? "Show Balances" : "Hide Balances"}
+            >
+              {preferences.hideBalances ? <Eye size={16} /> : <EyeOff size={16} />}
+            </button>
+          </div>
         </div>
 
         {/* Date Range Picker */}
@@ -211,7 +222,9 @@ const Reports = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 print:grid-cols-3">
         <div className="card bg-success/10 border-success/20 p-8 shadow-xl">
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-success mb-4">{t('report_liquidity')}</p>
-          <p className="text-4xl font-black tracking-tighter">${reportData.totalIncome.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+          <p className="text-4xl font-black tracking-tighter">
+            {preferences.hideBalances ? '••••' : `$${reportData.totalIncome.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+          </p>
           <div className="flex items-center gap-2 mt-4 text-success/60">
             <ArrowUpRight size={14} />
             <span className="text-[10px] font-bold uppercase">{t('report_synced')}</span>
@@ -219,7 +232,9 @@ const Reports = () => {
         </div>
         <div className="card bg-danger/10 border-danger/20 p-8 shadow-xl">
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-danger mb-4">{t('report_capital')}</p>
-          <p className="text-4xl font-black tracking-tighter">${reportData.totalExpense.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+          <p className="text-4xl font-black tracking-tighter">
+            {preferences.hideBalances ? '••••' : `$${reportData.totalExpense.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+          </p>
           <div className="flex items-center gap-2 mt-4 text-danger/60">
             <ArrowDownRight size={14} />
             <span className="text-[10px] font-bold uppercase">{t('report_verified')}</span>
@@ -227,7 +242,9 @@ const Reports = () => {
         </div>
         <div className="card bg-primary/10 border-primary/20 p-8 shadow-xl">
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary mb-4">{t('report_retention')}</p>
-          <p className="text-4xl font-black tracking-tighter">${(reportData.totalIncome - reportData.totalExpense).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+          <p className="text-4xl font-black tracking-tighter">
+            {preferences.hideBalances ? '••••' : `$${(reportData.totalIncome - reportData.totalExpense).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+          </p>
           <div className="flex items-center gap-2 mt-4 text-primary/60">
             <Target size={14} />
             <span className="text-[10px] font-bold uppercase">Saving Capacity</span>
@@ -265,7 +282,7 @@ const Reports = () => {
                 <Tooltip 
                   contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
                   itemStyle={{ color: '#fff', fontSize: '10px', fontWeight: '900', textTransform: 'uppercase' }}
-                  formatter={(value) => [`$${Number(value).toLocaleString()}`, 'Amount']}
+                  formatter={(value) => [preferences.hideBalances ? '••••' : `$${Number(value).toLocaleString()}`, 'Amount']}
                 />
               </RePieChart>
             </ResponsiveContainer>
@@ -276,7 +293,7 @@ const Reports = () => {
                 <div className="w-2 h-2 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }}></div>
                 <div className="flex-1">
                   <p className="text-[8px] text-text-muted uppercase font-black tracking-tighter">{item.name}</p>
-                  <p className="text-xs font-bold">${item.value.toLocaleString()}</p>
+                  <p className="text-xs font-bold">{preferences.hideBalances ? '••••' : `$${item.value.toLocaleString()}`}</p>
                 </div>
               </div>
             ))}
@@ -300,7 +317,7 @@ const Reports = () => {
                 <Tooltip 
                   cursor={{ fill: 'rgba(255,255,255,0.05)' }}
                   contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
-                  formatter={(value) => [`$${Number(value).toLocaleString()}`, '']}
+                  formatter={(value) => [preferences.hideBalances ? '••••' : `$${Number(value).toLocaleString()}`, '']}
                 />
                 <Bar dataKey="income" fill="#c1ff72" radius={[4, 4, 0, 0]} name={t('income')} />
                 <Bar dataKey="expense" fill="rgba(255,255,255,0.1)" radius={[4, 4, 0, 0]} name={t('expense')} />
