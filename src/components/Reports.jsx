@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useFinance } from '../context/FinanceContext';
 import { 
   FileText, 
@@ -11,7 +11,9 @@ import {
   ArrowDownRight,
   ChevronRight,
   Target,
-  Sparkles
+  Sparkles,
+  Calendar,
+  RefreshCw
 } from 'lucide-react';
 
 import { 
@@ -31,6 +33,13 @@ import {
 const Reports = () => {
   const { transactions, accounts, availableHouseholds, currentHouseholdId, t } = useFinance();
 
+  // Date Range State
+  const now = new Date();
+  const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+  const today = now.toISOString().split('T')[0];
+
+  const [startDate, setStartDate] = useState(firstDayOfMonth);
+  const [endDate, setEndDate] = useState(today);
 
   const currentWorkspaceName = useMemo(() => {
     return availableHouseholds.find(h => h.id === currentHouseholdId)?.name || t('dash_personal_account');
@@ -38,15 +47,20 @@ const Reports = () => {
 
 
   const reportData = useMemo(() => {
-    const incomes = transactions.filter(t => t.type === 'Income');
-    const expenses = transactions.filter(t => t.type === 'Expense');
+    // Filter transactions by date range
+    const filteredTxs = transactions.filter(tx => {
+      return tx.date >= startDate && tx.date <= endDate;
+    });
+
+    const incomes = filteredTxs.filter(t => t.type === 'Income');
+    const expenses = filteredTxs.filter(t => t.type === 'Expense');
     
-    const totalIncome = incomes.reduce((s, t) => s + t.amount, 0);
-    const totalExpense = expenses.reduce((s, t) => s + t.amount, 0);
+    const totalIncome = incomes.reduce((s, t) => s + Number(t.amount), 0);
+    const totalExpense = expenses.reduce((s, t) => s + Number(t.amount), 0);
     
     const catData = {};
     expenses.forEach(t => {
-      catData[t.category] = (catData[t.category] || 0) + t.amount;
+      catData[t.category] = (catData[t.category] || 0) + Number(t.amount);
     });
 
     const pieData = Object.keys(catData).map(name => ({
@@ -54,22 +68,31 @@ const Reports = () => {
       value: catData[name]
     })).sort((a, b) => b.value - a.value);
 
-    // Monthly data (last 6 months)
+    // Monthly data logic adjusted for range
     const months = {};
-    const last6Months = [];
-    for (let i = 5; i >= 0; i--) {
-      const d = new Date();
-      d.setMonth(d.getMonth() - i);
-      const mLabel = d.toLocaleString('default', { month: 'short' });
-      months[mLabel] = { name: mLabel, income: 0, expense: 0 };
-      last6Months.push(mLabel);
+    const monthLabels = [];
+    
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const current = new Date(start.getFullYear(), start.getMonth(), 1);
+
+    while (current <= end) {
+      const label = current.toLocaleString('default', { month: 'short' });
+      const year = current.getFullYear();
+      const uniqueLabel = `${label} ${year}`;
+      months[uniqueLabel] = { name: label, year, income: 0, expense: 0 };
+      monthLabels.push(uniqueLabel);
+      current.setMonth(current.getMonth() + 1);
     }
 
-    transactions.forEach(t => {
-      const tMonth = new Date(t.date).toLocaleString('default', { month: 'short' });
-      if (months[tMonth]) {
-        if (t.type === 'Income') months[tMonth].income += t.amount;
-        if (t.type === 'Expense') months[tMonth].expense += t.amount;
+    filteredTxs.forEach(t => {
+      const d = new Date(t.date);
+      const label = d.toLocaleString('default', { month: 'short' });
+      const year = d.getFullYear();
+      const uniqueLabel = `${label} ${year}`;
+      if (months[uniqueLabel]) {
+        if (t.type === 'Income') months[uniqueLabel].income += Number(t.amount);
+        if (t.type === 'Expense') months[uniqueLabel].expense += Number(t.amount);
       }
     });
 
@@ -77,9 +100,9 @@ const Reports = () => {
       totalIncome,
       totalExpense,
       pieData,
-      barData: last6Months.map(m => months[m])
+      barData: monthLabels.map(m => months[m])
     };
-  }, [transactions]);
+  }, [transactions, startDate, endDate]);
 
   const COLORS = ['#c1ff72', '#ffffff', '#3d3d3d', '#1a1a1a', '#4ade80', '#fbbf24', '#f87171'];
 
@@ -89,7 +112,9 @@ const Reports = () => {
 
   const exportFullLedger = () => {
     const headers = ['Date', 'Description', 'Category', 'Type', 'Amount', 'Wallet'];
-    const rows = transactions.map(t => [
+    const filteredTxs = transactions.filter(tx => tx.date >= startDate && tx.date <= endDate);
+    
+    const rows = filteredTxs.map(t => [
       t.date,
       `"${t.description.replace(/"/g, '""')}"`,
       t.category,
@@ -101,16 +126,21 @@ const Reports = () => {
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.setAttribute("download", `Full_Ledger_${currentWorkspaceName.replace(/\s+/g, '_')}.csv`);
+    link.setAttribute("download", `Ledger_${startDate}_to_${endDate}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
 
+  const resetDates = () => {
+    setStartDate(firstDayOfMonth);
+    setEndDate(today);
+  };
+
   return (
     <div className="space-y-8 animate-slide-up pb-20">
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
+      <header className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 no-print">
+        <div className="flex-1">
           <div className="flex items-center gap-3 mb-2">
             <FileText className="text-primary" size={32} />
             <h2 className="text-3xl font-black tracking-tight uppercase italic">{t('nav_intel')}</h2>
@@ -118,42 +148,86 @@ const Reports = () => {
           <p className="text-text-muted font-bold uppercase text-[10px] tracking-[0.2em]">
             {t('report_analysis_for')} <span className="text-primary">{currentWorkspaceName}</span>
           </p>
-
         </div>
+
+        {/* Date Range Picker */}
+        <div className="flex flex-wrap items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/10">
+           <div className="flex items-center gap-3">
+              <Calendar size={16} className="text-primary" />
+              <div className="flex flex-col">
+                <span className="text-[8px] font-black uppercase text-text-muted tracking-widest mb-1">From</span>
+                <input 
+                  type="date" 
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="bg-transparent border-none p-0 text-xs font-black uppercase text-white focus:ring-0 cursor-pointer"
+                />
+              </div>
+           </div>
+           <div className="w-px h-8 bg-white/10 mx-2"></div>
+           <div className="flex items-center gap-3">
+              <Calendar size={16} className="text-primary" />
+              <div className="flex flex-col">
+                <span className="text-[8px] font-black uppercase text-text-muted tracking-widest mb-1">To</span>
+                <input 
+                  type="date" 
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  className="bg-transparent border-none p-0 text-xs font-black uppercase text-white focus:ring-0 cursor-pointer"
+                />
+              </div>
+           </div>
+           <button 
+            onClick={resetDates}
+            className="p-3 hover:bg-white/10 rounded-xl transition-all text-text-muted hover:text-white"
+            title="Reset to current month"
+           >
+             <RefreshCw size={14} />
+           </button>
+        </div>
+
         <div className="flex gap-2">
-          <button onClick={printReport} className="btn bg-white/5 border-white/10 h-12 px-6 hover:bg-white/10">
+          <button onClick={printReport} className="btn bg-white/5 border-white/10 h-14 px-6 hover:bg-white/10">
             <Printer size={18} />
             <span className="font-black text-[10px] uppercase tracking-widest">{t('report_print')}</span>
           </button>
-          <button onClick={exportFullLedger} className="btn btn-primary h-12 px-6 text-black">
+          <button onClick={exportFullLedger} className="btn btn-primary h-14 px-8 text-black shadow-xl shadow-primary/20">
             <Download size={18} />
             <span className="font-black text-[10px] uppercase tracking-widest">{t('report_master')}</span>
           </button>
         </div>
-
       </header>
+
+      {/* Print-only Header */}
+      <div className="hidden print:block mb-10 border-b-2 border-black pb-8">
+        <h1 className="text-4xl font-black uppercase italic mb-2">Financial Intel Report</h1>
+        <div className="flex justify-between items-center text-sm font-bold uppercase tracking-widest">
+           <p>{currentWorkspaceName}</p>
+           <p className="text-primary">{startDate} — {endDate}</p>
+        </div>
+      </div>
 
       {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 print:grid-cols-3">
-        <div className="card bg-success/10 border-success/20 p-8">
+        <div className="card bg-success/10 border-success/20 p-8 shadow-xl">
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-success mb-4">{t('report_liquidity')}</p>
-          <p className="text-4xl font-black tracking-tighter">${reportData.totalIncome.toLocaleString()}</p>
+          <p className="text-4xl font-black tracking-tighter">${reportData.totalIncome.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
           <div className="flex items-center gap-2 mt-4 text-success/60">
             <ArrowUpRight size={14} />
             <span className="text-[10px] font-bold uppercase">{t('report_synced')}</span>
           </div>
         </div>
-        <div className="card bg-danger/10 border-danger/20 p-8">
+        <div className="card bg-danger/10 border-danger/20 p-8 shadow-xl">
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-danger mb-4">{t('report_capital')}</p>
-          <p className="text-4xl font-black tracking-tighter">${reportData.totalExpense.toLocaleString()}</p>
+          <p className="text-4xl font-black tracking-tighter">${reportData.totalExpense.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
           <div className="flex items-center gap-2 mt-4 text-danger/60">
             <ArrowDownRight size={14} />
             <span className="text-[10px] font-bold uppercase">{t('report_verified')}</span>
           </div>
         </div>
-        <div className="card bg-primary/10 border-primary/20 p-8">
+        <div className="card bg-primary/10 border-primary/20 p-8 shadow-xl">
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary mb-4">{t('report_retention')}</p>
-          <p className="text-4xl font-black tracking-tighter">${(reportData.totalIncome - reportData.totalExpense).toLocaleString()}</p>
+          <p className="text-4xl font-black tracking-tighter">${(reportData.totalIncome - reportData.totalExpense).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
           <div className="flex items-center gap-2 mt-4 text-primary/60">
             <Target size={14} />
             <span className="text-[10px] font-bold uppercase">Saving Capacity</span>
@@ -164,7 +238,7 @@ const Reports = () => {
 
       {/* Visual Analytics */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="card bg-white/5 border-white/10 p-8 print:border-black/10">
+        <div className="card bg-white/5 border-white/10 p-8 print:border-black/10 print:shadow-none">
           <div className="flex items-center justify-between mb-8">
             <h3 className="font-black uppercase tracking-widest text-xs flex items-center gap-2">
               <PieChart className="text-primary" size={18} />
@@ -191,6 +265,7 @@ const Reports = () => {
                 <Tooltip 
                   contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
                   itemStyle={{ color: '#fff', fontSize: '10px', fontWeight: '900', textTransform: 'uppercase' }}
+                  formatter={(value) => [`$${Number(value).toLocaleString()}`, 'Amount']}
                 />
               </RePieChart>
             </ResponsiveContainer>
@@ -208,7 +283,7 @@ const Reports = () => {
           </div>
         </div>
 
-        <div className="card bg-white/5 border-white/10 p-8">
+        <div className="card bg-white/5 border-white/10 p-8 print:border-black/10 print:shadow-none">
           <div className="flex items-center justify-between mb-8">
             <h3 className="font-black uppercase tracking-widest text-xs flex items-center gap-2">
               <TableIcon className="text-primary" size={18} />
@@ -225,6 +300,7 @@ const Reports = () => {
                 <Tooltip 
                   cursor={{ fill: 'rgba(255,255,255,0.05)' }}
                   contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
+                  formatter={(value) => [`$${Number(value).toLocaleString()}`, '']}
                 />
                 <Bar dataKey="income" fill="#c1ff72" radius={[4, 4, 0, 0]} name={t('income')} />
                 <Bar dataKey="expense" fill="rgba(255,255,255,0.1)" radius={[4, 4, 0, 0]} name={t('expense')} />
@@ -236,7 +312,7 @@ const Reports = () => {
       </div>
 
       {/* AI Strategy Export Section */}
-      <div className="card bg-primary/5 border-primary/10 p-10 relative overflow-hidden group">
+      <div className="card bg-primary/5 border-primary/10 p-10 relative overflow-hidden group no-print">
         <BrainCircuit className="absolute -right-10 -bottom-10 text-primary opacity-5 w-64 h-64 group-hover:scale-110 transition-all duration-700" />
         <div className="relative z-10">
           <h3 className="text-xl font-black uppercase italic tracking-tight mb-4 flex items-center gap-3">
