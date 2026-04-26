@@ -341,7 +341,7 @@ const AppContent = () => {
       </header>
 
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex w-64 glass border-r border-white/10 h-screen sticky top-0 z-20 flex-col no-print">
+      <aside className="hidden md:flex w-64 glass border-r border-white/10 h-screen flex-col no-print sticky top-0">
         <div className="p-6 flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -388,7 +388,7 @@ const AppContent = () => {
           </div>
         )}
 
-        <nav className="flex-1 px-4 space-y-2 py-4">
+        <nav className="flex-1 px-4 space-y-2 py-4 overflow-y-auto scrollbar-hide">
           <button 
             onClick={() => setActiveTab('dashboard')}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${activeTab === 'dashboard' ? 'bg-primary text-black shadow-lg shadow-primary/20' : 'hover:bg-white/5 text-text-muted hover:text-white'}`}

@@ -320,3 +320,11 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   .text-primary { color: #000 !important; }
   .text-text-muted { color: #666 !important; }
 }
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
