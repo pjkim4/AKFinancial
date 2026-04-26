@@ -1,6 +1,8 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import SearchableSelect from './ui/SearchableSelect';
+import { exportToIIF } from '../lib/exportUtils';
+
 
 import { useFinance } from '../context/FinanceContext';
 import { 
@@ -26,7 +28,8 @@ import {
   Check,
   Zap,
   History,
-  ArrowUpDown
+  ArrowUpDown,
+  Download
 } from 'lucide-react';
 
 
@@ -68,6 +71,10 @@ const Dashboard = () => {
   const [isAccountPickerOpen, setIsAccountPickerOpen] = useState(false);
   const [isLogConfirmationOpen, setIsLogConfirmationOpen] = useState(false);
   const [logFormData, setLogFormData] = useState({ amount: '', date: '' });
+  const [statsCustomRange, setStatsCustomRange] = useState({ 
+    start: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0], 
+    end: new Date().toISOString().split('T')[0] 
+  });
   
   // Instant Move State
   const [qtSource, setQtSource] = useState(accounts[0]?.id || '');
@@ -170,6 +177,13 @@ const Dashboard = () => {
       }
       if (statsPeriod === 'YTD') {
         return txDate.getFullYear() === currentYear;
+      }
+      if (statsPeriod === 'Custom') {
+        const start = new Date(statsCustomRange.start);
+        const end = new Date(statsCustomRange.end);
+        // Set end of day for the end date to ensure inclusive match
+        end.setHours(23, 59, 59, 999);
+        return txDate >= start && txDate <= end;
       }
       return true; // 'All'
     });
@@ -358,6 +372,42 @@ const Dashboard = () => {
     setLoading(false);
   };
 
+  const handleDashboardExport = () => {
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    const periodTransactions = filteredTransactions.filter(t => {
+      const txDate = new Date(t.date);
+      if (statsPeriod === '1M') {
+        // Current Calendar Month
+        return txDate.getMonth() === currentMonth && txDate.getFullYear() === currentYear;
+      }
+      if (statsPeriod === '3M') {
+        // Last 90 days
+        const ninetyDaysAgo = new Date();
+        ninetyDaysAgo.setDate(now.getDate() - 90);
+        return txDate >= ninetyDaysAgo;
+      }
+      if (statsPeriod === 'YTD') {
+        // Year to Date
+        return txDate.getFullYear() === currentYear;
+      }
+      if (statsPeriod === 'Custom') {
+        const start = new Date(statsCustomRange.start);
+        const end = new Date(statsCustomRange.end);
+        end.setHours(23, 59, 59, 999);
+        return txDate >= start && txDate <= end;
+      }
+      return true; // 'All'
+    });
+
+    const fileName = filterAccount === 'all' 
+      ? `Total_Portfolio_${statsPeriod}_QuickBooks` 
+      : `${accounts.find(a => a.id === filterAccount)?.name || 'Account'}_${statsPeriod}_QuickBooks`;
+    
+    exportToIIF(periodTransactions, accounts, fileName);
+  };
 
   return (
     <div className="space-y-8 animate-slide-up">
@@ -409,11 +459,36 @@ const Dashboard = () => {
             >
               <PieChartIcon size={18} />
             </button>
+            <button 
+              onClick={handleDashboardExport}
+              className="p-2 text-text-muted hover:text-primary transition-all flex items-center gap-2 border-l border-white/10 ml-1"
+              title="Export to QuickBooks (IIF)"
+            >
+              <Download size={18} />
+              <span className="text-[10px] font-black uppercase tracking-widest hidden xl:block">QuickBooks</span>
+            </button>
           </div>
 
           <div className="flex flex-wrap items-center gap-3 md:gap-4 ml-auto w-full md:w-auto justify-end">
+            {statsPeriod === 'Custom' && (
+              <div className="flex items-center gap-2 bg-white/5 p-1 rounded-xl border border-white/10 animate-slide-right">
+                <input 
+                  type="date" 
+                  value={statsCustomRange.start}
+                  onChange={(e) => setStatsCustomRange({...statsCustomRange, start: e.target.value})}
+                  className="bg-transparent border-none text-[10px] font-black uppercase p-1 w-28"
+                />
+                <span className="text-[10px] text-text-muted font-black">TO</span>
+                <input 
+                  type="date" 
+                  value={statsCustomRange.end}
+                  onChange={(e) => setStatsCustomRange({...statsCustomRange, end: e.target.value})}
+                  className="bg-transparent border-none text-[10px] font-black uppercase p-1 w-28"
+                />
+              </div>
+            )}
             <div className="flex bg-white/5 p-1 rounded-xl border border-white/10 shrink-0">
-              {['1M', '3M', 'YTD', 'All'].map(p => (
+              {['1M', '3M', 'YTD', 'All', 'Custom'].map(p => (
                 <button 
                   key={p}
                   onClick={() => setStatsPeriod(p)}
@@ -423,7 +498,6 @@ const Dashboard = () => {
                 </button>
               ))}
             </div>
-
           </div>
         </div>
       </div>

@@ -18,6 +18,8 @@ import {
 
 
 import SearchableSelect from './ui/SearchableSelect';
+import { exportToIIF } from '../lib/exportUtils';
+
 
 const AccountManager = () => {
   const { 
@@ -141,6 +143,21 @@ const AccountManager = () => {
     } catch (err) {
       console.error('[DEBUG] Download failed:', err);
       setError('Download failed. Please use the COPY DATA button.');
+    }
+  };
+
+  const exportAccountIIF = () => {
+    const safeName = (selectedAccount.name || 'Account')
+      .replace(/[^a-z0-9\s-]/gi, '')
+      .replace(/\s+/g, '_');
+    
+    const accountTxs = transactions.filter(t => t.account_id === selectedAccount.id);
+    const result = exportToIIF(accountTxs, accounts, `${safeName}_QuickBooks_Desktop`);
+    
+    if (result.success) {
+      setBackupDownloaded(true);
+    } else {
+      setError('IIF Export failed. Please try CSV instead.');
     }
   };
 
@@ -499,9 +516,13 @@ const AccountManager = () => {
                         Step 1: Download or verify your history below.
                       </p>
                       
-                      <div className="flex gap-2">
-                        <button onClick={downloadAccountBackup} className="flex-1 btn btn-secondary border-white/10 h-14 font-black uppercase text-xs">
-                          Download CSV
+                      <div className="flex flex-col gap-3">
+                        <button onClick={downloadAccountBackup} className="btn btn-secondary border-white/10 h-14 font-black uppercase text-xs">
+                          Download CSV (Standard)
+                        </button>
+                        <button onClick={exportAccountIIF} className="btn bg-primary text-black h-14 font-black uppercase text-xs flex items-center justify-center gap-2">
+                          <Plus size={16} className="rotate-45" /> 
+                          Export for QuickBooks (.IIF)
                         </button>
                       </div>
 
