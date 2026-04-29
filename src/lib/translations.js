@@ -189,8 +189,8 @@ export const translations = {
     
     // Dashboard
     dash_total_assets: '총 자산',
-    dash_monthly_income: '이번 달 수입',
-    dash_monthly_expense: '이번 달 지출',
+    dash_monthly_income: '월 수입',
+    dash_monthly_expense: '월 지출',
     dash_active_workspace: '활성 워크스페이스',
     dash_personal_account: '개인 계정',
     dash_total_portfolio: '전체 포트폴리오',
