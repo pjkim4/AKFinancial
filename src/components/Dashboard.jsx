@@ -472,21 +472,21 @@ const Dashboard = () => {
             </button>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 md:gap-4 ml-auto w-full md:w-auto justify-end">
+          <div className="flex flex-wrap items-center gap-3 md:gap-4 w-full md:w-auto justify-start md:justify-end">
             {statsPeriod === 'Custom' && (
-              <div className="flex items-center gap-2 bg-white/5 p-1 rounded-xl border border-white/10 animate-slide-right">
+              <div className="flex items-center gap-1 sm:gap-2 bg-white/5 p-1 rounded-xl border border-white/10 animate-slide-right w-full sm:w-auto justify-center">
                 <input 
                   type="date" 
                   value={statsCustomRange.start}
                   onChange={(e) => setStatsCustomRange({...statsCustomRange, start: e.target.value})}
-                  className="bg-transparent border-none text-[10px] font-black uppercase p-1 w-28"
+                  className="bg-transparent border-none text-[10px] font-black uppercase p-1 w-[100px] sm:w-28"
                 />
                 <span className="text-[10px] text-text-muted font-black">TO</span>
                 <input 
                   type="date" 
                   value={statsCustomRange.end}
                   onChange={(e) => setStatsCustomRange({...statsCustomRange, end: e.target.value})}
-                  className="bg-transparent border-none text-[10px] font-black uppercase p-1 w-28"
+                  className="bg-transparent border-none text-[10px] font-black uppercase p-1 w-[100px] sm:w-28"
                 />
               </div>
             )}
