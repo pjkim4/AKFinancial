@@ -29,7 +29,8 @@ import {
   Zap,
   History,
   ArrowUpDown,
-  Download
+  Download,
+  ChevronDown
 } from 'lucide-react';
 
 
@@ -521,16 +522,19 @@ const Dashboard = () => {
             <Filter size={16} className="text-primary" />
             <span className="text-[10px] font-black uppercase tracking-widest text-text-muted hidden sm:block">Portfolio filter</span>
           </div>
-          <select 
-            value={filterAccount} 
-            onChange={(e) => setFilterAccount(e.target.value)}
-            className="bg-transparent border-none focus:ring-0 text-white font-black uppercase italic tracking-tight text-sm h-10 px-4 cursor-pointer hover:text-primary transition-colors min-w-[200px]"
-          >
-            <option value="all" className="bg-[#181818] text-white">Total Portfolio</option>
-            {accounts.map(acc => (
-              <option key={acc.id} value={acc.id} className="bg-[#181818] text-white">{acc.name}</option>
-            ))}
-          </select>
+          <div className="relative flex items-center">
+            <select 
+              value={filterAccount} 
+              onChange={(e) => setFilterAccount(e.target.value)}
+              className="appearance-none bg-transparent border-none focus:ring-0 text-white font-black uppercase italic tracking-tight text-sm h-10 pl-4 pr-10 cursor-pointer hover:text-primary transition-colors min-w-[200px]"
+            >
+              <option value="all" className="bg-[#181818] text-white">Total Portfolio</option>
+              {accounts.map(acc => (
+                <option key={acc.id} value={acc.id} className="bg-[#181818] text-white">{acc.name}</option>
+              ))}
+            </select>
+            <ChevronDown size={16} className="absolute right-3 text-text-muted pointer-events-none group-hover:text-primary transition-colors" />
+          </div>
         </div>
       </div>
 
