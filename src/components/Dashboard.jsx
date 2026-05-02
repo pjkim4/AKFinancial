@@ -490,12 +490,12 @@ const Dashboard = () => {
                 />
               </div>
             )}
-            <div className="flex bg-white/5 p-1 rounded-xl border border-white/10 shrink-0">
+            <div className="grid grid-cols-3 sm:flex bg-white/5 p-1 rounded-xl border border-white/10 w-full sm:w-auto gap-1">
               {['1M', '3M', 'YTD', 'All', 'Custom'].map(p => (
                 <button 
                   key={p}
                   onClick={() => setStatsPeriod(p)}
-                  className={`px-2 sm:px-4 py-2 text-[10px] font-black uppercase rounded-lg transition-all ${statsPeriod === p ? 'bg-primary text-black' : 'text-text-muted hover:text-white'}`}
+                  className={`px-2 sm:px-4 py-2 text-[10px] font-black uppercase rounded-lg transition-all ${statsPeriod === p ? 'bg-primary text-black' : 'text-text-muted hover:text-white'} w-full`}
                 >
                   {p}
                 </button>
