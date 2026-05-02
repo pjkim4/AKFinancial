@@ -29,7 +29,9 @@ const AIInsights = () => {
     const filteredTxs = transactions.filter(tx => {
       const txDate = new Date(tx.date);
       if (period === '1M') {
-        return txDate.getMonth() === currentMonth && txDate.getFullYear() === currentYear;
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(now.getDate() - 30);
+        return txDate >= thirtyDaysAgo;
       }
       if (period === '3M') {
         const ninetyDaysAgo = new Date();

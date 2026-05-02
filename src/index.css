@@ -238,6 +238,12 @@ input:focus, select:focus {
 .border-b { border-bottom: 1px solid var(--border); }
 .border-t { border-top: 1px solid var(--border); }
 
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* Additional Utilities for Premium Components */
 .bg-lime { background-color: #c1ff72; }
 .rounded-2xl { border-radius: 1.25rem; }

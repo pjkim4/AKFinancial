@@ -168,7 +168,9 @@ const Dashboard = () => {
     const periodTransactions = filteredTransactions.filter(t => {
       const txDate = new Date(t.date);
       if (statsPeriod === '1M') {
-        return txDate.getMonth() === currentMonth && txDate.getFullYear() === currentYear;
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(now.getDate() - 30);
+        return txDate >= thirtyDaysAgo;
       }
       if (statsPeriod === '3M') {
         const ninetyDaysAgo = new Date();
@@ -380,8 +382,9 @@ const Dashboard = () => {
     const periodTransactions = filteredTransactions.filter(t => {
       const txDate = new Date(t.date);
       if (statsPeriod === '1M') {
-        // Current Calendar Month
-        return txDate.getMonth() === currentMonth && txDate.getFullYear() === currentYear;
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(now.getDate() - 30);
+        return txDate >= thirtyDaysAgo;
       }
       if (statsPeriod === '3M') {
         // Last 90 days
@@ -655,8 +658,10 @@ const Dashboard = () => {
                           <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-2 font-black text-base bg-white/10 group-hover:bg-black/20 shrink-0 shadow-sm" style={{ color: item.color }}>
                             {item.type === 'Income' ? <ArrowUpRight size={18} /> : item.name.charAt(0)}
                           </div>
-                          <div className="flex-1 flex flex-col items-end justify-center min-h-[36px] w-full px-1">
-                             <p className="w-full text-[10px] font-black group-hover:text-black transition-colors truncate leading-tight text-right mb-0.5">{item.name}</p>
+                          <div className="flex-1 flex flex-col items-end justify-center min-h-[36px] w-full px-1 min-w-0">
+                             <p className="w-full text-[10px] font-black group-hover:text-black transition-colors truncate leading-tight text-right mb-0.5">
+                               {item.name.replace('Bloomingdales', 'Bloomies')}
+                             </p>
                              <p className="text-[9px] font-black text-text-muted group-hover:text-black/60 shrink-0">
                                {item.type === 'Income' ? '+' : ''}${item.amount || '???'}
                              </p>
@@ -719,8 +724,10 @@ const Dashboard = () => {
                           <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-2 font-black text-base bg-white/10 group-hover:bg-black/20 shrink-0 shadow-sm" style={{ color: item.color }}>
                             {item.type === 'Income' ? <ArrowUpRight size={18} /> : item.name.charAt(0)}
                           </div>
-                          <div className="flex-1 flex flex-col items-end justify-center min-h-[36px] w-full px-1">
-                             <p className="w-full text-[10px] font-black group-hover:text-black transition-colors truncate leading-tight text-right mb-0.5">{item.name}</p>
+                          <div className="flex-1 flex flex-col items-end justify-center min-h-[36px] w-full px-1 min-w-0">
+                             <p className="w-full text-[10px] font-black group-hover:text-black transition-colors truncate leading-tight text-right mb-0.5">
+                               {item.name.replace('Bloomingdales', 'Bloomies')}
+                             </p>
                              <p className="text-[9px] font-black text-text-muted group-hover:text-black/60 shrink-0">
                                {item.type === 'Income' ? '+' : ''}${item.amount || '???'}
                              </p>
