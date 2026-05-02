@@ -472,36 +472,43 @@ const Dashboard = () => {
             </button>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 md:gap-4 w-full md:w-auto justify-start md:justify-end">
-            {statsPeriod === 'Custom' && (
-              <div className="flex items-center gap-1 sm:gap-2 bg-white/5 p-1 rounded-xl border border-white/10 animate-slide-right w-full sm:w-auto justify-center">
-                <input 
-                  type="date" 
-                  value={statsCustomRange.start}
-                  onChange={(e) => setStatsCustomRange({...statsCustomRange, start: e.target.value})}
-                  className="bg-transparent border-none text-[10px] font-black uppercase p-1 w-[100px] sm:w-28"
-                />
-                <span className="text-[10px] text-text-muted font-black">TO</span>
-                <input 
-                  type="date" 
-                  value={statsCustomRange.end}
-                  onChange={(e) => setStatsCustomRange({...statsCustomRange, end: e.target.value})}
-                  className="bg-transparent border-none text-[10px] font-black uppercase p-1 w-[100px] sm:w-28"
-                />
-              </div>
-            )}
-            <div className="grid grid-cols-3 sm:flex bg-white/5 p-1 rounded-xl border border-white/10 w-full sm:w-auto gap-1">
-              {['1M', '3M', 'YTD', 'All', 'Custom'].map(p => (
-                <button 
-                  key={p}
-                  onClick={() => setStatsPeriod(p)}
-                  className={`px-2 sm:px-4 py-2 text-[10px] font-black uppercase rounded-lg transition-all ${statsPeriod === p ? 'bg-primary text-black' : 'text-text-muted hover:text-white'} w-full`}
-                >
-                  {p}
-                </button>
-              ))}
-            </div>
+        </div>
+      </div>
+
+      {/* Period Selector Row */}
+      <div className="flex flex-wrap items-center gap-3 md:gap-4 w-full justify-start animate-slide-up" style={{ animationDelay: '50ms' }}>
+        <div className="flex items-center gap-3 bg-white/5 px-4 py-2 rounded-xl border border-white/10">
+          <History size={16} className="text-primary" />
+          <span className="text-[10px] font-black uppercase tracking-widest text-text-muted">Timeframe</span>
+        </div>
+
+        {statsPeriod === 'Custom' && (
+          <div className="flex items-center gap-1 sm:gap-2 bg-white/5 p-1 rounded-xl border border-white/10 animate-slide-right w-full sm:w-auto justify-center">
+            <input 
+              type="date" 
+              value={statsCustomRange.start}
+              onChange={(e) => setStatsCustomRange({...statsCustomRange, start: e.target.value})}
+              className="bg-transparent border-none text-[10px] font-black uppercase p-1 w-[100px] sm:w-28"
+            />
+            <span className="text-[10px] text-text-muted font-black">TO</span>
+            <input 
+              type="date" 
+              value={statsCustomRange.end}
+              onChange={(e) => setStatsCustomRange({...statsCustomRange, end: e.target.value})}
+              className="bg-transparent border-none text-[10px] font-black uppercase p-1 w-[100px] sm:w-28"
+            />
           </div>
+        )}
+        <div className="grid grid-cols-3 sm:flex bg-white/5 p-1 rounded-xl border border-white/10 w-full sm:w-auto gap-1">
+          {['1M', '3M', 'YTD', 'All', 'Custom'].map(p => (
+            <button 
+              key={p}
+              onClick={() => setStatsPeriod(p)}
+              className={`px-2 sm:px-4 py-2 text-[10px] font-black uppercase rounded-lg transition-all ${statsPeriod === p ? 'bg-primary text-black' : 'text-text-muted hover:text-white'} w-full`}
+            >
+              {p}
+            </button>
+          ))}
         </div>
       </div>
 
