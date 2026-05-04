@@ -505,6 +505,7 @@ export const FinanceProvider = ({ children }) => {
     try {
       const { member_id, ...txData } = transaction;
       let finalTx = { ...txData, user_id: currentHouseholdId || user.id };
+      console.log('[DB] Attempting to insert transaction:', finalTx);
       
       // Try with member_id if provided
       if (member_id) {
