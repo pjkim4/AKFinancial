@@ -143,6 +143,11 @@ export const FinanceProvider = ({ children }) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
+      
+      if (_event === 'SIGNED_IN' || _event === 'USER_UPDATED') {
+        setPreferences(prev => ({ ...prev, hideBalances: true }));
+      }
+
       if (!session) {
         setLoading(false);
       } else {
