@@ -1378,17 +1378,18 @@ export const FinanceProvider = ({ children }) => {
   };
 
 
-  const inviteMember = async (email, householdId) => {
+  const inviteMember = async (email, householdId, accessLevel = 'read') => {
     try {
       const trimmedEmail = email.trim().toLowerCase();
-      console.log('Inviting:', trimmedEmail, 'to household:', householdId);
+      console.log('Inviting:', trimmedEmail, 'to household:', householdId, 'with access:', accessLevel);
       const { data, error } = await supabase
         .from('household_invitations')
         .insert([{ 
           household_id: householdId,
           inviter_id: user.id,
           invitee_email: trimmedEmail,
-          status: 'pending'
+          status: 'pending',
+          access_level: accessLevel
         }])
         .select();
       if (error) throw error;

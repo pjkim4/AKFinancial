@@ -24,6 +24,7 @@ const AdminSettings = () => {
   const [newMember, setNewMember] = useState({ name: '', role: 'Spouse', color: '#c1ff72' });
   const [editMemberData, setEditMemberData] = useState({ name: '', role: 'Spouse', color: '#c1ff72' });
   const [inviteEmail, setInviteEmail] = useState('');
+  const [inviteAccessLevel, setInviteAccessLevel] = useState('read');
 
   const [formData, setFormData] = useState({
     username: profile?.username || user?.email?.split('@')[0] || '',
@@ -43,7 +44,7 @@ const AdminSettings = () => {
 
   const handleInvite = async () => {
     setLoading(true);
-    const { error } = await inviteMember(inviteEmail, currentHouseholdId);
+    const { error } = await inviteMember(inviteEmail, currentHouseholdId, inviteAccessLevel);
     setLoading(false);
     if (error) {
       alert('Invitation failed: ' + error.message);
@@ -229,34 +230,78 @@ const AdminSettings = () => {
               <h4 className="text-xs font-black uppercase tracking-widest text-primary">{t('settings_add_member')}</h4>
               <button onClick={() => setIsAddingMember(false)}><X size={18} /></button>
             </div>
-            <div className="space-y-4">
-              <input 
-                placeholder="Full Name"
-                className="w-full"
-                value={newMember.name}
-                onChange={e => setNewMember({...newMember, name: e.target.value})}
-              />
-              <div className="grid grid-cols-2 gap-4">
-                <select 
-                  className="w-full"
-                  value={newMember.role} 
-                  onChange={e => setNewMember({...newMember, role: e.target.value})}
-                >
-                  {allRoles.map(role => (
-                    <option key={role.id} value={role.id}>{role.name}</option>
-                  ))}
-                </select>
-                <input 
-                  type="color" 
-                  className="w-full h-12 p-1 bg-white/5 border-white/10" 
-                  value={newMember.color} 
-                  onChange={e => setNewMember({...newMember, color: e.target.value})} 
-                />
-              </div>
-              <button onClick={handleAddMember} className="btn btn-primary w-full h-12 text-black font-black uppercase text-xs tracking-widest">
-                Add Household Member
+
+            <div className="flex gap-2 mb-6 p-1 bg-black/40 rounded-xl">
+              <button 
+                onClick={() => setMemberType('virtual')}
+                className={`flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all ${memberType === 'virtual' ? 'bg-primary text-black' : 'text-text-muted hover:text-white'}`}
+              >
+                Virtual Member
+              </button>
+              <button 
+                onClick={() => setMemberType('cloud')}
+                className={`flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all ${memberType === 'cloud' ? 'bg-primary text-black' : 'text-text-muted hover:text-white'}`}
+              >
+                Invite via Email
               </button>
             </div>
+
+            {memberType === 'virtual' ? (
+              <div className="space-y-4 animate-slide-up">
+                <p className="text-[10px] text-text-muted uppercase italic mb-2">Virtual members do not have login access. They are for tracking only.</p>
+                <input 
+                  placeholder="Full Name"
+                  className="w-full"
+                  value={newMember.name}
+                  onChange={e => setNewMember({...newMember, name: e.target.value})}
+                />
+                <div className="grid grid-cols-2 gap-4">
+                  <select 
+                    className="w-full"
+                    value={newMember.role} 
+                    onChange={e => setNewMember({...newMember, role: e.target.value})}
+                  >
+                    {allRoles.map(role => (
+                      <option key={role.id} value={role.id}>{role.name}</option>
+                    ))}
+                  </select>
+                  <input 
+                    type="color" 
+                    className="w-full h-12 p-1 bg-white/5 border-white/10" 
+                    value={newMember.color} 
+                    onChange={e => setNewMember({...newMember, color: e.target.value})} 
+                  />
+                </div>
+                <button onClick={handleAddMember} disabled={loading} className="btn btn-primary w-full h-12 text-black font-black uppercase text-xs tracking-widest disabled:opacity-50">
+                  Add Virtual Member
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-4 animate-slide-up">
+                <p className="text-[10px] text-text-muted uppercase italic mb-2">Invite a real user to join your household. They will log in with their own account.</p>
+                <input 
+                  type="email"
+                  placeholder="Email Address"
+                  className="w-full"
+                  value={inviteEmail}
+                  onChange={e => setInviteEmail(e.target.value)}
+                />
+                <div>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-text-muted block mb-2">Access Level</label>
+                  <select 
+                    className="w-full"
+                    value={inviteAccessLevel}
+                    onChange={e => setInviteAccessLevel(e.target.value)}
+                  >
+                    <option value="read">Read Only (View Data)</option>
+                    <option value="write">Read & Write (Full Access)</option>
+                  </select>
+                </div>
+                <button onClick={handleInvite} disabled={loading || !inviteEmail} className="btn btn-primary w-full h-12 text-black font-black uppercase text-xs tracking-widest flex items-center justify-center gap-2 disabled:opacity-50">
+                  <Mail size={16} /> Send Invitation
+                </button>
+              </div>
+            )}
           </div>
         )}
 
@@ -330,6 +375,31 @@ const AdminSettings = () => {
             </div>
           ))}
         </div>
+        </div>
+
+        {sentInvitations.length > 0 && (
+          <div className="mt-8 pt-8 border-t border-white/10">
+            <h4 className="text-xs font-black uppercase tracking-widest text-text-muted mb-4">Pending Cloud Invitations</h4>
+            <div className="space-y-3">
+              {sentInvitations.filter(inv => inv.status === 'pending').map(inv => (
+                <div key={inv.id} className="flex items-center justify-between p-4 bg-white/5 border border-white/10 rounded-xl">
+                  <div>
+                    <p className="font-bold">{inv.invitee_email}</p>
+                    <p className="text-[10px] text-primary uppercase tracking-widest">Access: {inv.access_level || 'read'}</p>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      if(confirm('Revoke this invitation?')) revokeInvitation(inv.id);
+                    }}
+                    className="text-[10px] font-black uppercase text-danger hover:underline"
+                  >
+                    Revoke
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </section>
 
       {/* Role Manager Section */}
