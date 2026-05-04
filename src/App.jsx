@@ -17,7 +17,8 @@ import {
   EyeOff,
   ChevronDown,
   FileText,
-  Shield
+  Shield,
+  HelpCircle
 } from 'lucide-react';
 
 
@@ -33,6 +34,7 @@ import Reports from './components/Reports';
 import LogEntryModal from './components/LogEntryModal';
 import PendingApproval from './components/PendingApproval';
 import AdminDashboard from './components/AdminDashboard';
+import HelpModal from './components/HelpModal';
 import { supabase } from './lib/supabase';
 import logoImg from './assets/logo.png';
 
@@ -67,6 +69,7 @@ const AppContent = () => {
   const [authMode, setAuthMode] = useState('login'); // 'login', 'signup', 'forgot', 'reset'
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  const [showHelpModal, setShowHelpModal] = useState(false);
 
   useEffect(() => {
     // Listen for the recovery event to trigger the 'reset' mode
@@ -328,6 +331,13 @@ const AppContent = () => {
         </div>
         <div className="flex items-center gap-2">
           <button 
+            onClick={() => setShowHelpModal(true)}
+            className="w-12 h-12 flex items-center justify-center bg-primary/10 text-primary rounded-xl hover:bg-primary/20 transition-all border border-primary/20"
+            title="Help"
+          >
+            <HelpCircle size={20} />
+          </button>
+          <button 
             onClick={() => setLanguage(language === 'en' ? 'ko' : 'en')}
             className="w-12 h-12 flex items-center justify-center bg-white/10 rounded-xl text-[12px] font-black uppercase tracking-widest hover:bg-white/20 transition-all border border-white/10"
           >
@@ -451,6 +461,13 @@ const AppContent = () => {
           >
             <Settings size={20} />
             {t('nav_setup')}
+          </button>
+          <button 
+            onClick={() => setShowHelpModal(true)}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl mt-2 hover:bg-white/5 text-text-muted hover:text-white transition-all"
+          >
+            <HelpCircle size={20} />
+            Help Center
           </button>
           <button 
             onClick={logout}
@@ -580,6 +597,13 @@ const AppContent = () => {
       <LogEntryModal 
         isOpen={showLogModal} 
         onClose={() => setShowLogModal(false)} 
+      />
+
+      {/* Help Modal */}
+      <HelpModal 
+        isOpen={showHelpModal} 
+        onClose={() => setShowHelpModal(false)} 
+        t={t}
       />
     </div>
   );
