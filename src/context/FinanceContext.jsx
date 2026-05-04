@@ -671,12 +671,18 @@ export const FinanceProvider = ({ children }) => {
       if (!tx) throw new Error('Transaction not found');
 
       console.log('[DEBUG] Sending DELETE to Supabase...');
-      const { error } = await supabase.from('transactions').delete().eq('id', id);
+      const { error, count } = await supabase.from('transactions').delete({ count: 'exact' }).eq('id', id);
+      
       if (error) {
         console.error('[DEBUG] Supabase DELETE Error:', error);
         throw error;
       }
-      console.log('[DEBUG] Supabase DELETE Success');
+
+      if (count === 0) {
+        throw new Error('Permission denied or transaction already deleted');
+      }
+
+      console.log('[DEBUG] Supabase DELETE Success, rows affected:', count);
 
       // Reverse balance
       const account = accounts.find(acc => acc.id === tx.account_id);
@@ -729,8 +735,12 @@ export const FinanceProvider = ({ children }) => {
       });
 
       // 2. Batch Delete from Supabase
-      const { error: delError } = await supabase.from('transactions').delete().in('id', ids);
+      const { error: delError, count } = await supabase.from('transactions').delete({ count: 'exact' }).in('id', ids);
       if (delError) throw delError;
+
+      if (count === 0 && ids.length > 0) {
+        throw new Error('Permission denied or transactions already deleted');
+      }
 
       // 3. Update account balances (Sequential but efficient)
       for (const accountId of Object.keys(updatesByAccount)) {
