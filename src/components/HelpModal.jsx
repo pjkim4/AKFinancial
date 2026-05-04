@@ -54,8 +54,14 @@ const HelpModal = ({ isOpen, onClose, t }) => {
   ];
 
   return createPortal(
-    <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl animate-fade-in">
-      <div className="card w-full max-w-2xl max-h-[85vh] overflow-hidden flex flex-col shadow-2xl border-white/10 bg-[#0F0F0F] p-0">
+    <div 
+      className="fixed inset-0 z-ultra flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl animate-fade-in cursor-pointer"
+      onClick={onClose}
+    >
+      <div 
+        className="card w-full max-w-2xl max-h-[85vh] overflow-hidden flex flex-col shadow-2xl border-white/10 bg-[#0F0F0F] p-0 cursor-default"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
         <div className="p-6 md:p-8 border-b border-white/5 flex items-center justify-between bg-white/5">
           <div className="flex items-center gap-4">
