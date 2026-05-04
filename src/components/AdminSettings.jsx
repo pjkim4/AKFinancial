@@ -6,7 +6,7 @@ const AdminSettings = () => {
   const { 
     user, profile, updateProfile, updatePassword, 
     householdMembers, addHouseholdMember, updateHouseholdMember, deleteHouseholdMember,
-    inviteMember, currentHouseholdId, pendingInvitations, sentInvitations, revokeInvitation, respondToInvitation, availableHouseholds,
+    inviteMember, currentHouseholdId, pendingInvitations, sentInvitations, revokeInvitation, respondToInvitation, availableHouseholds, updateInvitationAccessLevel,
     setCurrentHouseholdId,
     preferences,
     t,
@@ -378,21 +378,45 @@ const AdminSettings = () => {
 
         {sentInvitations.length > 0 && (
           <div className="mt-8 pt-8 border-t border-white/10">
-            <h4 className="text-xs font-black uppercase tracking-widest text-text-muted mb-4">Pending Cloud Invitations</h4>
+            <h4 className="text-xs font-black uppercase tracking-widest text-text-muted mb-4">Cloud Access Management</h4>
             <div className="space-y-3">
-              {sentInvitations.filter(inv => inv.status === 'pending').map(inv => (
+              {sentInvitations.map(inv => (
                 <div key={inv.id} className="flex items-center justify-between p-4 bg-white/5 border border-white/10 rounded-xl">
-                  <div>
-                    <p className="font-bold">{inv.invitee_email}</p>
-                    <p className="text-[10px] text-primary uppercase tracking-widest">Access: {inv.access_level || 'read'}</p>
+                  <div className="flex-1 min-w-0 mr-4">
+                    <div className="flex items-center gap-2">
+                      <p className="font-bold truncate">{inv.invitee_email}</p>
+                      <span className={`text-[8px] px-1.5 py-0.5 rounded uppercase font-black tracking-widest ${inv.status === 'accepted' ? 'bg-success/20 text-success' : 'bg-warning/20 text-warning'}`}>
+                        {inv.status}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-4 mt-1">
+                      <p className="text-[10px] text-text-muted uppercase tracking-widest">
+                        Access: <span className="text-primary font-black">{inv.access_level || 'read'}</span>
+                      </p>
+                      <div className="flex gap-1">
+                        <button 
+                          onClick={() => updateInvitationAccessLevel(inv.id, 'read')}
+                          className={`text-[8px] font-black uppercase px-2 py-0.5 rounded transition-all ${inv.access_level === 'read' ? 'bg-primary text-black' : 'bg-white/5 text-text-muted hover:text-white'}`}
+                        >
+                          Read Only
+                        </button>
+                        <button 
+                          onClick={() => updateInvitationAccessLevel(inv.id, 'write')}
+                          className={`text-[8px] font-black uppercase px-2 py-0.5 rounded transition-all ${inv.access_level === 'write' ? 'bg-primary text-black' : 'bg-white/5 text-text-muted hover:text-white'}`}
+                        >
+                          Read & Write
+                        </button>
+                      </div>
+                    </div>
                   </div>
                   <button 
                     onClick={() => {
-                      if(confirm('Revoke this invitation?')) revokeInvitation(inv.id);
+                      if(confirm(`Revoke access for ${inv.invitee_email}?`)) revokeInvitation(inv.id);
                     }}
-                    className="text-[10px] font-black uppercase text-danger hover:underline"
+                    className="p-2 text-danger hover:bg-danger/10 rounded-lg transition-all"
+                    title="Revoke Access"
                   >
-                    Revoke
+                    <Trash2 size={16} />
                   </button>
                 </div>
               ))}

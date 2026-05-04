@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useFinance } from '../context/FinanceContext';
 import { supabase } from '../lib/supabase';
-import { Shield, ShieldAlert, ShieldCheck, UserCheck, UserX, Loader2, RefreshCcw } from 'lucide-react';
+import { Shield, ShieldAlert, ShieldCheck, UserCheck, UserX, Loader2, RefreshCcw, Trash2 } from 'lucide-react';
 
 const AdminDashboard = () => {
   const { profile } = useFinance();
@@ -69,6 +69,31 @@ const AdminDashboard = () => {
       setUsers(users.map(u => u.id === targetId ? { ...u, is_admin: !currentStatus } : u));
     } catch (err) {
       alert("Failed to update admin status: " + err.message);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const deleteUser = async (targetId, username) => {
+    if (targetId === profile.id) {
+      alert("You cannot delete yourself.");
+      return;
+    }
+    
+    if (!confirm(`CRITICAL WARNING: Are you sure you want to PERMANENTLY DELETE user "${username}"? This will wipe all their data, accounts, and transactions. This action CANNOT be undone.`)) return;
+
+    setActionLoading(targetId + '-delete');
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('id', targetId);
+        
+      if (error) throw error;
+      setUsers(users.filter(u => u.id !== targetId));
+      alert("User deleted successfully.");
+    } catch (err) {
+      alert("Failed to delete user: " + err.message);
     } finally {
       setActionLoading(null);
     }
@@ -167,9 +192,18 @@ const AdminDashboard = () => {
                       <button
                         onClick={() => toggleAdmin(u.id, u.is_admin)}
                         disabled={actionLoading === u.id + '-admin' || u.id === profile.id}
-                        className={`btn h-9 px-3 text-[10px] font-black uppercase ${u.is_admin ? 'bg-danger/20 text-danger border border-danger/30 hover:bg-danger/30' : 'btn-secondary border-white/10'}`}
+                        className={`btn h-9 px-3 text-[10px] font-black uppercase ${u.is_admin ? 'bg-info/20 text-info border border-info/30 hover:bg-info/30' : 'btn-secondary border-white/10'}`}
                       >
                          {actionLoading === u.id + '-admin' ? <Loader2 size={14} className="animate-spin" /> : u.is_admin ? 'Remove Admin' : 'Make Admin'}
+                      </button>
+
+                      <button
+                        onClick={() => deleteUser(u.id, u.username)}
+                        disabled={actionLoading === u.id + '-delete' || u.id === profile.id}
+                        className="btn h-9 px-3 text-danger border border-danger/10 hover:bg-danger/10 hover:border-danger/30 transition-all"
+                        title="Delete User"
+                      >
+                        {actionLoading === u.id + '-delete' ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={16} />}
                       </button>
                     </td>
                   </tr>

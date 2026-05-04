@@ -1393,6 +1393,22 @@ export const FinanceProvider = ({ children }) => {
         }])
         .select();
       if (error) throw error;
+      fetchSentInvitations(); // Refresh list
+      return { success: true };
+    } catch (error) {
+      return { error };
+    }
+  };
+
+  const updateInvitationAccessLevel = async (invitationId, newLevel) => {
+    try {
+      const { error } = await supabase
+        .from('household_invitations')
+        .update({ access_level: newLevel })
+        .eq('id', invitationId);
+      
+      if (error) throw error;
+      setSentInvitations(prev => prev.map(inv => inv.id === invitationId ? { ...inv, access_level: newLevel } : inv));
       return { success: true };
     } catch (error) {
       return { error };
@@ -1430,7 +1446,7 @@ export const FinanceProvider = ({ children }) => {
       transferFunds, adjustBalance, createAccount, updateAccount, deleteAccount,
       addFrequentPayment, updateFrequentPayment, deleteFrequentPayment,
       addRecurringSchedule, updateRecurringSchedule, deleteRecurringSchedule, skipNextOccurrence,
-      addHouseholdMember, updateHouseholdMember, deleteHouseholdMember, inviteMember, revokeInvitation, respondToInvitation,
+      addHouseholdMember, updateHouseholdMember, deleteHouseholdMember, inviteMember, revokeInvitation, respondToInvitation, updateInvitationAccessLevel,
       calculateNextPaymentDate,
       login, signup, logout, fetchData, updateProfile, updatePassword, sendPasswordResetEmail,
       setAccounts,
