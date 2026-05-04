@@ -4,15 +4,25 @@ import { X, HelpCircle, Wallet, History, Users, Shield, Zap, Info, Eye, MousePoi
 
 const HelpModal = ({ isOpen, onClose, t }) => {
   useEffect(() => {
+    const handleEsc = (e) => {
+      if (e.key === 'Escape') {
+        console.log('[DEBUG] ESC key pressed');
+        onClose();
+      }
+    };
+    
     if (isOpen) {
       document.body.style.overflow = 'hidden';
+      window.addEventListener('keydown', handleEsc);
     } else {
       document.body.style.overflow = 'unset';
     }
+    
     return () => {
       document.body.style.overflow = 'unset';
+      window.removeEventListener('keydown', handleEsc);
     };
-  }, [isOpen]);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -66,8 +76,11 @@ const HelpModal = ({ isOpen, onClose, t }) => {
 
   return createPortal(
     <div 
-      className="fixed inset-0 z-ultra flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl animate-fade-in cursor-pointer"
-      onClick={onClose}
+      className="fixed inset-0 z-ultra flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl animate-fade-in pointer-events-auto"
+      onClick={() => {
+        console.log('[DEBUG] HelpModal backdrop clicked');
+        onClose();
+      }}
     >
       <div 
         className="card w-full max-w-2xl max-h-[85vh] overflow-hidden flex flex-col shadow-2xl border-white/10 bg-[#0F0F0F] p-0 cursor-default"
