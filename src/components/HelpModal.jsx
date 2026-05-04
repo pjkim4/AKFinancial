@@ -76,10 +76,17 @@ const HelpModal = ({ isOpen, onClose, t }) => {
 
   return createPortal(
     <div 
-      className="fixed inset-0 z-ultra flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl animate-fade-in pointer-events-auto"
+      className="fixed inset-0 z-ultra flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl animate-fade-in pointer-events-auto cursor-pointer"
+      style={{ WebkitTapHighlightColor: 'transparent' }}
       onClick={() => {
         console.log('[DEBUG] HelpModal backdrop clicked');
         onClose();
+      }}
+      onTouchStart={(e) => {
+        if (e.target === e.currentTarget) {
+          console.log('[DEBUG] HelpModal backdrop touched');
+          onClose();
+        }
       }}
     >
       <div 
