@@ -1,6 +1,6 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
-import { X, HelpCircle, Wallet, History, Users, Shield, Zap, Info } from 'lucide-react';
+import { X, HelpCircle, Wallet, History, Users, Shield, Zap, Info, Eye, MousePointer2, FileOutput } from 'lucide-react';
 
 const HelpModal = ({ isOpen, onClose, t }) => {
   if (!isOpen) return null;
@@ -30,6 +30,21 @@ const HelpModal = ({ isOpen, onClose, t }) => {
       icon: <Zap className="text-primary" />,
       title: "AI Insights",
       content: "The AI tab analyzes your spending patterns and gives you personalized tips on how to save money and stay on budget."
+    },
+    {
+      icon: <MousePointer2 className="text-primary" />,
+      title: "Quick Actions",
+      content: "Save time with 'Quick Actions' on the dashboard. One-tap buttons for common expenses like Coffee or Groceries help you log transactions in seconds."
+    },
+    {
+      icon: <Eye className="text-primary" />,
+      title: "Privacy Mode",
+      content: "Need to check your finances in public? Click the 'Eye' icon in the dashboard to hide your balances. Click it again to reveal them."
+    },
+    {
+      icon: <FileOutput className="text-primary" />,
+      title: "QuickBooks Export",
+      content: "Go to the 'Reports' or 'History' tab to export your data. You can download an .IIF file specifically formatted for QuickBooks imports."
     },
     {
       icon: <Info className="text-primary" />,
