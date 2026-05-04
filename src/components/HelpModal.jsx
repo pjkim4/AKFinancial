@@ -76,7 +76,7 @@ const HelpModal = ({ isOpen, onClose, t }) => {
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 scrollbar-hide">
+        <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 scroll-smooth">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {sections.map((section, idx) => (
               <div key={idx} className="p-4 rounded-xl bg-white/5 border border-white/5 hover:border-primary/20 transition-all group">
