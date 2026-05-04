@@ -72,8 +72,15 @@ const SearchableSelect = ({ options = [], value, onChange, onEdit, onDelete, pla
       {/* Trigger / Search Input */}
       <div 
         ref={triggerRef}
+        tabIndex="0"
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center justify-between p-4 border rounded-xl cursor-pointer transition-all ${!isOpen ? 'hover:bg-white/10' : ''}`}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setIsOpen(!isOpen);
+          }
+        }}
+        className={`flex items-center justify-between p-4 border rounded-xl cursor-pointer transition-all outline-none focus:ring-2 focus:ring-primary/50 ${!isOpen ? 'hover:bg-white/10' : ''}`}
         style={{ 
           backgroundColor: isOpen ? '#FFFFFF' : '#1A1A1A',
           borderColor: isOpen ? '#00D1FF' : 'rgba(255,255,255,0.1)',
