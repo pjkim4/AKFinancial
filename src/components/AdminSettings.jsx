@@ -375,7 +375,6 @@ const AdminSettings = () => {
             </div>
           ))}
         </div>
-        </div>
 
         {sentInvitations.length > 0 && (
           <div className="mt-8 pt-8 border-t border-white/10">
