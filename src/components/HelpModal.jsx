@@ -76,15 +76,15 @@ const HelpModal = ({ isOpen, onClose, t }) => {
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8 scrollbar-hide">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 scrollbar-hide">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {sections.map((section, idx) => (
-              <div key={idx} className="p-6 rounded-2xl bg-white/5 border border-white/5 hover:border-primary/20 transition-all group">
-                <div className="flex items-center gap-3 mb-4">
-                  {section.icon}
-                  <h4 className="font-black text-sm uppercase tracking-tight">{section.title}</h4>
+              <div key={idx} className="p-4 rounded-xl bg-white/5 border border-white/5 hover:border-primary/20 transition-all group">
+                <div className="flex items-center gap-2 mb-2">
+                  {React.cloneElement(section.icon, { size: 18 })}
+                  <h4 className="font-black text-[10px] uppercase tracking-tight">{section.title}</h4>
                 </div>
-                <p className="text-xs text-text-muted leading-relaxed font-medium">
+                <p className="text-[10px] text-text-muted leading-relaxed font-medium">
                   {section.content}
                 </p>
               </div>
@@ -92,13 +92,14 @@ const HelpModal = ({ isOpen, onClose, t }) => {
           </div>
 
           {/* Quick Tip */}
-          <div className="p-6 rounded-2xl bg-primary/10 border border-primary/20 flex gap-4">
-            <Zap className="text-primary shrink-0" size={20} />
-            <p className="text-[11px] text-primary font-bold leading-relaxed">
+          <div className="p-4 rounded-xl bg-primary/10 border border-primary/20 flex gap-3">
+            <Zap className="text-primary shrink-0" size={16} />
+            <p className="text-[10px] text-primary font-bold leading-relaxed">
               PRO TIP: Use the 'Language' toggle in the sidebar to switch between English and Korean instantly.
             </p>
           </div>
         </div>
+
 
         {/* Footer */}
         <div className="p-6 border-t border-white/5 text-center bg-white/5">
