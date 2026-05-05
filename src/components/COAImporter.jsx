@@ -4,7 +4,7 @@ import { useFinance } from '../context/FinanceContext';
 import { useEffect } from 'react';
 
 const COAImporter = ({ onClose }) => {
-  const { addCustomCategories, t } = useFinance();
+  const { addCustomCategories, preferences, t } = useFinance();
   
   useEffect(() => {
     document.body.style.overflow = 'hidden';
@@ -82,7 +82,6 @@ const COAImporter = ({ onClose }) => {
       const name = values[nameIndex];
       const rawType = values[typeIndex] || '';
       
-      // Mapping QuickBooks Types to Income/Expense
       let type = 'expense';
       const upperType = rawType.toUpperCase();
       
@@ -95,17 +94,21 @@ const COAImporter = ({ onClose }) => {
       ) {
         type = 'expense';
       } else {
-        // Skip types like Bank, Asset, Liability, Equity for category import
         return null; 
       }
 
       if (!name) return null;
 
+      // Check if it already exists in preferences
+      const existing = preferences.customCategories?.[type] || [];
+      const isDuplicate = existing.some(c => c.id.toLowerCase() === name.toLowerCase());
+
       return {
         id: `preview-${idx}`,
         name: name,
         type: type,
-        selected: true
+        selected: !isDuplicate,
+        isDuplicate: isDuplicate
       };
     }).filter(Boolean);
   };
@@ -285,15 +288,18 @@ const COAImporter = ({ onClose }) => {
                 {previewData.map((item) => (
                   <div 
                     key={item.id} 
-                    onClick={() => toggleSelection(item.id)}
-                    className={`flex items-center justify-between p-4 rounded-2xl cursor-pointer border transition-all ${item.selected ? 'bg-primary/10 border-primary/30' : 'bg-white/5 border-white/5 opacity-60'}`}
+                    onClick={() => !item.isDuplicate && toggleSelection(item.id)}
+                    className={`flex items-center justify-between p-4 rounded-2xl border transition-all ${item.isDuplicate ? 'bg-white/5 border-white/5 opacity-40 cursor-not-allowed' : item.selected ? 'bg-primary/10 border-primary/30 cursor-pointer' : 'bg-white/5 border-white/5 opacity-60 cursor-pointer'}`}
                   >
                     <div className="flex items-center gap-4">
-                      <div className={`w-5 h-5 rounded flex items-center justify-center transition-all ${item.selected ? 'bg-primary text-black' : 'bg-white/10'}`}>
-                        {item.selected && <Check size={14} strokeWidth={4} />}
+                      <div className={`w-5 h-5 rounded flex items-center justify-center transition-all ${item.selected ? 'bg-primary text-black' : item.isDuplicate ? 'bg-white/5 text-text-muted' : 'bg-white/10'}`}>
+                        {item.selected ? <Check size={14} strokeWidth={4} /> : item.isDuplicate && <X size={14} />}
                       </div>
                       <div>
-                        <p className="text-sm font-bold">{item.name}</p>
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-bold">{item.name}</p>
+                          {item.isDuplicate && <span className="text-[8px] bg-white/10 px-1.5 py-0.5 rounded text-text-muted font-black uppercase">Already Exists</span>}
+                        </div>
                         <span className={`text-[8px] font-black uppercase tracking-widest ${item.type === 'income' ? 'text-success' : 'text-danger'}`}>
                           {item.type}
                         </span>

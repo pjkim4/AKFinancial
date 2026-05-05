@@ -532,9 +532,21 @@ const AdminSettings = () => {
                       </button>
                       <button 
                         onClick={() => {
-                          if (confirm('Delete?')) deleteCustomCategory(type, cat.id);
+                          const hasTransactions = transactions.some(t => 
+                            t.category === cat.id && 
+                            t.type.toLowerCase() === type.toLowerCase()
+                          );
+                          
+                          if (hasTransactions) {
+                            alert(`Cannot delete "${cat.name}" because it has existing transactions. Please move them first.`);
+                            return;
+                          }
+                          
+                          if (confirm(`Are you sure you want to delete the category "${cat.name}"?`)) {
+                            deleteCustomCategory(type, cat.id);
+                          }
                         }}
-                        className="p-2 bg-danger/20 text-danger rounded-lg"
+                        className="p-2 bg-danger/20 text-danger rounded-lg hover:bg-danger hover:text-white transition-all"
                       >
                         <Trash2 size={14} />
                       </button>
