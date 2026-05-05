@@ -1655,17 +1655,22 @@ export const FinanceProvider = ({ children }) => {
             };
           }
 
-          const updated = {
-            ...prev,
-            customCategories: {
-              ...prev.customCategories,
-              [type]: (prev.customCategories?.[type] || []).filter(c => c.id !== id)
-            }
-          };
-          syncPreferencesToCloud(updated);
-          return updated;
-        });
-        return { success: true };
+          setPreferences(prev => {
+            const updated = {
+              ...prev,
+              customCategories: {
+                ...prev.customCategories,
+                [type]: (prev.customCategories?.[type] || []).filter(c => c.id !== id)
+              }
+            };
+            syncPreferencesToCloud(updated);
+            return updated;
+          });
+          return { success: true };
+        } catch (err) {
+          console.error('Delete category error:', err);
+          return { error: err.message };
+        }
       },
       updateCustomCategory: (type, id, newName) => {
         setPreferences(prev => {
