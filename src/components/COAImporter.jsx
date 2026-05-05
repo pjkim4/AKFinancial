@@ -156,8 +156,14 @@ const COAImporter = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-max flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
-      <div className="bg-[#181818] border-2 border-white/10 w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl relative">
+    <div 
+      className="fixed inset-0 z-ultra flex items-center justify-center p-4 bg-black/90 backdrop-blur-md"
+      onClick={onClose}
+    >
+      <div 
+        className="bg-[#181818] border-2 border-white/10 w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl relative"
+        onClick={e => e.stopPropagation()}
+      >
         {/* Header */}
         <div className="p-6 border-b border-white/5 flex items-center justify-between bg-white/5">
           <div className="flex items-center gap-3">
