@@ -1472,12 +1472,12 @@ export const FinanceProvider = ({ children }) => {
             .from('transactions')
             .update({ category: newCategory })
             .eq('user_id', currentHouseholdId || user.id)
-            .eq('category', oldCategory)
-            .eq('type', type.charAt(0).toUpperCase() + type.slice(1));
+            .ilike('category', oldCategory.trim())
+            .ilike('type', type);
           
           if (error) throw error;
           setTransactions(prev => prev.map(t => 
-            (t.category === oldCategory && t.type.toLowerCase() === type.toLowerCase()) 
+            (String(t.category || '').toLowerCase().trim() === String(oldCategory || '').toLowerCase().trim() && String(t.type || '').toLowerCase() === type.toLowerCase()) 
             ? { ...t, category: newCategory } 
             : t
           ));

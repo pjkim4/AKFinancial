@@ -509,6 +509,10 @@ const AdminSettings = () => {
                       <button 
                         onClick={async () => {
                           const targetId = currentHouseholdId || user.id;
+                          
+                          // DEBUG ALERT: Let's see what we are searching for
+                          console.log(`[DEBUG] Migrating cat: "${cat.id}" type: "${type}" household: "${targetId}"`);
+                          
                           const { count, error } = await supabase
                             .from('transactions')
                             .select('*', { count: 'exact', head: true })
@@ -517,12 +521,12 @@ const AdminSettings = () => {
                             .ilike('type', type);
 
                           if (error) {
-                            alert('Error fetching transactions: ' + error.message);
+                            alert('Database Error: ' + error.message);
                             return;
                           }
 
                           if (count === 0) {
-                            alert(`No transactions found for "${cat.name}".`);
+                            alert(`Found 0 transactions for "${cat.name}".\n\nSearch Details:\n- Category: ${cat.id}\n- Type: ${type}\n- Household: ${targetId}`);
                             return;
                           }
 
