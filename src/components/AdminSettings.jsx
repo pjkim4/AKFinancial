@@ -509,15 +509,15 @@ const AdminSettings = () => {
                       <button 
                         onClick={async () => {
                           const targetId = currentHouseholdId || user.id;
+                          const catId = cat.id.trim();
+                          const catName = cat.name.trim();
                           
-                          // DEBUG ALERT: Let's see what we are searching for
-                          console.log(`[DEBUG] Migrating cat: "${cat.id}" type: "${type}" household: "${targetId}"`);
-                          
+                          // Check for both ID and Name to be safe
                           const { count, error } = await supabase
                             .from('transactions')
                             .select('*', { count: 'exact', head: true })
                             .eq('user_id', targetId)
-                            .ilike('category', cat.id.trim())
+                            .or(`category.ilike.${catId},category.ilike.${catName}`)
                             .ilike('type', type);
 
                           if (error) {
@@ -526,13 +526,13 @@ const AdminSettings = () => {
                           }
 
                           if (count === 0) {
-                            alert(`Found 0 transactions for "${cat.name}".\n\nSearch Details:\n- Category: ${cat.id}\n- Type: ${type}\n- Household: ${targetId}`);
+                            alert(`Found 0 transactions matching "${catName}" or "${catId}".\n\nPlease check if the transactions are under a different category name.`);
                             return;
                           }
 
-                          const newName = prompt(`Move ${count} transactions from "${cat.name}" to:`);
+                          const newName = prompt(`Move ${count} transactions from "${catName}" to:`);
                           if (newName && confirm(`Confirm moving ${count} items to "${newName}"?`)) {
-                            reassignCategory(type, cat.id, newName);
+                            reassignCategory(type, catId, newName);
                           }
                         }}
                         title="Move transactions to another category"
