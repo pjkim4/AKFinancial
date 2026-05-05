@@ -100,7 +100,7 @@ const HelpModal = ({ isOpen, onClose, t }) => {
       }}
     >
       <div 
-        className="card w-full max-w-2xl max-h-[85vh] overflow-hidden flex flex-col shadow-2xl border-white/10 bg-[#0F0F0F] p-0 cursor-default"
+        className="card w-full max-w-4xl max-h-[85vh] overflow-hidden flex flex-col shadow-2xl border-white/10 bg-[#0F0F0F] p-0 cursor-default"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -123,15 +123,17 @@ const HelpModal = ({ isOpen, onClose, t }) => {
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 scroll-smooth">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="flex-1 overflow-y-auto p-6 md:p-10 space-y-8 scroll-smooth">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {sections.map((section, idx) => (
-              <div key={idx} className="p-4 rounded-xl bg-white/5 border border-white/5 hover:border-primary/20 transition-all group">
-                <div className="flex items-center gap-2 mb-2">
-                  {React.cloneElement(section.icon, { size: 18 })}
-                  <h4 className="font-black text-[10px] uppercase tracking-tight">{section.title}</h4>
+              <div key={idx} className="p-6 rounded-2xl bg-white/5 border border-white/5 hover:border-primary/30 hover:bg-white/[0.07] transition-all group flex flex-col h-full">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover:scale-110 transition-transform">
+                    {React.cloneElement(section.icon, { size: 20 })}
+                  </div>
+                  <h4 className="font-black text-xs uppercase tracking-widest text-white">{section.title}</h4>
                 </div>
-                <p className="text-[10px] text-text-muted leading-relaxed font-medium">
+                <p className="text-[11px] text-text-muted leading-relaxed font-medium flex-1">
                   {section.content}
                 </p>
               </div>
