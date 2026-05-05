@@ -221,9 +221,9 @@ const LogEntryModal = ({ isOpen, onClose }) => {
                       updateCustomCategory(modalType, id, newName);
                     }
                   }}
-                  onDelete={(id) => {
+                  onDelete={async (id) => {
                     if (confirm('Delete this custom category?')) {
-                      const result = deleteCustomCategory(modalType, id);
+                      const result = await deleteCustomCategory(modalType, id);
                       if (result?.error) {
                         alert(result.error);
                       } else {

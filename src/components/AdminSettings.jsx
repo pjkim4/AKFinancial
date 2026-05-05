@@ -550,9 +550,9 @@ const AdminSettings = () => {
                         <Edit2 size={14} />
                       </button>
                       <button 
-                        onClick={() => {
+                        onClick={async () => {
                           if (confirm(`Are you sure you want to delete the category "${cat.name}"?`)) {
-                            const result = deleteCustomCategory(type, cat.id);
+                            const result = await deleteCustomCategory(type, cat.id);
                             if (result?.error) {
                               alert(result.error);
                             }
