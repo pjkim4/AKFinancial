@@ -86,32 +86,22 @@ const HelpModal = ({ isOpen, onClose, t }) => {
 
   return createPortal(
     <div 
-      className="fixed inset-0 z-ultra flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl animate-fade-in pointer-events-auto cursor-pointer"
-      style={{ WebkitTapHighlightColor: 'transparent' }}
-      onClick={() => {
-        console.log('[DEBUG] HelpModal backdrop clicked');
-        onClose();
-      }}
-      onTouchStart={(e) => {
-        if (e.target === e.currentTarget) {
-          console.log('[DEBUG] HelpModal backdrop touched');
-          onClose();
-        }
-      }}
+      className="fixed inset-0 z-ultra flex items-center justify-center p-0 md:p-4 bg-black/95 backdrop-blur-xl animate-fade-in pointer-events-auto"
+      onClick={onClose}
     >
       <div 
-        className="card w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl border-white/10 bg-[#0F0F0F] p-0 cursor-default mx-auto"
+        className="card w-full max-w-3xl h-full md:h-auto md:max-h-[85vh] flex flex-col shadow-2xl border-white/10 bg-[#0F0F0F] p-0 overflow-hidden relative"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="p-5 md:p-6 border-b border-white/5 flex items-center justify-between bg-white/5 sticky top-0 z-10">
+        {/* Header - Pin to Top */}
+        <div className="flex-none p-4 md:p-6 border-b border-white/5 flex items-center justify-between bg-white/5">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
-              <HelpCircle className="text-primary" size={20} />
+            <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-primary/20 flex items-center justify-center">
+              <HelpCircle className="text-primary" size={18} />
             </div>
             <div>
-              <h3 className="text-lg md:text-xl font-black uppercase tracking-tighter">Help Center</h3>
-              <p className="text-[9px] text-text-muted uppercase tracking-widest font-black">Learn how to master your finances</p>
+              <h3 className="text-sm md:text-xl font-black uppercase tracking-tighter text-white">Help Center</h3>
+              <p className="text-[7px] md:text-[9px] text-text-muted uppercase tracking-widest font-black">Learn how to master your finances</p>
             </div>
           </div>
           <button 
@@ -122,39 +112,37 @@ const HelpModal = ({ isOpen, onClose, t }) => {
           </button>
         </div>
 
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-4 scroll-smooth">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth overscroll-contain">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
             {sections.map((section, idx) => (
-              <div key={idx} className="p-5 rounded-xl bg-white/5 border border-white/5 hover:border-primary/20 hover:bg-white/10 transition-all group">
-                <div className="flex items-center gap-3 mb-3">
+              <div key={idx} className="p-4 rounded-xl bg-white/5 border border-white/5 hover:border-primary/20 transition-all group">
+                <div className="flex items-center gap-2 mb-2">
                   <div className="text-primary group-hover:scale-110 transition-transform">
-                    {React.cloneElement(section.icon, { size: 16 })}
+                    {React.cloneElement(section.icon, { size: 14 })}
                   </div>
-                  <h4 className="font-black text-[10px] uppercase tracking-widest text-white">{section.title}</h4>
+                  <h4 className="font-black text-[9px] md:text-[10px] uppercase tracking-widest text-white">{section.title}</h4>
                 </div>
-                <p className="text-[10px] text-text-muted leading-relaxed font-medium">
+                <p className="text-[9px] md:text-[10px] text-text-muted leading-relaxed font-medium">
                   {section.content}
                 </p>
               </div>
             ))}
           </div>
 
-          {/* Quick Tip */}
-          <div className="p-4 rounded-xl bg-primary/10 border border-primary/20 flex gap-3">
-            <Zap className="text-primary shrink-0" size={16} />
-            <p className="text-[10px] text-primary font-bold leading-relaxed">
+          <div className="mt-6 p-4 rounded-xl bg-primary/10 border border-primary/20 flex gap-3">
+            <Zap className="text-primary shrink-0" size={14} />
+            <p className="text-[9px] md:text-[10px] text-primary font-bold leading-relaxed">
               PRO TIP: Use the 'Language' toggle in the sidebar to switch between English and Korean instantly.
             </p>
           </div>
         </div>
 
-
-        {/* Footer */}
-        <div className="p-6 border-t border-white/5 text-center bg-white/5">
+        {/* Footer - Pin to Bottom */}
+        <div className="flex-none p-4 md:p-6 border-t border-white/5 bg-white/5 text-center">
           <button 
             onClick={onClose}
-            className="px-8 py-3 bg-primary text-black font-black rounded-xl uppercase tracking-widest text-xs hover:scale-105 transition-all shadow-lg shadow-primary/20"
+            className="w-full md:w-auto px-10 py-3 bg-primary text-black font-black rounded-xl uppercase tracking-widest text-[10px] hover:scale-105 transition-all shadow-lg shadow-primary/20"
           >
             Got it, thanks!
           </button>
