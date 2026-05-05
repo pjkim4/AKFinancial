@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Upload, Download, FileText, Check, X, AlertCircle, ChevronRight, List } from 'lucide-react';
+import { Upload, Download, FileText, Check, X, AlertCircle, ChevronRight } from 'lucide-react';
 import { useFinance } from '../context/FinanceContext';
 
 const COAImporter = ({ onClose }) => {
@@ -156,8 +156,8 @@ const COAImporter = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-      <div className="bg-surface border-2 border-white/10 w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl animate-scale-in">
+    <div className="fixed inset-0 z-max flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
+      <div className="bg-[#181818] border-2 border-white/10 w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl relative">
         {/* Header */}
         <div className="p-6 border-b border-white/5 flex items-center justify-between bg-white/5">
           <div className="flex items-center gap-3">
@@ -224,7 +224,7 @@ const COAImporter = ({ onClose }) => {
               {/* Preview List */}
               <div className="flex items-center justify-between mb-2">
                 <h4 className="text-xs font-black uppercase tracking-widest text-primary flex items-center gap-2">
-                  <List size={14} /> Preview Categories ({previewData.length})
+                  <FileText size={14} /> Preview Categories ({previewData.length})
                 </h4>
                 <div className="flex gap-2">
                   <button 

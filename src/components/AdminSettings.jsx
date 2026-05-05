@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useFinance } from '../context/FinanceContext';
 import { Shield, User, Key, Save, AlertCircle, Mail, Zap, Users, Trash2, Plus, X, Check, Edit2, Briefcase, Upload, Repeat } from 'lucide-react';
+import { createPortal } from 'react-dom';
 import COAImporter from './COAImporter';
 
 const AdminSettings = () => {
@@ -565,7 +566,10 @@ const AdminSettings = () => {
         </div>
       </div>
 
-      {showCOAImporter && <COAImporter onClose={() => setShowCOAImporter(false)} />}
+      {showCOAImporter && createPortal(
+        <COAImporter onClose={() => setShowCOAImporter(false)} />,
+        document.body
+      )}
     </div>
   );
 };
