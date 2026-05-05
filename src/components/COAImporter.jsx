@@ -157,11 +157,10 @@ const COAImporter = ({ onClose }) => {
 
   return (
     <div 
-      className="fixed inset-0 z-ultra flex items-center justify-center p-4 bg-black/90 backdrop-blur-md"
-      onClick={onClose}
+      className="fixed inset-0 z-ultra flex items-center justify-center p-4 bg-black/95 backdrop-blur-md"
     >
       <div 
-        className="bg-[#181818] border-2 border-white/10 w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl relative"
+        className="bg-[#181818] border-2 border-white/10 w-full max-w-2xl rounded-3xl flex flex-col shadow-2xl relative max-h-[95vh] overflow-y-auto"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
@@ -187,15 +186,18 @@ const COAImporter = ({ onClose }) => {
                 onClick={() => fileInputRef.current.click()}
                 className="group border-2 border-dashed border-white/10 rounded-3xl p-12 text-center cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition-all"
               >
-                <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 group-hover:bg-primary group-hover:text-black transition-all shadow-xl group-hover:shadow-primary/20">
-                  <Upload size={32} />
+                <div className="w-20 h-20 bg-primary/20 rounded-3xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 group-hover:bg-primary group-hover:text-black transition-all shadow-xl group-hover:shadow-primary/30 border-2 border-primary/20">
+                  <Upload size={40} />
                 </div>
-                <h4 className="font-black text-lg uppercase mb-2 group-hover:text-primary transition-colors">Drop your CSV here</h4>
-                <p className="text-sm text-text-muted max-w-xs mx-auto mb-6">Upload a Chart of Accounts export from QuickBooks or use our template.</p>
+                <h4 className="font-black text-2xl uppercase mb-3 group-hover:text-primary transition-colors">Select your file</h4>
+                <p className="text-sm text-text-muted max-w-xs mx-auto mb-8 font-bold">Upload a QuickBooks CSV export or use our template to instantly create your categories.</p>
                 
-                <div className="inline-flex items-center gap-2 px-6 py-3 bg-white/5 border border-white/10 rounded-xl font-black text-[10px] uppercase tracking-widest group-hover:bg-primary group-hover:text-black transition-all">
-                  Browse Files
-                </div>
+                <button 
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); fileInputRef.current.click(); }}
+                  className="px-10 py-5 bg-primary text-black rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-lg shadow-primary/20"
+                >
+                  Click here to Browse
+                </button>
 
                 <input 
                   type="file" 
