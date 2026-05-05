@@ -160,10 +160,23 @@ const AdminSettings = () => {
           </div>
         )}
 
-        <div className="mt-6 pt-4 border-t border-white/20 text-center">
+        <div className="mt-6 pt-4 border-t border-white/20 space-y-3">
+          <button 
+            onClick={async () => {
+              setLoading(true);
+              const res = await syncPreferencesToCloud();
+              setLoading(false);
+              if (res?.error) alert('Sync failed: ' + res.error);
+              else alert('Categories and preferences synced to cloud! Now refresh on your iPhone.');
+            }}
+            className="w-full py-4 bg-primary text-black font-black rounded-2xl text-[10px] uppercase tracking-[0.2em] shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2"
+          >
+            <Zap size={14} /> {t('sync_to_cloud') || 'Sync to Cloud Now'}
+          </button>
+          
           <button 
             onClick={() => window.location.reload()}
-            className="w-full py-4 bg-white text-black font-black rounded-2xl text-[10px] uppercase tracking-[0.2em] shadow-xl active:scale-95 transition-all"
+            className="w-full py-4 bg-white/5 text-text-muted hover:text-white font-black rounded-2xl text-[10px] uppercase tracking-[0.2em] active:scale-95 transition-all"
           >
             {t('refresh_app')}
           </button>

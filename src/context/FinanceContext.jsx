@@ -117,17 +117,20 @@ export const FinanceProvider = ({ children }) => {
   }, [preferences]);
 
   // Helper: Save preferences to Supabase (only if viewing own household)
-  const savePreferencesToDB = async (newPrefs) => {
-    if (!user || currentHouseholdId !== user.id) return;
+  const syncPreferencesToCloud = async (prefsOverride = null) => {
+    if (!user || currentHouseholdId !== user.id) return { error: 'Not household owner' };
     try {
+      const targetPrefs = prefsOverride || preferences;
       const { error } = await supabase
         .from('profiles')
-        .update({ preferences: newPrefs })
+        .update({ preferences: targetPrefs })
         .eq('id', user.id);
       if (error) throw error;
       console.log('[SYNC] Preferences saved to database');
+      return { success: true };
     } catch (err) {
       console.error('[SYNC] Error saving preferences:', err.message);
+      return { error: err.message };
     }
   };
 
@@ -1533,6 +1536,7 @@ export const FinanceProvider = ({ children }) => {
       calculateNextPaymentDate,
       login, signup, logout, fetchData, updateProfile, updatePassword, sendPasswordResetEmail,
       setAccounts,
+      syncPreferencesToCloud,
       reassignCategory: async (type, oldCategory, newCategory) => {
         try {
           const { error } = await supabase
@@ -1573,12 +1577,12 @@ export const FinanceProvider = ({ children }) => {
       preferences,
       updatePreferences: (newPrefs) => setPreferences(prev => {
         const updated = { ...prev, ...newPrefs };
-        savePreferencesToDB(updated);
+        syncPreferencesToCloud(updated);
         return updated;
       }),
       toggleBalances: () => setPreferences(prev => {
         const updated = { ...prev, hideBalances: !prev.hideBalances };
-        savePreferencesToDB(updated);
+        syncPreferencesToCloud(updated);
         return updated;
       }),
       addCustomCategory: (type, name) => {
@@ -1592,7 +1596,7 @@ export const FinanceProvider = ({ children }) => {
               [type]: [...current, { id: name, name, isCustom: true }]
             }
           };
-          savePreferencesToDB(updated);
+          syncPreferencesToCloud(updated);
           return updated;
         });
       },
@@ -1611,7 +1615,7 @@ export const FinanceProvider = ({ children }) => {
             ...prev,
             customCategories: newCustomCategories
           };
-          savePreferencesToDB(updated);
+          syncPreferencesToCloud(updated);
           return updated;
         });
       },
@@ -1658,7 +1662,7 @@ export const FinanceProvider = ({ children }) => {
               [type]: (prev.customCategories?.[type] || []).filter(c => c.id !== id)
             }
           };
-          savePreferencesToDB(updated);
+          syncPreferencesToCloud(updated);
           return updated;
         });
         return { success: true };
@@ -1674,7 +1678,7 @@ export const FinanceProvider = ({ children }) => {
               )
             }
           };
-          savePreferencesToDB(updated);
+          syncPreferencesToCloud(updated);
           return updated;
         });
       },
@@ -1684,7 +1688,7 @@ export const FinanceProvider = ({ children }) => {
             ...prev,
             customRoles: [...(prev.customRoles || []), { id: name, name }]
           };
-          savePreferencesToDB(updated);
+          syncPreferencesToCloud(updated);
           return updated;
         });
       },
@@ -1694,7 +1698,7 @@ export const FinanceProvider = ({ children }) => {
             ...prev,
             customRoles: (prev.customRoles || []).filter(r => r.id !== id)
           };
-          savePreferencesToDB(updated);
+          syncPreferencesToCloud(updated);
           return updated;
         });
       },
@@ -1704,7 +1708,7 @@ export const FinanceProvider = ({ children }) => {
             ...prev,
             customRoles: (prev.customRoles || []).map(r => r.id === id ? { ...r, name: newName } : r)
           };
-          savePreferencesToDB(updated);
+          syncPreferencesToCloud(updated);
           return updated;
         });
       },
