@@ -187,11 +187,16 @@ const COAImporter = ({ onClose }) => {
                 onClick={() => fileInputRef.current.click()}
                 className="group border-2 border-dashed border-white/10 rounded-3xl p-12 text-center cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition-all"
               >
-                <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 group-hover:bg-primary group-hover:text-black transition-all">
+                <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 group-hover:bg-primary group-hover:text-black transition-all shadow-xl group-hover:shadow-primary/20">
                   <Upload size={32} />
                 </div>
-                <h4 className="font-black text-lg uppercase mb-2">Drop your CSV here</h4>
-                <p className="text-sm text-text-muted max-w-xs mx-auto">Upload a Chart of Accounts export from QuickBooks or use our template.</p>
+                <h4 className="font-black text-lg uppercase mb-2 group-hover:text-primary transition-colors">Drop your CSV here</h4>
+                <p className="text-sm text-text-muted max-w-xs mx-auto mb-6">Upload a Chart of Accounts export from QuickBooks or use our template.</p>
+                
+                <div className="inline-flex items-center gap-2 px-6 py-3 bg-white/5 border border-white/10 rounded-xl font-black text-[10px] uppercase tracking-widest group-hover:bg-primary group-hover:text-black transition-all">
+                  Browse Files
+                </div>
+
                 <input 
                   type="file" 
                   ref={fileInputRef} 
