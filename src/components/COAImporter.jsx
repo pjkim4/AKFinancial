@@ -214,7 +214,25 @@ const COAImporter = ({ onClose }) => {
                   </div>
                   <div>
                     <span className="block text-xs font-black uppercase tracking-widest text-lime">Compatibility</span>
-                    <span className="text-[10px] text-text-muted">Supports QuickBooks Online & Desktop</span>
+                    <span className="text-[10px] text-text-muted">QuickBooks CSV Exports</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-4">
+                <h5 className="text-[10px] font-black uppercase tracking-widest text-primary">QuickBooks Export Guide</h5>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-[10px] leading-relaxed text-text-muted font-bold">
+                  <div className="space-y-2">
+                    <p className="text-white">QB ONLINE:</p>
+                    <p>1. Gear Icon → Chart of Accounts</p>
+                    <p>2. Click "Run Report"</p>
+                    <p>3. Click Export Icon → "Export to CSV"</p>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-white">QB DESKTOP:</p>
+                    <p>1. Lists → Chart of Accounts</p>
+                    <p>2. Account (Bottom) → Print List</p>
+                    <p>3. Choose "File" & "Comma Delimited"</p>
                   </div>
                 </div>
               </div>
