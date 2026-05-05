@@ -508,7 +508,8 @@ const AdminSettings = () => {
                       <button 
                         onClick={() => {
                           const relevantTxs = transactions.filter(t => 
-                            t.category === cat.id && t.type.toLowerCase() === type.toLowerCase()
+                            String(t.category || '').toLowerCase().trim() === String(cat.id || '').toLowerCase().trim() && 
+                            String(t.type || '').toLowerCase() === type.toLowerCase()
                           );
                           const count = relevantTxs.length;
                           const newName = prompt(`Move ${count} transactions from "${cat.name}" to:`);
@@ -533,8 +534,8 @@ const AdminSettings = () => {
                       <button 
                         onClick={() => {
                           const hasTransactions = transactions.some(t => 
-                            t.category === cat.id && 
-                            t.type.toLowerCase() === type.toLowerCase()
+                            String(t.category || '').toLowerCase().trim() === String(cat.id || '').toLowerCase().trim() && 
+                            String(t.type || '').toLowerCase() === type.toLowerCase()
                           );
                           
                           if (hasTransactions) {
