@@ -70,7 +70,7 @@ const HelpModal = ({ isOpen, onClose, t }) => {
     {
       icon: <Upload className="text-primary" />,
       title: "Chart of Accounts",
-      content: "Import your existing QuickBooks categories in 'Admin Settings'. Upload a CSV to bulk-create categories. The system automatically detects duplicates to keep your list clean."
+      content: "Bulk-create categories in 'Admin Settings'. You can upload a QuickBooks CSV export or use our provided template to organize your accounts quickly."
     },
     {
       icon: <List className="text-primary" />,
