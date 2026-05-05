@@ -1546,19 +1546,22 @@ export const FinanceProvider = ({ children }) => {
           const catName = cat ? cat.name : id;
 
           // Direct DB check for ALL historical transactions (matching ID or Name)
+          // Using quotes in the OR filter to handle spaces in names correctly
           const { count, error } = await supabase
             .from('transactions')
             .select('*', { count: 'exact', head: true })
             .eq('user_id', targetId)
-            .or(`category.ilike.${id.trim()},category.ilike.${catName.trim()}`)
+            .or(`category.ilike."${id.trim()}",category.ilike."${catName.trim()}"`)
             .ilike('type', type);
 
           if (error) throw error;
 
+          console.log(`[DELETE CHECK] Category: ${id}/${catName}, Count: ${count}`);
+
           if (count > 0) {
             return { 
               success: false, 
-              error: `Cannot delete this category because it has ${count} existing transactions. Please reassign them first.` 
+              error: `The category "${catName}" cannot be deleted because it has ${count} transactions assigned to it. Please reassign them first.` 
             };
           }
 
