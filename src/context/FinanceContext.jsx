@@ -121,11 +121,19 @@ export const FinanceProvider = ({ children }) => {
     if (!user || currentHouseholdId !== user.id) return { error: 'Not household owner' };
     try {
       const targetPrefs = prefsOverride || preferences;
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('profiles')
         .update({ preferences: targetPrefs })
-        .eq('id', user.id);
+        .eq('id', user.id)
+        .select();
+      
       if (error) throw error;
+      
+      if (!data || data.length === 0) {
+        console.warn('[SYNC] Update blocked by RLS policies');
+        return { error: 'Cloud sync blocked by database security. Have you run the SQL migration?' };
+      }
+
       console.log('[SYNC] Preferences saved to database');
       return { success: true };
     } catch (err) {
