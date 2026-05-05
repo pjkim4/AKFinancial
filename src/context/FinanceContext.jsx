@@ -386,43 +386,42 @@ export const FinanceProvider = ({ children }) => {
       
       // Load and merge preferences from profile
       if (data?.preferences) {
-        setPreferences(prev => {
-          const remote = data.preferences;
-          const local = prev;
-          
-          // Merge custom categories
-          const mergedIncome = [...(remote.customCategories?.income || [])];
-          const localIncome = local.customCategories?.income || [];
-          localIncome.forEach(cat => {
-            if (!mergedIncome.some(c => c.id === cat.id)) mergedIncome.push(cat);
-          });
-
-          const mergedExpense = [...(remote.customCategories?.expense || [])];
-          const localExpense = local.customCategories?.expense || [];
-          localExpense.forEach(cat => {
-            if (!mergedExpense.some(c => c.id === cat.id)) mergedExpense.push(cat);
-          });
-
-          const mergedPrefs = {
-            ...local,
-            ...remote,
-            customCategories: {
-              income: mergedIncome,
-              expense: mergedExpense
-            }
-          };
-
-          // If local had data that remote didn't, push the merged version back to DB
-          const remoteHasData = (remote.customCategories?.income?.length || 0) + (remote.customCategories?.expense?.length || 0) > 0;
-          const localHasData = (localIncome.length + localExpense.length) > 0;
-          
-          if (localHasData && !remoteHasData) {
-            console.log('[SYNC] Pushing initial local categories to cloud...');
-            savePreferencesToDB(mergedPrefs);
-          }
-
-          return mergedPrefs;
+        const remote = data.preferences;
+        const localSaved = localStorage.getItem('finance_preferences');
+        const local = localSaved ? JSON.parse(localSaved) : {};
+        
+        // Merge custom categories
+        const mergedIncome = [...(remote.customCategories?.income || [])];
+        const localIncome = local.customCategories?.income || [];
+        localIncome.forEach(cat => {
+          if (!mergedIncome.some(c => c.id === cat.id)) mergedIncome.push(cat);
         });
+
+        const mergedExpense = [...(remote.customCategories?.expense || [])];
+        const localExpense = local.customCategories?.expense || [];
+        localExpense.forEach(cat => {
+          if (!mergedExpense.some(c => c.id === cat.id)) mergedExpense.push(cat);
+        });
+
+        const mergedPrefs = {
+          ...local,
+          ...remote,
+          customCategories: {
+            income: mergedIncome,
+            expense: mergedExpense
+          }
+        };
+
+        setPreferences(mergedPrefs);
+
+        // If local had data that remote didn't, push the merged version back to DB
+        const remoteHasData = (remote.customCategories?.income?.length || 0) + (remote.customCategories?.expense?.length || 0) > 0;
+        const localHasData = (localIncome.length + localExpense.length) > 0;
+        
+        if (localHasData && !remoteHasData) {
+          console.log('[SYNC] Pushing initial local categories to cloud...');
+          syncPreferencesToCloud(mergedPrefs);
+        }
       }
     } catch (error) {
       console.error('Error fetching profile:', error.message);
@@ -1596,7 +1595,7 @@ export const FinanceProvider = ({ children }) => {
               [type]: [...current, { id: name, name, isCustom: true }]
             }
           };
-          syncPreferencesToCloud(updated);
+          syncPreferencesToCloud(updated); // Calling this here is still risky but less likely to cause a black screen than if it crashes
           return updated;
         });
       },
