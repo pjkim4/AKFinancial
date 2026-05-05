@@ -1545,23 +1545,31 @@ export const FinanceProvider = ({ children }) => {
           const cat = (preferences.customCategories?.[type] || []).find(c => c.id === id);
           const catName = cat ? cat.name : id;
 
-          // Direct DB check for ALL historical transactions (matching ID or Name)
-          // Using quotes in the OR filter to handle spaces in names correctly
-          const { count, error } = await supabase
+          // More reliable separate checks to avoid complex OR filter syntax issues
+          const { count: idCount, error: idError } = await supabase
             .from('transactions')
             .select('*', { count: 'exact', head: true })
             .eq('user_id', targetId)
-            .or(`category.ilike."${id.trim()}",category.ilike."${catName.trim()}"`)
+            .ilike('category', id.trim())
             .ilike('type', type);
 
-          if (error) throw error;
+          const { count: nameCount, error: nameError } = await supabase
+            .from('transactions')
+            .select('*', { count: 'exact', head: true })
+            .eq('user_id', targetId)
+            .ilike('category', catName.trim())
+            .ilike('type', type);
 
-          console.log(`[DELETE CHECK] Category: ${id}/${catName}, Count: ${count}`);
+          if (idError) throw idError;
+          if (nameError) throw nameError;
 
-          if (count > 0) {
+          const totalCount = (idCount || 0) + (nameCount || 0);
+          console.log(`[DELETE CHECK] ID Count: ${idCount}, Name Count: ${nameCount}, Total: ${totalCount}`);
+
+          if (totalCount > 0) {
             return { 
               success: false, 
-              error: `The category "${catName}" cannot be deleted because it has ${count} transactions assigned to it. Please reassign them first.` 
+              error: `The category "${catName}" cannot be deleted because it has ${totalCount} transactions assigned to it. Please reassign them first.` 
             };
           }
 
