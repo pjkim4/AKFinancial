@@ -121,20 +121,28 @@ export const FinanceProvider = ({ children }) => {
     if (!user || currentHouseholdId !== user.id) return { error: 'Not household owner' };
     try {
       const targetPrefs = prefsOverride || preferences;
+      console.log('[SYNC] Attempting to save preferences for user:', user.id);
+      
       const { data, error } = await supabase
         .from('profiles')
-        .update({ preferences: targetPrefs })
+        .update({ 
+          preferences: targetPrefs,
+          updated_at: new Date().toISOString()
+        })
         .eq('id', user.id)
         .select();
       
-      if (error) throw error;
+      if (error) {
+        console.error('[SYNC] Supabase error:', error);
+        return { error: `Database error: ${error.message}` };
+      }
       
       if (!data || data.length === 0) {
-        console.warn('[SYNC] Update blocked by RLS policies');
-        return { error: 'Cloud sync blocked by database security. Have you run the SQL migration?' };
+        console.warn('[SYNC] Update blocked by RLS policies. User ID:', user.id);
+        return { error: 'Update blocked by database security. Please ensure you ran the SQL correctly.' };
       }
 
-      console.log('[SYNC] Preferences saved to database');
+      console.log('[SYNC] Successfully saved to cloud. Row updated:', data[0].updated_at);
       return { success: true };
     } catch (err) {
       console.error('[SYNC] Error saving preferences:', err.message);
