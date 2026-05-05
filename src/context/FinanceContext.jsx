@@ -116,6 +116,21 @@ export const FinanceProvider = ({ children }) => {
     localStorage.setItem('finance_preferences', JSON.stringify(preferences));
   }, [preferences]);
 
+  // Helper: Save preferences to Supabase (only if viewing own household)
+  const savePreferencesToDB = async (newPrefs) => {
+    if (!user || currentHouseholdId !== user.id) return;
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ preferences: newPrefs })
+        .eq('id', user.id);
+      if (error) throw error;
+      console.log('[SYNC] Preferences saved to database');
+    } catch (err) {
+      console.error('[SYNC] Error saving preferences:', err.message);
+    }
+  };
+
   useEffect(() => {
     if (!supabase) {
       console.error('Supabase client not initialized');
@@ -365,6 +380,12 @@ export const FinanceProvider = ({ children }) => {
       
       if (error && error.code !== 'PGRST116') throw error;
       setProfile(data);
+      
+      // Load preferences from profile if available
+      if (data?.preferences) {
+        console.log('[SYNC] Loading preferences from your profile');
+        setPreferences(prev => ({ ...prev, ...data.preferences }));
+      }
     } catch (error) {
       console.error('Error fetching profile:', error.message);
     }
@@ -450,7 +471,7 @@ export const FinanceProvider = ({ children }) => {
     try {
       console.log(`[SYNC] [v${currentVersion}] Starting data sync for ID:`, targetId);
 
-      const [accountsRes, transactionsRes] = await Promise.all([
+      const [accountsRes, transactionsRes, profileRes] = await Promise.all([
         supabase
           .from('accounts')
           .select('*')
@@ -461,7 +482,12 @@ export const FinanceProvider = ({ children }) => {
           .select('*')
           .eq('user_id', targetId)
           .order('date', { ascending: false })
-          .limit(1000)
+          .limit(1000),
+        supabase
+          .from('profiles')
+          .select('preferences')
+          .eq('id', targetId)
+          .single()
       ]);
       
       // If a newer request has started, ignore this one
@@ -475,6 +501,12 @@ export const FinanceProvider = ({ children }) => {
 
       setAccounts(accountsRes.data || []);
       setTransactions(transactionsRes.data || []);
+
+      // Update preferences from the household owner's profile
+      if (profileRes.data?.preferences) {
+        console.log(`[SYNC] [v${currentVersion}] Loading preferences for household:`, targetId);
+        setPreferences(prev => ({ ...prev, ...profileRes.data.preferences }));
+      }
 
     } catch (err) {
       if (currentVersion === syncVersionRef.current) {
@@ -1504,20 +1536,29 @@ export const FinanceProvider = ({ children }) => {
       },
 
       preferences,
-      updatePreferences: (newPrefs) => setPreferences(prev => ({ ...prev, ...newPrefs })),
-      toggleBalances: () => setPreferences(prev => ({ ...prev, hideBalances: !prev.hideBalances })),
+      updatePreferences: (newPrefs) => setPreferences(prev => {
+        const updated = { ...prev, ...newPrefs };
+        savePreferencesToDB(updated);
+        return updated;
+      }),
+      toggleBalances: () => setPreferences(prev => {
+        const updated = { ...prev, hideBalances: !prev.hideBalances };
+        savePreferencesToDB(updated);
+        return updated;
+      }),
       addCustomCategory: (type, name) => {
         setPreferences(prev => {
           const current = prev.customCategories?.[type] || [];
           if (current.some(c => c.id === name)) return prev;
-          return {
+          const updated = {
             ...prev,
             customCategories: {
               ...prev.customCategories,
               [type]: [...current, { id: name, name, isCustom: true }]
             }
           };
-
+          savePreferencesToDB(updated);
+          return updated;
         });
       },
       addCustomCategories: (categories) => {
@@ -1531,10 +1572,12 @@ export const FinanceProvider = ({ children }) => {
             }
           });
 
-          return {
+          const updated = {
             ...prev,
             customCategories: newCustomCategories
           };
+          savePreferencesToDB(updated);
+          return updated;
         });
       },
       deleteCustomCategory: async (type, id) => {
@@ -1573,47 +1616,62 @@ export const FinanceProvider = ({ children }) => {
             };
           }
 
-          setPreferences(prev => ({
+          const updated = {
             ...prev,
             customCategories: {
               ...prev.customCategories,
               [type]: (prev.customCategories?.[type] || []).filter(c => c.id !== id)
             }
-          }));
-          return { success: true };
-        } catch (err) {
-          console.error('Delete category error:', err);
-          return { error: err.message };
-        }
+          };
+          savePreferencesToDB(updated);
+          return updated;
+        });
+        return { success: true };
       },
       updateCustomCategory: (type, id, newName) => {
-        setPreferences(prev => ({
-          ...prev,
-          customCategories: {
-            ...prev.customCategories,
-            [type]: (prev.customCategories?.[type] || []).map(c => 
-              c.id === id ? { ...c, name: newName } : c
-            )
-          }
-        }));
+        setPreferences(prev => {
+          const updated = {
+            ...prev,
+            customCategories: {
+              ...prev.customCategories,
+              [type]: (prev.customCategories?.[type] || []).map(c => 
+                c.id === id ? { ...c, name: newName } : c
+              )
+            }
+          };
+          savePreferencesToDB(updated);
+          return updated;
+        });
       },
       addCustomRole: (name) => {
-        setPreferences(prev => ({
-          ...prev,
-          customRoles: [...(prev.customRoles || []), { id: name, name }]
-        }));
+        setPreferences(prev => {
+          const updated = {
+            ...prev,
+            customRoles: [...(prev.customRoles || []), { id: name, name }]
+          };
+          savePreferencesToDB(updated);
+          return updated;
+        });
       },
       deleteCustomRole: (id) => {
-        setPreferences(prev => ({
-          ...prev,
-          customRoles: (prev.customRoles || []).filter(r => r.id !== id)
-        }));
+        setPreferences(prev => {
+          const updated = {
+            ...prev,
+            customRoles: (prev.customRoles || []).filter(r => r.id !== id)
+          };
+          savePreferencesToDB(updated);
+          return updated;
+        });
       },
       updateCustomRole: (id, newName) => {
-        setPreferences(prev => ({
-          ...prev,
-          customRoles: (prev.customRoles || []).map(r => r.id === id ? { ...r, name: newName } : r)
-        }));
+        setPreferences(prev => {
+          const updated = {
+            ...prev,
+            customRoles: (prev.customRoles || []).map(r => r.id === id ? { ...r, name: newName } : r)
+          };
+          savePreferencesToDB(updated);
+          return updated;
+        });
       },
 
 
