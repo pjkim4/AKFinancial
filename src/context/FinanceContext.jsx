@@ -406,25 +406,21 @@ export const FinanceProvider = ({ children }) => {
         const localSaved = localStorage.getItem('finance_preferences');
         const local = localSaved ? JSON.parse(localSaved) : {};
         
-        // Merge custom categories
-        const mergedIncome = [...(remote.customCategories?.income || [])];
-        const localIncome = local.customCategories?.income || [];
-        localIncome.forEach(cat => {
-          if (!mergedIncome.some(c => c.id === cat.id)) mergedIncome.push(cat);
-        });
-
-        const mergedExpense = [...(remote.customCategories?.expense || [])];
-        const localExpense = local.customCategories?.expense || [];
-        localExpense.forEach(cat => {
-          if (!mergedExpense.some(c => c.id === cat.id)) mergedExpense.push(cat);
-        });
+        // Helper to union category arrays by ID
+        const unionCategories = (remoteArr, localArr) => {
+          const merged = [...(remoteArr || [])];
+          (localArr || []).forEach(cat => {
+            if (!merged.some(c => c.id === cat.id)) merged.push(cat);
+          });
+          return merged;
+        };
 
         const mergedPrefs = {
           ...local,
           ...remote,
           customCategories: {
-            income: mergedIncome,
-            expense: mergedExpense
+            income: unionCategories(remote.customCategories?.income, local.customCategories?.income),
+            expense: unionCategories(remote.customCategories?.expense, local.customCategories?.expense)
           }
         };
 
@@ -432,7 +428,7 @@ export const FinanceProvider = ({ children }) => {
 
         // If local had data that remote didn't, push the merged version back to DB
         const remoteHasData = (remote.customCategories?.income?.length || 0) + (remote.customCategories?.expense?.length || 0) > 0;
-        const localHasData = (localIncome.length + localExpense.length) > 0;
+        const localHasData = (local.customCategories?.income?.length || 0) + (local.customCategories?.expense?.length || 0) > 0;
         
         if (localHasData && !remoteHasData) {
           console.log('[SYNC] Pushing initial local categories to cloud...');
@@ -555,10 +551,29 @@ export const FinanceProvider = ({ children }) => {
       setAccounts(accountsRes.data || []);
       setTransactions(transactionsRes.data || []);
 
-      // Update preferences from the household owner's profile
+      // Update preferences from the household owner's profile (with merging)
       if (profileRes.data?.preferences) {
-        console.log(`[SYNC] [v${currentVersion}] Loading preferences for household:`, targetId);
-        setPreferences(prev => ({ ...prev, ...profileRes.data.preferences }));
+        console.log(`[SYNC] [v${currentVersion}] Loading and merging preferences for household:`, targetId);
+        const remote = profileRes.data.preferences;
+        
+        setPreferences(prev => {
+          const unionCategories = (remoteArr, localArr) => {
+            const merged = [...(remoteArr || [])];
+            (localArr || []).forEach(cat => {
+              if (!merged.some(c => c.id === cat.id)) merged.push(cat);
+            });
+            return merged;
+          };
+
+          return {
+            ...prev,
+            ...remote,
+            customCategories: {
+              income: unionCategories(remote.customCategories?.income, prev.customCategories?.income),
+              expense: unionCategories(remote.customCategories?.expense, prev.customCategories?.expense)
+            }
+          };
+        });
       }
 
     } catch (err) {
