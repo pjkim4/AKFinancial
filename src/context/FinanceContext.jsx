@@ -1466,7 +1466,6 @@ export const FinanceProvider = ({ children }) => {
       calculateNextPaymentDate,
       login, signup, logout, fetchData, updateProfile, updatePassword, sendPasswordResetEmail,
       setAccounts,
-      addCustomCategories,
       reassignCategory: async (type, oldCategory, newCategory) => {
         try {
           const { error } = await supabase
