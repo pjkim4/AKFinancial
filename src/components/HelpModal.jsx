@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, HelpCircle, Wallet, History, Users, Shield, Zap, Info, Eye, MousePointer2, FileOutput } from 'lucide-react';
+import { X, HelpCircle, Wallet, History, Users, Shield, Zap, Info, Eye, MousePointer2, FileOutput, Upload, List } from 'lucide-react';
 
 const HelpModal = ({ isOpen, onClose, t }) => {
   useEffect(() => {
@@ -68,9 +68,19 @@ const HelpModal = ({ isOpen, onClose, t }) => {
       content: "Go to the 'Reports' or 'History' tab to export your data. You can download an .IIF file specifically formatted for QuickBooks imports."
     },
     {
+      icon: <Upload className="text-primary" />,
+      title: "Chart of Accounts",
+      content: "Import your existing QuickBooks categories in 'Admin Settings'. Upload a CSV to bulk-create categories. The system automatically detects duplicates to keep your list clean."
+    },
+    {
+      icon: <List className="text-primary" />,
+      title: "Category Safety",
+      content: "Categories with active transactions cannot be deleted. Use the 'Move' icon in Admin Settings to migrate history to a new category before removing the old one."
+    },
+    {
       icon: <Info className="text-primary" />,
       title: "Admin Controls",
-      content: "If you are a platform admin, you can manage user access and approve new members in the 'Admin' dashboard."
+      content: "Manage your profile, household settings, and category lists in the Admin tab. This is where you control the core structure of your financial workspace."
     }
   ];
 
