@@ -381,10 +381,45 @@ export const FinanceProvider = ({ children }) => {
       if (error && error.code !== 'PGRST116') throw error;
       setProfile(data);
       
-      // Load preferences from profile if available
+      // Load and merge preferences from profile
       if (data?.preferences) {
-        console.log('[SYNC] Loading preferences from your profile');
-        setPreferences(prev => ({ ...prev, ...data.preferences }));
+        setPreferences(prev => {
+          const remote = data.preferences;
+          const local = prev;
+          
+          // Merge custom categories
+          const mergedIncome = [...(remote.customCategories?.income || [])];
+          const localIncome = local.customCategories?.income || [];
+          localIncome.forEach(cat => {
+            if (!mergedIncome.some(c => c.id === cat.id)) mergedIncome.push(cat);
+          });
+
+          const mergedExpense = [...(remote.customCategories?.expense || [])];
+          const localExpense = local.customCategories?.expense || [];
+          localExpense.forEach(cat => {
+            if (!mergedExpense.some(c => c.id === cat.id)) mergedExpense.push(cat);
+          });
+
+          const mergedPrefs = {
+            ...local,
+            ...remote,
+            customCategories: {
+              income: mergedIncome,
+              expense: mergedExpense
+            }
+          };
+
+          // If local had data that remote didn't, push the merged version back to DB
+          const remoteHasData = (remote.customCategories?.income?.length || 0) + (remote.customCategories?.expense?.length || 0) > 0;
+          const localHasData = (localIncome.length + localExpense.length) > 0;
+          
+          if (localHasData && !remoteHasData) {
+            console.log('[SYNC] Pushing initial local categories to cloud...');
+            savePreferencesToDB(mergedPrefs);
+          }
+
+          return mergedPrefs;
+        });
       }
     } catch (error) {
       console.error('Error fetching profile:', error.message);
