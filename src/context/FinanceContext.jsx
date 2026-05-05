@@ -1538,6 +1538,19 @@ export const FinanceProvider = ({ children }) => {
         });
       },
       deleteCustomCategory: (type, id) => {
+        // Find if any transactions exist for this category
+        const hasTransactions = (transactions || []).some(t => 
+          String(t.category || '').toLowerCase().trim() === String(id || '').toLowerCase().trim() && 
+          String(t.type || '').toLowerCase() === type.toLowerCase()
+        );
+
+        if (hasTransactions) {
+          return { 
+            success: false, 
+            error: `Cannot delete this category because it has existing transactions. Please reassign them first.` 
+          };
+        }
+
         setPreferences(prev => ({
           ...prev,
           customCategories: {
@@ -1545,6 +1558,7 @@ export const FinanceProvider = ({ children }) => {
             [type]: (prev.customCategories?.[type] || []).filter(c => c.id !== id)
           }
         }));
+        return { success: true };
       },
       updateCustomCategory: (type, id, newName) => {
         setPreferences(prev => ({

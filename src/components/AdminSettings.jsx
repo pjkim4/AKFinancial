@@ -533,18 +533,11 @@ const AdminSettings = () => {
                       </button>
                       <button 
                         onClick={() => {
-                          const hasTransactions = transactions.some(t => 
-                            String(t.category || '').toLowerCase().trim() === String(cat.id || '').toLowerCase().trim() && 
-                            String(t.type || '').toLowerCase() === type.toLowerCase()
-                          );
-                          
-                          if (hasTransactions) {
-                            alert(`Cannot delete "${cat.name}" because it has existing transactions. Please move them first.`);
-                            return;
-                          }
-                          
                           if (confirm(`Are you sure you want to delete the category "${cat.name}"?`)) {
-                            deleteCustomCategory(type, cat.id);
+                            const result = deleteCustomCategory(type, cat.id);
+                            if (result?.error) {
+                              alert(result.error);
+                            }
                           }
                         }}
                         className="p-2 bg-danger/20 text-danger rounded-lg hover:bg-danger hover:text-white transition-all"

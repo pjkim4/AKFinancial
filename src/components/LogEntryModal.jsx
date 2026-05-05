@@ -223,8 +223,12 @@ const LogEntryModal = ({ isOpen, onClose }) => {
                   }}
                   onDelete={(id) => {
                     if (confirm('Delete this custom category?')) {
-                      deleteCustomCategory(modalType, id);
-                      if (formData.category === id) setFormData(prev => ({ ...prev, category: '' }));
+                      const result = deleteCustomCategory(modalType, id);
+                      if (result?.error) {
+                        alert(result.error);
+                      } else {
+                        if (formData.category === id) setFormData(prev => ({ ...prev, category: '' }));
+                      }
                     }
                   }}
                   placeholder={t('tx_search_cat') || "Search Category..."} 
