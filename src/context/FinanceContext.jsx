@@ -1466,6 +1466,43 @@ export const FinanceProvider = ({ children }) => {
       calculateNextPaymentDate,
       login, signup, logout, fetchData, updateProfile, updatePassword, sendPasswordResetEmail,
       setAccounts,
+      addCustomCategories,
+      reassignCategory: async (type, oldCategory, newCategory) => {
+        try {
+          const { error } = await supabase
+            .from('transactions')
+            .update({ category: newCategory })
+            .eq('user_id', currentHouseholdId || user.id)
+            .eq('category', oldCategory)
+            .eq('type', type.charAt(0).toUpperCase() + type.slice(1));
+          
+          if (error) throw error;
+          setTransactions(prev => prev.map(t => 
+            (t.category === oldCategory && t.type.toLowerCase() === type.toLowerCase()) 
+            ? { ...t, category: newCategory } 
+            : t
+          ));
+          return { success: true };
+        } catch (err) {
+          return { error: err };
+        }
+      },
+      updateTransactionsCategory: async (ids, newCategory) => {
+        try {
+          const { error } = await supabase
+            .from('transactions')
+            .update({ category: newCategory })
+            .in('id', ids);
+          
+          if (error) throw error;
+          setTransactions(prev => prev.map(t => 
+            ids.includes(t.id) ? { ...t, category: newCategory } : t
+          ));
+          return { success: true };
+        } catch (err) {
+          return { error: err };
+        }
+      },
 
       preferences,
       updatePreferences: (newPrefs) => setPreferences(prev => ({ ...prev, ...newPrefs })),
@@ -1482,6 +1519,23 @@ export const FinanceProvider = ({ children }) => {
             }
           };
 
+        });
+      },
+      addCustomCategories: (categories) => {
+        setPreferences(prev => {
+          const newCustomCategories = { ...(prev.customCategories || { expense: [], income: [] }) };
+          
+          categories.forEach(({ type, name }) => {
+            const current = newCustomCategories[type] || [];
+            if (!current.some(c => c.id === name)) {
+              newCustomCategories[type] = [...current, { id: name, name, isCustom: true }];
+            }
+          });
+
+          return {
+            ...prev,
+            customCategories: newCustomCategories
+          };
         });
       },
       deleteCustomCategory: (type, id) => {

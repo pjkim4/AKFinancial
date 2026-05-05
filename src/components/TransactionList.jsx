@@ -156,6 +156,7 @@ const TransactionList = () => {
     addCustomCategory,
     deleteCustomCategory,
     updateCustomCategory,
+    updateTransactionsCategory,
     t
   } = useFinance();
 
@@ -169,6 +170,8 @@ const TransactionList = () => {
   const [showBulkConfirm, setShowBulkConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showBulkCategoryModal, setShowBulkCategoryModal] = useState(false);
+  const [bulkCategory, setBulkCategory] = useState('');
   
   // Bulk Selection State
   const [selectedIds, setSelectedIds] = useState([]);
@@ -674,14 +677,24 @@ const TransactionList = () => {
           </button>
 
           {selectedIds.length > 0 && (
-            <button 
-              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowBulkConfirm(true); }}
-              disabled={loading}
-              className="btn bg-danger text-white border border-danger/20 hover:bg-danger/90 h-14 px-6 transition-all animate-scale-in shadow-lg shadow-danger/20 flex-1 md:flex-none"
-            >
-              <Trash2 size={18} />
-              <span className="font-black text-xs uppercase">Delete ({selectedIds.length})</span>
-            </button>
+            <div className="flex gap-2 flex-1 md:flex-none">
+              <button 
+                onClick={() => setShowBulkCategoryModal(true)}
+                disabled={loading}
+                className="btn bg-primary/10 text-primary border border-primary/30 hover:bg-primary hover:text-black h-14 px-6 transition-all animate-scale-in flex-1 md:flex-none"
+              >
+                <Edit2 size={18} />
+                <span className="font-black text-xs uppercase">Edit Category ({selectedIds.length})</span>
+              </button>
+              <button 
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowBulkConfirm(true); }}
+                disabled={loading}
+                className="btn bg-danger text-white border border-danger/20 hover:bg-danger/90 h-14 px-6 transition-all animate-scale-in shadow-lg shadow-danger/20 flex-1 md:flex-none"
+              >
+                <Trash2 size={18} />
+                <span className="font-black text-xs uppercase">Delete</span>
+              </button>
+            </div>
           )}
 
           <button 
@@ -805,6 +818,57 @@ const TransactionList = () => {
                 </button>
                 <button 
                   onClick={() => setShowBulkConfirm(false)}
+                  className="btn btn-secondary border-white/10 h-14 font-bold uppercase text-xs tracking-widest"
+                >
+                  Cancel
+                </button>
+              </div>
+           </div>
+        </div>,
+        document.body
+      )}
+
+      {showBulkCategoryModal && createPortal(
+        <div className="fixed inset-0 z-max flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl">
+           <div className="card w-full max-w-sm border-primary/30 bg-card p-10 text-center shadow-2xl animate-scale-in">
+              <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-primary/20">
+                <Edit2 size={40} className="text-primary" />
+              </div>
+              <h3 className="text-2xl font-black mb-2 uppercase text-primary">Batch Update Category</h3>
+              <p className="text-text-muted text-sm font-bold mb-6">Assign {selectedIds.length} items to a new category.</p>
+              
+              <div className="mb-8">
+                <SearchableSelect 
+                  options={[...allCategories.income, ...allCategories.expense].filter((v, i, a) => a.findIndex(t => t.id === v.id) === i)}
+                  value={bulkCategory}
+                  onChange={(val) => setBulkCategory(val)}
+                  placeholder="Select Target Category"
+                  className="!h-14 !rounded-2xl"
+                />
+              </div>
+
+              <div className="flex flex-col gap-4">
+                <button 
+                  onClick={async () => {
+                    if (!bulkCategory) return;
+                    setLoading(true);
+                    const result = await updateTransactionsCategory(selectedIds, bulkCategory);
+                    setLoading(false);
+                    if (!result.error) {
+                      setSelectedIds([]);
+                      setShowBulkCategoryModal(false);
+                      setBulkCategory('');
+                    } else {
+                      alert('Update failed: ' + result.error.message);
+                    }
+                  }}
+                  disabled={loading || !bulkCategory}
+                  className="btn bg-primary text-black h-16 font-black uppercase text-sm tracking-widest hover:bg-primary/90 disabled:opacity-50"
+                >
+                  {loading ? <Loader2 className="animate-spin" /> : `Apply to ${selectedIds.length} Items`}
+                </button>
+                <button 
+                  onClick={() => setShowBulkCategoryModal(false)}
                   className="btn btn-secondary border-white/10 h-14 font-bold uppercase text-xs tracking-widest"
                 >
                   Cancel

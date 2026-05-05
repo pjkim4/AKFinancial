@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useFinance } from '../context/FinanceContext';
-import { Shield, User, Key, Save, AlertCircle, Mail, Zap, Users, Trash2, Plus, X, Check, Edit2, Briefcase } from 'lucide-react';
+import { Shield, User, Key, Save, AlertCircle, Mail, Zap, Users, Trash2, Plus, X, Check, Edit2, Briefcase, Upload, Repeat } from 'lucide-react';
+import COAImporter from './COAImporter';
 
 const AdminSettings = () => {
   const { 
@@ -15,7 +16,9 @@ const AdminSettings = () => {
     addCustomCategory,
     addCustomRole,
     deleteCustomRole,
-    updateCustomRole
+    updateCustomRole,
+    reassignCategory,
+    transactions
   } = useFinance();
 
   const [isAddingMember, setIsAddingMember] = useState(false);
@@ -25,6 +28,7 @@ const AdminSettings = () => {
   const [editMemberData, setEditMemberData] = useState({ name: '', role: 'Spouse', color: '#c1ff72' });
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteAccessLevel, setInviteAccessLevel] = useState('read');
+  const [showCOAImporter, setShowCOAImporter] = useState(false);
 
   const [formData, setFormData] = useState({
     username: profile?.username || user?.email?.split('@')[0] || '',
@@ -478,9 +482,17 @@ const AdminSettings = () => {
 
       {/* Category Manager Section */}
       <section className="card glass border-white/10 p-8 space-y-6">
-        <div className="flex items-center gap-3">
-          <Plus size={24} className="text-primary" />
-          <h3 className="font-black text-lg uppercase italic">Category Manager</h3>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Plus size={24} className="text-primary" />
+            <h3 className="font-black text-lg uppercase italic">Category Manager</h3>
+          </div>
+          <button 
+            onClick={() => setShowCOAImporter(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary border border-primary/20 rounded-xl hover:bg-primary hover:text-black transition-all text-[10px] font-black uppercase tracking-widest"
+          >
+            <Upload size={14} /> Import COA
+          </button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -492,6 +504,22 @@ const AdminSettings = () => {
                   <div key={cat.id} className="flex items-center justify-between p-3 bg-white/5 border border-white/10 rounded-xl">
                     <span className="text-sm font-black uppercase tracking-wider text-white italic">{cat.name}</span>
                     <div className="flex items-center gap-2">
+                      <button 
+                        onClick={() => {
+                          const relevantTxs = transactions.filter(t => 
+                            t.category === cat.id && t.type.toLowerCase() === type.toLowerCase()
+                          );
+                          const count = relevantTxs.length;
+                          const newName = prompt(`Move ${count} transactions from "${cat.name}" to:`);
+                          if (newName && confirm(`Confirm moving ${count} items to "${newName}"?`)) {
+                            reassignCategory(type, cat.id, newName);
+                          }
+                        }}
+                        title="Move transactions to another category"
+                        className="p-2 bg-primary/20 text-primary rounded-lg"
+                      >
+                        <Repeat size={14} />
+                      </button>
                       <button 
                         onClick={() => {
                           const newName = prompt('New name:', cat.name);
@@ -536,6 +564,8 @@ const AdminSettings = () => {
           {window.location.origin}
         </div>
       </div>
+
+      {showCOAImporter && <COAImporter onClose={() => setShowCOAImporter(false)} />}
     </div>
   );
 };
