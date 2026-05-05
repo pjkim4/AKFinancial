@@ -125,18 +125,26 @@ const AdminSettings = () => {
       {/* EMERGENCY TROUBLESHOOTING BOX */}
       <div className="p-4 bg-danger/10 border-2 border-danger rounded-2xl">
         <p className="text-[10px] text-danger font-black uppercase tracking-widest mb-3 text-center">{t('diagnostic_mode')}</p>
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
           <div className="bg-black/20 p-2 rounded-xl border border-danger/20 text-center">
-            <p className="text-[7px] text-text-muted mb-1 uppercase">{t('user')}</p>
-            <p className="text-[9px] font-mono truncate text-white">{user?.email?.split('@')[0]}</p>
+            <p className="text-[7px] text-text-muted mb-1 uppercase">User ID</p>
+            <p className="text-[9px] font-mono truncate text-white">{user?.id?.slice(0, 8)}</p>
           </div>
           <div className="bg-black/20 p-2 rounded-xl border border-danger/20 text-center">
-            <p className="text-[7px] text-text-muted mb-1 uppercase">{t('pending')}</p>
-            <p className="text-md font-black font-mono text-danger">{pendingInvitations.length}</p>
+            <p className="text-[7px] text-text-muted mb-1 uppercase">Household</p>
+            <p className="text-[9px] font-mono truncate text-white">{currentHouseholdId?.slice(0, 8)}</p>
           </div>
           <div className="bg-black/20 p-2 rounded-xl border border-danger/20 text-center">
-            <p className="text-[7px] text-text-muted mb-1 uppercase">{t('joined')}</p>
-            <p className="text-md font-black font-mono text-success">{availableHouseholds.length}</p>
+            <p className="text-[7px] text-text-muted mb-1 uppercase">Custom Cats</p>
+            <p className="text-md font-black font-mono text-primary">
+              {(preferences.customCategories?.income?.length || 0) + (preferences.customCategories?.expense?.length || 0)}
+            </p>
+          </div>
+          <div className="bg-black/20 p-2 rounded-xl border border-danger/20 text-center">
+            <p className="text-[7px] text-text-muted mb-1 uppercase">Roles</p>
+            <p className="text-md font-black font-mono text-white">
+              {preferences.customRoles?.length || 0}
+            </p>
           </div>
         </div>
 
