@@ -281,7 +281,7 @@ const COAImporter = ({ onClose }) => {
                 </div>
               </div>
 
-              <div className="max-h-[300px] overflow-y-auto pr-2 space-y-2 scrollbar-thin">
+              <div className="max-h-[500px] overflow-y-auto pr-2 space-y-2 scrollbar-thin flex-1">
                 {previewData.map((item) => (
                   <div 
                     key={item.id} 
@@ -310,7 +310,7 @@ const COAImporter = ({ onClose }) => {
                 </div>
               )}
 
-              <div className="flex gap-4">
+              <div className="sticky bottom-0 bg-[#181818] pt-6 pb-2 mt-auto border-t border-white/5 flex gap-4">
                 <button 
                   onClick={() => { setFile(null); setPreviewData([]); }}
                   className="flex-1 h-14 bg-white/5 text-white font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-white/10 transition-all"
