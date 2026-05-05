@@ -1,9 +1,16 @@
 import React, { useState, useRef } from 'react';
 import { Upload, Download, FileText, Check, X, AlertCircle, ChevronRight } from 'lucide-react';
 import { useFinance } from '../context/FinanceContext';
+import { useEffect } from 'react';
 
 const COAImporter = ({ onClose }) => {
   const { addCustomCategories, t } = useFinance();
+  
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = 'unset'; };
+  }, []);
+
   const [file, setFile] = useState(null);
   const [previewData, setPreviewData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -157,10 +164,10 @@ const COAImporter = ({ onClose }) => {
 
   return (
     <div 
-      className="fixed inset-0 z-ultra flex items-center justify-center p-4 bg-black/95 backdrop-blur-md"
+      className="fixed inset-0 z-ultra bg-black/95 backdrop-blur-md overflow-y-auto py-10 px-4"
     >
       <div 
-        className="bg-[#181818] border-2 border-white/10 w-full max-w-2xl rounded-3xl flex flex-col shadow-2xl relative max-h-[95vh] overflow-y-auto"
+        className="bg-[#181818] border-2 border-white/10 w-full max-w-2xl mx-auto rounded-3xl flex flex-col shadow-2xl relative"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
