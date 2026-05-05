@@ -19,7 +19,8 @@ const AdminSettings = () => {
     deleteCustomRole,
     updateCustomRole,
     reassignCategory,
-    transactions
+    transactions,
+    supabase
   } = useFinance();
 
   const [isAddingMember, setIsAddingMember] = useState(false);
@@ -506,19 +507,32 @@ const AdminSettings = () => {
                     <span className="text-sm font-black uppercase tracking-wider text-white italic">{cat.name}</span>
                     <div className="flex items-center gap-2">
                       <button 
-                        onClick={() => {
-                          const relevantTxs = transactions.filter(t => 
-                            String(t.category || '').toLowerCase().trim() === String(cat.id || '').toLowerCase().trim() && 
-                            String(t.type || '').toLowerCase() === type.toLowerCase()
-                          );
-                          const count = relevantTxs.length;
+                        onClick={async () => {
+                          const targetId = currentHouseholdId || user.id;
+                          const { count, error } = await supabase
+                            .from('transactions')
+                            .select('*', { count: 'exact', head: true })
+                            .eq('user_id', targetId)
+                            .ilike('category', cat.id.trim())
+                            .ilike('type', type);
+
+                          if (error) {
+                            alert('Error fetching transactions: ' + error.message);
+                            return;
+                          }
+
+                          if (count === 0) {
+                            alert(`No transactions found for "${cat.name}".`);
+                            return;
+                          }
+
                           const newName = prompt(`Move ${count} transactions from "${cat.name}" to:`);
                           if (newName && confirm(`Confirm moving ${count} items to "${newName}"?`)) {
                             reassignCategory(type, cat.id, newName);
                           }
                         }}
                         title="Move transactions to another category"
-                        className="p-2 bg-primary/20 text-primary rounded-lg"
+                        className="p-2 bg-primary/20 text-primary rounded-lg hover:bg-primary hover:text-black transition-all"
                       >
                         <Repeat size={14} />
                       </button>

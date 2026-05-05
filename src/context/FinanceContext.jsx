@@ -461,7 +461,7 @@ export const FinanceProvider = ({ children }) => {
           .select('*')
           .eq('user_id', targetId)
           .order('date', { ascending: false })
-          .limit(100)
+          .limit(1000)
       ]);
       
       // If a newer request has started, ignore this one
@@ -1456,7 +1456,7 @@ export const FinanceProvider = ({ children }) => {
 
   return (
     <FinanceContext.Provider value={{
-      user, profile, session, accounts, transactions, frequentPayments, recurringSchedules, householdMembers, 
+      supabase, user, profile, session, accounts, transactions, frequentPayments, recurringSchedules, householdMembers, 
       availableHouseholds, pendingInvitations, sentInvitations, currentHouseholdId, setCurrentHouseholdId, loading,
       addTransaction, updateTransaction, deleteTransaction, deleteTransactions,
       transferFunds, adjustBalance, createAccount, updateAccount, deleteAccount,
@@ -1537,28 +1537,38 @@ export const FinanceProvider = ({ children }) => {
           };
         });
       },
-      deleteCustomCategory: (type, id) => {
-        // Find if any transactions exist for this category
-        const hasTransactions = (transactions || []).some(t => 
-          String(t.category || '').toLowerCase().trim() === String(id || '').toLowerCase().trim() && 
-          String(t.type || '').toLowerCase() === type.toLowerCase()
-        );
+      deleteCustomCategory: async (type, id) => {
+        try {
+          const targetId = currentHouseholdId || user.id;
+          // Direct DB check for ALL historical transactions (bypassing local state limit)
+          const { count, error } = await supabase
+            .from('transactions')
+            .select('*', { count: 'exact', head: true })
+            .eq('user_id', targetId)
+            .ilike('category', id.trim())
+            .ilike('type', type);
 
-        if (hasTransactions) {
-          return { 
-            success: false, 
-            error: `Cannot delete this category because it has existing transactions. Please reassign them first.` 
-          };
-        }
+          if (error) throw error;
 
-        setPreferences(prev => ({
-          ...prev,
-          customCategories: {
-            ...prev.customCategories,
-            [type]: (prev.customCategories?.[type] || []).filter(c => c.id !== id)
+          if (count > 0) {
+            return { 
+              success: false, 
+              error: `Cannot delete this category because it has ${count} existing transactions. Please reassign them first.` 
+            };
           }
-        }));
-        return { success: true };
+
+          setPreferences(prev => ({
+            ...prev,
+            customCategories: {
+              ...prev.customCategories,
+              [type]: (prev.customCategories?.[type] || []).filter(c => c.id !== id)
+            }
+          }));
+          return { success: true };
+        } catch (err) {
+          console.error('Delete category error:', err);
+          return { error: err.message };
+        }
       },
       updateCustomCategory: (type, id, newName) => {
         setPreferences(prev => ({
