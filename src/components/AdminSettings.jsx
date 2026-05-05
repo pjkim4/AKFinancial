@@ -11,6 +11,7 @@ const AdminSettings = () => {
     inviteMember, currentHouseholdId, pendingInvitations, sentInvitations, revokeInvitation, respondToInvitation, availableHouseholds, updateInvitationAccessLevel,
     setCurrentHouseholdId,
     preferences,
+    syncPreferencesToCloud,
     t,
     updateCustomCategory,
     deleteCustomCategory,
