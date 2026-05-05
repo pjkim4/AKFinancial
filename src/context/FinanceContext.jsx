@@ -1540,12 +1540,17 @@ export const FinanceProvider = ({ children }) => {
       deleteCustomCategory: async (type, id) => {
         try {
           const targetId = currentHouseholdId || user.id;
-          // Direct DB check for ALL historical transactions (bypassing local state limit)
+          
+          // Find the name associated with this ID to check for both
+          const cat = (preferences.customCategories?.[type] || []).find(c => c.id === id);
+          const catName = cat ? cat.name : id;
+
+          // Direct DB check for ALL historical transactions (matching ID or Name)
           const { count, error } = await supabase
             .from('transactions')
             .select('*', { count: 'exact', head: true })
             .eq('user_id', targetId)
-            .ilike('category', id.trim())
+            .or(`category.ilike.${id.trim()},category.ilike.${catName.trim()}`)
             .ilike('type', type);
 
           if (error) throw error;
